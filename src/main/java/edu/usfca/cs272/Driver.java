@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -34,32 +35,34 @@ public class Driver {
 	
 	  public static void main(String[] args) {
 		
-		
-		// Check if there are no arguments...
-		if (args.length == 0) {
-			System.out.println("No arguments provided. Exiting.");
-			return;
-		}
-		// Check if there are only values and no flags..
-	    boolean flagPresent = false;
-	    for (String arg : args) {
-	        if (arg.startsWith("-")) {
-	            flagPresent = true;
-	            break;
-	        }
-	    }
-	    if (!flagPresent) {
-	        System.out.println("Only values given, no flags.");
-	        return;
-	    }
+		 // Print initial args for debugging
+	     System.out.println("Initial args: " + Arrays.toString(args));
 
+	     // Instantiate ArgumentParser with the command-line args
+	     ArgumentParser parser = new ArgumentParser(args);
+
+	     // Get the input and output paths
+	     Path inputPath = parser.getPath("-text");
+	     Path outputPath = parser.getPath("-counts");
+
+	     // Check if the input and output paths are valid
+	     if (inputPath == null || outputPath == null) {
+	    	 System.out.println("Missing input or output path");
+	         return;
+	     }
+
+	     // Print input and output paths for debugging
+	     System.out.println("Input Path: " + inputPath);
+	     System.out.println("Output Path: " + outputPath);
+		
+		
 
 	    // Handling arguments
 		// In this case, the input path will be arg 1
 		// The output path is arg 3
 		// This is my assumption
-	    Path inputPath = Paths.get(args[1]); // Arg1
-	    Path outputPath = Paths.get(args[3]); // Arg3
+	    // Path inputPath = Paths.get(args[1]); // Arg1
+	    // Path outputPath = Paths.get(args[3]); // Arg3
 
 	    // Decide if the input is a file or directory
 	    if (Files.isRegularFile(inputPath)) {

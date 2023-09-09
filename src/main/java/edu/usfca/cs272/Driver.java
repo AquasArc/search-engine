@@ -29,64 +29,74 @@ import java.io.FileWriter;
  */
 public class Driver {
 	  /* Important Self-Reminder: 
-	  * Maybe create a helper function to deal
-	  * with some of the exception handling
+	  * Maybe for a design idea, create a helper function to deal
+	  * with exception handling.
+	  * Also, I currently am some what hard coding the counts,
+	  * input and output flags. I need to figure out later how to 
+	  * make it more universal...
 	  */
 	
 	  public static void main(String[] args) {
-		
-		 // Print initial args for debugging
-	     System.out.println("Initial args: " + Arrays.toString(args));
+		  // Print initial args for debugging
+		  System.out.println("Initial args: " + Arrays.toString(args));
 
-	     // Instantiate ArgumentParser with the command-line args
-	     ArgumentParser parser = new ArgumentParser(args);
+		  // Instantiate ArgumentParser with the command-line args
+		  ArgumentParser parser = new ArgumentParser(args);
 
-	     // Get the input and output paths
-	     Path inputPath = parser.getPath("-text");
-	     Path outputPath = parser.getPath("-counts");
+		  // Get the input and output paths
+		  Path inputPath = parser.getPath("-text");
+		  Path outputPath = parser.getPath("-counts");
+		  
+		  // If outputPath is null, set a default path
+		  if (outputPath == null) {
+		      outputPath = Paths.get("counts.json"); // Default
+		  }
+		  
+		  // Print the paths for debugging
+		  System.out.println("Parsed Input Path: " + (inputPath == null ? "null" : inputPath.toString()));
+		  System.out.println("Parsed Output Path: " + (outputPath == null ? "null" : outputPath.toString()));
+		  
+		  if (inputPath == null && outputPath != null) {
+			  // Handle -counts only case
+		      String jsonOutput = "{\n}"; // default empty JSON
+		      try {
+		    	  System.out.println("About to write to: " + outputPath.toString());
+		    	  Files.writeString(outputPath, jsonOutput);
+		      } catch (IOException e) {
+		    	  System.out.println("Error writing to output file: " + outputPath);
+		      }
+		      return;
+		  }
+		  
+		  if (inputPath != null) {
+			  if (Files.isRegularFile(inputPath)) {
+				  long wordCount = processFile(inputPath);
 
-	     // Check if the input and output paths are valid
-	     if (inputPath == null || outputPath == null) {
-	    	 System.out.println("Missing input or output path");
-	         return;
-	     }
+				  if (outputPath != null) {
+					  String jsonOutput;
+					  if (wordCount == 0) {
+						  jsonOutput = "{\n}";
+					  } else {
+						  jsonOutput = String.format("{\n  \"%s\": %d\n}", inputPath.toString(), wordCount);
+					  }
 
-	     // Print input and output paths for debugging
-	     System.out.println("Input Path: " + inputPath);
-	     System.out.println("Output Path: " + outputPath);
-		
-		
-
-	    // Handling arguments
-		// In this case, the input path will be arg 1
-		// The output path is arg 3
-		// This is my assumption
-	    // Path inputPath = Paths.get(args[1]); // Arg1
-	    // Path outputPath = Paths.get(args[3]); // Arg3
-
-	    // Decide if the input is a file or directory
-	    if (Files.isRegularFile(inputPath)) {
-	      long wordCount = processFile(inputPath);
-	      
-	      // Output wordCount in JSON format
-	      String jsonOutput;
-	      if (wordCount == 0) {
-	        jsonOutput = "{\n}";
-	      } else {
-	        jsonOutput = String.format("{\n  \"%s\": %d\n}", inputPath.toString(), wordCount);
-	      }
-
-	      try {
-	        Files.writeString(outputPath, jsonOutput);
-	      } catch (IOException e) {
-	        System.out.println("Error writing to output file: " + outputPath);
-	      }
-
-	    } else if (Files.isDirectory(inputPath)) {
-	    	processDirectory(inputPath, outputPath);
-	    } else {
-	      System.out.println("Invalid input path");
-	    }
+					  try {
+					      // Print statement to log what is being written
+					      System.out.println("About to write to: " + outputPath.toString());
+					      System.out.println("Content to write: \n" + jsonOutput);
+						  Files.writeString(outputPath, jsonOutput);
+					  } catch (IOException e) {
+						  System.out.println("Error writing to output file: " + outputPath);
+					  }
+				  }
+			  } else if (Files.isDirectory(inputPath)) {
+				  if (outputPath != null) {
+					  processDirectory(inputPath, outputPath);
+				  }
+			  } else {
+				  System.out.println("Invalid input path");
+			  }
+		  }
 	  }
 
 	  public static long processFile(Path filePath) {
@@ -148,7 +158,6 @@ public class Driver {
 		    }
 		}
 
-
 	  public static long countWordsInFile(Path filePath) throws IOException {
 	    List<String> lines = Files.readAllLines(filePath);
 	    long wordCount = 0;
@@ -165,3 +174,5 @@ public class Driver {
 	    return wordCount;
 	  }
 	}
+
+	

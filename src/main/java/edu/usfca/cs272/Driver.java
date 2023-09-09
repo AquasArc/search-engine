@@ -37,6 +37,19 @@ public class Driver {
 			System.out.println("No arguments provided. Exiting.");
 			return;
 		}
+		// Check if there are only values and no flags..
+	    boolean flagPresent = false;
+	    for (String arg : args) {
+	        if (arg.startsWith("-")) {
+	            flagPresent = true;
+	            break;
+	        }
+	    }
+	    if (!flagPresent) {
+	        System.out.println("Only values given, no flags.");
+	        return;
+	    }
+
 	    // Handling arguments
 		// In this case, the input path will be arg 1
 		// The output path is arg 2

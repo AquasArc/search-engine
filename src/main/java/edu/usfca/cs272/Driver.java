@@ -33,10 +33,6 @@ public class Driver {
 	  */
 	
 	  public static void main(String[] args) {
-		// Creating a hashset for valid flags...
-		Set<String> validFlags = new HashSet<>();
-		validFlags.add("-input");
-		validFlags.add("-output");
 		
 		
 		// Check if there are no arguments...
@@ -60,10 +56,10 @@ public class Driver {
 
 	    // Handling arguments
 		// In this case, the input path will be arg 1
-		// The output path is arg 2
+		// The output path is arg 3
 		// This is my assumption
 	    Path inputPath = Paths.get(args[1]); // Arg1
-	    Path outputPath = Paths.get(args[3]); // Arg2
+	    Path outputPath = Paths.get(args[3]); // Arg3
 
 	    // Decide if the input is a file or directory
 	    if (Files.isRegularFile(inputPath)) {

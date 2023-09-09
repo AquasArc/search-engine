@@ -24,51 +24,70 @@ import java.nio.file.FileVisitOption;
  * @version Fall 2023
  */
 public class Driver {
-	public static void main(String[] args) {
-		Instant start = Instant.now();
+	  
+	  public static void main(String[] args) {
+	    // Handle command-line arguments
+	    // For this example, I'll use your original code
+	    Path inputPath = Paths.get(args[1]);
+	    Path outputPath = Paths.get(args[3]);
 
-		System.out.println("Command-line arguments: " + Arrays.toString(args));
+	    // Decide if the input is a file or directory
+	    if (Files.isRegularFile(inputPath)) {
+	      long wordCount = processFile(inputPath);
+	      
+	      // Output wordCount in JSON format
+	      String jsonOutput;
+	      if (wordCount == 0) {
+	        jsonOutput = "{\n}";
+	      } else {
+	        jsonOutput = String.format("{\n  \"%s\": %d\n}", inputPath.toString(), wordCount);
+	      }
 
-		Path inputPath = Paths.get(args[1]);
-		Path outputPath = Paths.get(args[3]);
+	      try {
+	        Files.writeString(outputPath, jsonOutput);
+	      } catch (IOException e) {
+	        System.out.println("Error writing to output file: " + outputPath);
+	      }
 
-		try {
-			long wordCount = countWordsInFile(inputPath);
+	    } else if (Files.isDirectory(inputPath)) {
+	    	//Directory Handling
+	    } else {
+	      System.out.println("Invalid input path");
+	    }
+	  }
 
-			// Output wordCount in JSON format
-			String jsonOutput;
-			if (wordCount == 0) {
-				jsonOutput = "{\n}";
-			} else {
-				jsonOutput = String.format("{\n  \"%s\": %d\n}", inputPath.toString(), wordCount);
-			}
+	  public static long processFile(Path filePath) {
+	    long wordCount = 0;
+	  
+	    // Check if the filePath is a regular file
+	    if (!Files.isRegularFile(filePath)) {
+	      System.out.println("The provided path is not a file: " + filePath);
+	      return 0;
+	    }
+	    
+	    try {
+	      // Count words in the file
+	      wordCount = countWordsInFile(filePath);
+	    } catch (IOException e) {
+	      System.out.println("An error occurred while reading the file: " + filePath);
+	    }
+	    
+	    return wordCount;
+	  }
 
-			Files.writeString(outputPath, jsonOutput);
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		long elapsed = Duration.between(start, Instant.now()).toMillis();
-		double seconds = (double) elapsed / Duration.ofSeconds(1).toMillis();
-		System.out.printf("Elapsed: %f seconds%n", seconds);
+	  public static long countWordsInFile(Path filePath) throws IOException {
+	    List<String> lines = Files.readAllLines(filePath);
+	    long wordCount = 0;
+	  
+	    for (String line : lines) {
+	      // Assuming FileStemmer is another class you have
+	      String cleanedLine = FileStemmer.clean(line);  
+	      String[] words = FileStemmer.split(cleanedLine);
+	  
+	      // Count the words
+	      wordCount += words.length;
+	    }
+	  
+	    return wordCount;
+	  }
 	}
-
-	public static long countWordsInFile(Path filePath) throws IOException {
-		List<String> lines = Files.readAllLines(filePath);
-		long wordCount = 0;
-
-		for (String line : lines) {
-			// Clean the line using FileStemmer
-			String cleanedLine = FileStemmer.clean(line);
-
-			// Split the cleaned line into words
-			String[] words = FileStemmer.split(cleanedLine);
-
-			// Count the words
-			wordCount += words.length;
-		}
-
-		return wordCount;
-	}
-}

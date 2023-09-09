@@ -5,14 +5,15 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.Instant;
-import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.nio.file.FileVisitOption;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.nio.file.FileVisitOption;
+import java.io.Writer;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+
 
 
 /**
@@ -50,7 +51,7 @@ public class Driver {
 	      }
 
 	    } else if (Files.isDirectory(inputPath)) {
-	    	//Directory Handling
+	    	processDirectory(inputPath, outputPath);
 	    } else {
 	      System.out.println("Invalid input path");
 	    }
@@ -74,6 +75,47 @@ public class Driver {
 	    
 	    return wordCount;
 	  }
+	  
+	  public static void processDirectory(Path dirPath, Path outputPath) {
+		    try (Stream<Path> paths = Files.walk(dirPath, FileVisitOption.FOLLOW_LINKS)) {
+		        List<Path> filteredPaths = paths
+		            .filter(Files::isRegularFile)
+		            .filter(path -> path.toString().toLowerCase().endsWith(".txt") || path.toString().toLowerCase().endsWith(".text"))
+		            .collect(Collectors.toList());
+
+		        filteredPaths.sort((p1, p2) -> p1.toString().compareTo(p2.toString()));  // Sorting the string representations
+
+
+		        
+		        try (Writer writer = new BufferedWriter(new FileWriter(outputPath.toFile()))) {
+		            writer.write("{\n"); // Opening curly brace for JSON object
+
+		            boolean firstEntry = true;
+		            for (Path path : filteredPaths) {
+		                long wordCount = countWordsInFile(path);  // This is your existing word count method
+
+		                if (wordCount > 0) {
+		                    if (!firstEntry) {
+		                        writer.write(",\n");  // Comma and newline for previous entry
+		                    }
+		                    firstEntry = false;
+
+		                    writer.write("  \"");  // Indent and start of key
+		                    writer.write(path.toString());
+		                    writer.write("\": ");
+		                    writer.write(Long.toString(wordCount));
+		                }
+		            }
+
+		            writer.write("\n}");  // Close the JSON object
+		        } catch (IOException e) {
+		            System.out.println("An error occurred while writing to the output file: " + outputPath);
+		        }
+		    } catch (IOException e) {
+		        System.out.println("An error occurred while reading the directory: " + dirPath);
+		    }
+		}
+
 
 	  public static long countWordsInFile(Path filePath) throws IOException {
 	    List<String> lines = Files.readAllLines(filePath);

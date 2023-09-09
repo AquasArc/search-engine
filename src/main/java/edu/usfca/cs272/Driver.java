@@ -6,7 +6,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.nio.file.FileVisitOption;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -31,6 +33,11 @@ public class Driver {
 	  */
 	
 	  public static void main(String[] args) {
+		// Creating a hashset for valid flags...
+		Set<String> validFlags = new HashSet<>();
+		validFlags.add("-input");
+		validFlags.add("-output");
+		
 		
 		// Check if there are no arguments...
 		if (args.length == 0) {
@@ -49,6 +56,7 @@ public class Driver {
 	        System.out.println("Only values given, no flags.");
 	        return;
 	    }
+
 
 	    // Handling arguments
 		// In this case, the input path will be arg 1

@@ -6,10 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.nio.file.FileVisitOption;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -23,7 +20,7 @@ import java.io.FileWriter;
  * Class responsible for running this project based on the provided command-line
  * arguments. See the README for details.
  *
- * @author TODO Anton Lim
+ * @author Anton Lim
  * @author CS 272 Software Development (University of San Francisco)
  * @version Fall 2023
  */
@@ -40,33 +37,45 @@ public class Driver {
 		  // Print initial args for debugging
 		  System.out.println("Initial args: " + Arrays.toString(args));
 
-		  // Instantiate ArgumentParser with the command-line args
+		  // Create ArgumentParser with the command-line args
 		  ArgumentParser parser = new ArgumentParser(args);
+		  
+		  boolean countsFlagProvided = parser.hasFlag("-counts");
 
 		  // Get the input and output paths
 		  Path inputPath = parser.getPath("-text");
 		  Path outputPath = parser.getPath("-counts");
 		  
-		  // If outputPath is null, set a default path
-		  if (outputPath == null) {
-		      outputPath = Paths.get("counts.json"); // Default
+		  // Self-Note: If only -counts flag is provided, maybe solution is to write an empty file?
+		  // If only -counts flag is provided, write an empty file
+		  if (inputPath == null && countsFlagProvided) {
+		      if (outputPath == null) {
+		          outputPath = Paths.get("counts.json"); // Set a default if none provided
+		      }
+		      try {
+		          Files.writeString(outputPath, "{}");
+		      } catch (IOException e) {
+		          System.out.println("Failed to write empty JSON file.");
+		      }
+		      return;
 		  }
+
+
+		  // If only -text is provided, don't create any output files
+		  if (inputPath != null && outputPath == null && !countsFlagProvided) {
+			  return;
+		  }
+
+		  // Set default output path only if both -text and -counts are provided
+		  if (outputPath == null && inputPath != null && countsFlagProvided) {
+			  outputPath = Paths.get("counts.json");  // Default
+		  }
+		  
 		  
 		  // Print the paths for debugging
 		  System.out.println("Parsed Input Path: " + (inputPath == null ? "null" : inputPath.toString()));
 		  System.out.println("Parsed Output Path: " + (outputPath == null ? "null" : outputPath.toString()));
 		  
-		  if (inputPath == null && outputPath != null) {
-			  // Handle -counts only case
-		      String jsonOutput = "{\n}"; // default empty JSON
-		      try {
-		    	  System.out.println("About to write to: " + outputPath.toString());
-		    	  Files.writeString(outputPath, jsonOutput);
-		      } catch (IOException e) {
-		    	  System.out.println("Error writing to output file: " + outputPath);
-		      }
-		      return;
-		  }
 		  
 		  if (inputPath != null) {
 			  if (Files.isRegularFile(inputPath)) {

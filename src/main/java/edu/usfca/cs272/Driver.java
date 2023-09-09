@@ -25,12 +25,24 @@ import java.io.FileWriter;
  * @version Fall 2023
  */
 public class Driver {
-	  
+	  /* Important Self-Reminder: 
+	  * Maybe create a helper function to deal
+	  * with some of the exception handling
+	  */
+	
 	  public static void main(String[] args) {
-	    // Handle command-line arguments
-	    // For this example, I'll use your original code
-	    Path inputPath = Paths.get(args[1]);
-	    Path outputPath = Paths.get(args[3]);
+		
+		// Check if there are no arguments...
+		if (args.length == 0) {
+			System.out.println("No arguments provided. Exiting.");
+			return;
+		}
+	    // Handling arguments
+		// In this case, the input path will be arg 1
+		// The output path is arg 2
+		// This is my assumption
+	    Path inputPath = Paths.get(args[1]); // Arg1
+	    Path outputPath = Paths.get(args[3]); // Arg2
 
 	    // Decide if the input is a file or directory
 	    if (Files.isRegularFile(inputPath)) {

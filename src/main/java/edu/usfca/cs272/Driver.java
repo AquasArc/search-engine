@@ -92,7 +92,7 @@ public class Driver {
 
 		            boolean firstEntry = true;
 		            for (Path path : filteredPaths) {
-		                long wordCount = countWordsInFile(path);  // This is your existing word count method
+		                long wordCount = countWordsInFile(path);  // Check existing word methods
 
 		                if (wordCount > 0) {
 		                    if (!firstEntry) {
@@ -122,7 +122,7 @@ public class Driver {
 	    long wordCount = 0;
 	  
 	    for (String line : lines) {
-	      // Assuming FileStemmer is another class you have
+	      // Using the FileStemmer methods
 	      String cleanedLine = FileStemmer.clean(line);  
 	      String[] words = FileStemmer.split(cleanedLine);
 	  

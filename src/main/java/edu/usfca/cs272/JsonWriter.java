@@ -392,7 +392,14 @@ public class JsonWriter {
 	    writer.write("]\n");
 	}
 
-	// Writes a single map entry as a key-value pair in JSON format
+	/**
+	 * Writes a single map entry as a key value pair in JSON format.
+	 *
+	 * @param writer The writer object used for writing the key value pair
+	 * @param entry The map entry to be written as a key value pair
+	 * @param indent The number of spaces for indentation
+	 * @throws IOException If writing fails
+	 */
 	private static void writeMapEntry(Writer writer, Map.Entry<String, ? extends Number> entry, int indent) throws IOException {
 	    writeIndent(writer, indent); // Add appropriate indentation
 	    writer.write(String.format("\"%s\": %s", entry.getKey(), entry.getValue())); // Write the key-value pair

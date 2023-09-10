@@ -32,7 +32,12 @@ public class Driver {
 	  * input and output flags. I need to figure out later how to 
 	  * make it more universal...
 	  */
-	
+	  
+	  /**
+	   * Start of the program.
+	   *
+	   * @param args Command-line arguments
+	   */
 	  public static void main(String[] args) {
 		  // Print initial args for debugging
 		  System.out.println("Initial args: " + Arrays.toString(args));
@@ -108,6 +113,12 @@ public class Driver {
 		  }
 	  }
 
+	  /**
+	  * Processes a single file and returns its word count.
+	  *
+	  * @param filePath Path of the file to process
+	  * @return The word count of the file
+	  */
 	  public static long processFile(Path filePath) {
 	    long wordCount = 0;
 	  
@@ -127,6 +138,12 @@ public class Driver {
 	    return wordCount;
 	  }
 	  
+	  /**
+	   * Processes a directory and writes word counts to an output file.
+	   *
+	   * @param dirPath Path of the directory to process
+	   * @param outputPath Path of the output file
+	   */
 	  public static void processDirectory(Path dirPath, Path outputPath) {
 		    try (Stream<Path> paths = Files.walk(dirPath, FileVisitOption.FOLLOW_LINKS)) {
 		        List<Path> filteredPaths = paths
@@ -167,6 +184,14 @@ public class Driver {
 		    }
 		}
 
+	  
+	  /**
+	   * Counts the number of words in a file.
+	   *
+	   * @param filePath Path of the file to count words in
+	   * @return The word count of the file
+	   * @throws IOException If file reading fails
+	   */
 	  public static long countWordsInFile(Path filePath) throws IOException {
 	    List<String> lines = Files.readAllLines(filePath);
 	    long wordCount = 0;

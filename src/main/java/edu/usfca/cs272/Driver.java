@@ -1,5 +1,6 @@
 package edu.usfca.cs272;
 
+// TODO Configure Eclipse to remove unused imports for you
 import java.time.Duration;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -14,7 +15,7 @@ import java.io.Writer;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 
-
+// TODO Tell Eclipse to fix indentation so it isn't a mix of tabs and spaces
 
 /**
  * Class responsible for running this project based on the provided command-line
@@ -39,6 +40,37 @@ public class Driver {
 	   * @param args Command-line arguments
 	   */
 	  public static void main(String[] args) {
+	  	/*
+	  	 * TODO
+	  	 * Reduce the amount of console output...
+	  	 * 
+	  	 * 1) A little too complex with the argument handling
+	  	 * 
+	  	 * 2) A little too much is happening inside of Driver
+	  	 * 
+	  	 * Move most of what you have here with processing files and directories
+	  	 * into a new class instead
+	  	 */
+	  	
+	  	/* TODO 
+	  	ArgumentParser parser = new ArgumentParser(args);
+	  	
+	  	if (parser.hasFlag("-text")) {
+	  		Path inputPath = parser.getPath("-text");
+	  		
+	  		try {
+	  			1 or 2 lines of code
+	  		}
+	  		catch ( ) {
+	  			System.out.println("Could not process the file(s) at the input path: ...");
+	  		}
+	  	}
+	  	
+	  	if (-counts) {
+	  		
+	  	}
+	  	*/
+	  	
 		  // Print initial args for debugging
 		  System.out.println("Initial args: " + Arrays.toString(args));
 
@@ -145,6 +177,7 @@ public class Driver {
 	   * @param outputPath Path of the output file
 	   */
 	  public static void processDirectory(Path dirPath, Path outputPath) {
+	  	// TODO Avoid functional at this stage
 		    try (Stream<Path> paths = Files.walk(dirPath, FileVisitOption.FOLLOW_LINKS)) {
 		        List<Path> filteredPaths = paths
 		            .filter(Files::isRegularFile)

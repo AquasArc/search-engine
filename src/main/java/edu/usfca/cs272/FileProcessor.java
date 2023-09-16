@@ -29,6 +29,24 @@ public class FileProcessor {
 			}
 		}
 	}
+	
+	public static void fileOrDirIndex(Path inputPath,Path outputPath) {
+		if (inputPath != null) {
+			if (Files.isRegularFile(inputPath)) {
+				long wordCount = Driver.processFile(inputPath);
+
+				if (outputPath != null) {
+					// Code to do stuff...
+				}
+			} else if (Files.isDirectory(inputPath)) {
+				if (outputPath != null) {
+					// Code to do stuff...
+				}
+			} else {
+				System.out.println("Invalid input path");
+			}
+		}
+	}
 
 	/**
 	 * Writes the word count output to a file.
@@ -52,16 +70,5 @@ public class FileProcessor {
 		} catch (IOException e) {
 			System.out.println("Error writing to output file: " + outputPath);
 		}
-	}
-
-	/**
-	 * Placeholder method to demonstrate how to integrate with the -index flag.
-	 *
-	 * @param indexPath The path where the index should be written.
-	 */
-	public static void processIndex(Path inputPath ,Path indexPath) {
-		// Printing path...
-		System.out.println("Processing input:" + inputPath.toString());
-		System.out.println("Processing index: " + indexPath.toString());
 	}
 }

@@ -4,8 +4,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.nio.file.FileVisitOption;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -41,6 +44,7 @@ public class Driver {
 		Path indexPath = null;
 		boolean countsFlagProvided = parser.hasFlag("-counts");
 		boolean indexFlagProvided = parser.hasFlag("-index");
+		Map<String, Map<String, List<Integer>>> indexMap = new TreeMap<String, Map<String, List<Integer>>>();
 		
 		// If -text flag is provided
 		if (parser.hasFlag("-text")) {
@@ -77,9 +81,11 @@ public class Driver {
 			}
 			
 			try {
-				// Handle index...
+				updateInvertedIndex(inputPath, indexMap);
+				System.out.println("Main to see indexMap: " + indexMap);
+				writeNestedMapToFile(indexMap, indexPath);
 			} catch (Exception e) {
-				System.out.println("Failed to write to the index file: " + indexPath);
+				System.out.println("Failed to write to the index file(index1) : " + indexPath);
 			}
 		}
 
@@ -108,9 +114,10 @@ public class Driver {
 		// Print the paths for debugging
 		System.out.println("Parsed Input Path: " + (inputPath == null ? "null" : inputPath.toString()));
 		System.out.println("Parsed Output Path: " + (outputPath == null ? "null" : outputPath.toString()));
-
+		System.out.println("Parsed Index Path: " + (indexPath == null ? "null" : indexPath.toString()));
+		
 		if (indexPath != null) {
-			FileProcessor.processIndex(inputPath, indexPath);
+			//FileProcessor.processIndex(inputPath, indexPath);
 		}
 		if (outputPath != null) {
 			FileProcessor.processInput(inputPath, outputPath);
@@ -210,5 +217,73 @@ public class Driver {
 		}
 
 		return wordCount;
+	}
+	
+
+	public static void updateInvertedIndex(Path filePath, Map<String, Map<String, List<Integer>>> indexMap) {
+	    ArrayList<String> stemmedWords;
+	    System.out.println("This is the filepath: " + filePath.toString());
+	    try {
+	        stemmedWords = FileStemmer.listStems(filePath);
+	        System.out.println("Stemmed words: " + stemmedWords);  // Debugging line
+	    } catch (IOException e) {
+	        System.out.println("Error reading file(uII): " + filePath.toString());
+	        System.out.println("Exception: " + e.getMessage());  // Debugging line
+	        return;
+	    }
+
+	    int wordPosition = 0;
+	    for (String word : stemmedWords) {
+	        wordPosition++;
+
+	        indexMap.putIfAbsent(word, new TreeMap<>());
+	        indexMap.get(word).putIfAbsent(filePath.toString(), new ArrayList<>());
+	        indexMap.get(word).get(filePath.toString()).add(wordPosition);
+	    }
+	}
+
+	public static void writeNestedMapToFile(Map<String, Map<String, List<Integer>>> indexMap, Path indexPath) {
+		try (BufferedWriter writer = Files.newBufferedWriter(indexPath)) {
+			// Check if the map is empty
+			if (indexMap.isEmpty()) {
+				writer.write("{\n}");
+				return;
+			}
+			writer.write("{\n");  // Start of the JSON object
+
+			boolean isFirstOuter = true;
+			for (Map.Entry<String, Map<String, List<Integer>>> outerEntry : indexMap.entrySet()) {
+				if (!isFirstOuter) {
+					writer.write(",\n");
+				}
+				isFirstOuter = false;
+
+				writer.write("  \"" + outerEntry.getKey() + "\": {\n");  // Outer key
+
+				boolean isFirstInner = true;
+				for (Map.Entry<String, List<Integer>> innerEntry : outerEntry.getValue().entrySet()) {
+					if (!isFirstInner) {
+						writer.write(",\n");
+					}
+					isFirstInner = false;
+
+					writer.write("    \"" + innerEntry.getKey() + "\": [\n");  // Inner key
+
+					List<Integer> values = innerEntry.getValue();
+					for (int i = 0; i < values.size(); i++) {
+						writer.write("      " + values.get(i));
+						if (i < values.size() - 1) {
+							writer.write(",\n");
+						} else {
+							writer.write("\n    ]");  // Close the array and indent it
+						}
+					}
+				}
+				writer.write("\n  }");  // Close inner JSON object
+			}
+			writer.write("\n}");  // Close outer JSON object
+		} catch (IOException e) {
+			System.out.println("Failed to write to the file: " + indexPath);
+		}
 	}
 }

@@ -38,6 +38,7 @@ public class Driver {
 
 		Path inputPath = null;
 		Path outputPath = null;
+		Path indexPath = null;
 		boolean countsFlagProvided = parser.hasFlag("-counts");
 
 		// If -text flag is provided
@@ -48,11 +49,6 @@ public class Driver {
 			} catch (Exception e) {
 				System.out.println("Could not process the file(s) at the input path: " + inputPath);
 			}
-		}
-
-		// If only -text is provided, don't create any output files
-		if (inputPath != null && outputPath == null && !countsFlagProvided) {
-			return;
 		}
 
 		// If -counts flag is provided
@@ -83,12 +79,35 @@ public class Driver {
 			}
 			return;
 		}
+		
+
+		// If only -text is provided and neither -counts nor -output is present
+		// Check if -index is provided, if it isn't return and do nothing
+		if (inputPath != null && outputPath == null && !countsFlagProvided) {
+			// Handle -index flag
+			if (parser.hasFlag("-index")) {
+				indexPath = parser.getPath("-index");
+				if (indexPath == null) {
+					indexPath = Paths.get("index.json"); // Default
+				}
+			} else {
+				return;
+			}
+			return;
+		}
+
+
 
 		// Print the paths for debugging
 		System.out.println("Parsed Input Path: " + (inputPath == null ? "null" : inputPath.toString()));
 		System.out.println("Parsed Output Path: " + (outputPath == null ? "null" : outputPath.toString()));
+		
+		if (indexPath != null) {
+			  FileProcessor.processIndex(indexPath);
+			} else {
+			  FileProcessor.processInput(inputPath, outputPath);
+			}
 
-		FileProcessor.processInput(inputPath, outputPath);
 	}
 
 	/**

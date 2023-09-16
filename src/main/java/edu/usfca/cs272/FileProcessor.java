@@ -53,4 +53,14 @@ public class FileProcessor {
 			System.out.println("Error writing to output file: " + outputPath);
 		}
 	}
+
+	/**
+	 * Placeholder method to demonstrate how to integrate with the -index flag.
+	 *
+	 * @param indexPath The path where the index should be written.
+	 */
+	public static void processIndex(Path indexPath) {
+		// Printing path...
+		System.out.println("Processing index: " + indexPath.toString());
+	}
 }

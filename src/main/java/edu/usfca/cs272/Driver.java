@@ -1,6 +1,5 @@
 package edu.usfca.cs272;
 
-import java.time.Duration;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -39,6 +38,26 @@ public class Driver {
 	 * @param args Command-line arguments
 	 */
 	public static void main(String[] args) {
+
+		/* TODO 
+	  	ArgumentParser parser = new ArgumentParser(args);
+
+	  	if (parser.hasFlag("-text")) {
+	  		Path inputPath = parser.getPath("-text");
+
+	  		try {
+	  			1 or 2 lines of code
+	  		}
+	  		catch ( ) {
+	  			System.out.println("Could not process the file(s) at the input path: ...");
+	  		}
+	  	}
+
+	  	if (-counts) {
+			...
+	  	}
+		 */
+
 		// Print initial args for debugging
 		System.out.println("Initial args: " + Arrays.toString(args));
 
@@ -81,36 +100,7 @@ public class Driver {
 		System.out.println("Parsed Input Path: " + (inputPath == null ? "null" : inputPath.toString()));
 		System.out.println("Parsed Output Path: " + (outputPath == null ? "null" : outputPath.toString()));
 
-
-		if (inputPath != null) {
-			if (Files.isRegularFile(inputPath)) {
-				long wordCount = processFile(inputPath);
-
-				if (outputPath != null) {
-					String jsonOutput;
-					if (wordCount == 0) {
-						jsonOutput = "{\n}";
-					} else {
-						jsonOutput = String.format("{\n  \"%s\": %d\n}", inputPath.toString(), wordCount);
-					}
-
-					try {
-						// Print statement to log what is being written
-						System.out.println("About to write to: " + outputPath.toString());
-						System.out.println("Content to write: \n" + jsonOutput);
-						Files.writeString(outputPath, jsonOutput);
-					} catch (IOException e) {
-						System.out.println("Error writing to output file: " + outputPath);
-					}
-				}
-			} else if (Files.isDirectory(inputPath)) {
-				if (outputPath != null) {
-					processDirectory(inputPath, outputPath);
-				}
-			} else {
-				System.out.println("Invalid input path");
-			}
-		}
+		FileProcessor.processInput(inputPath, outputPath);
 	}
 
 	/**
@@ -145,6 +135,7 @@ public class Driver {
 	 * @param outputPath Path of the output file
 	 */
 	public static void processDirectory(Path dirPath, Path outputPath) {
+		// TODO Avoid functional at this stage
 		try (Stream<Path> paths = Files.walk(dirPath, FileVisitOption.FOLLOW_LINKS)) {
 			List<Path> filteredPaths = paths
 					.filter(Files::isRegularFile)
@@ -184,6 +175,7 @@ public class Driver {
 		}
 	}
 
+
 	/**
 	 * Counts the number of words in a file.
 	 *
@@ -207,5 +199,3 @@ public class Driver {
 		return wordCount;
 	}
 }
-
-	

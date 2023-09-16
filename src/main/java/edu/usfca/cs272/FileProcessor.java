@@ -59,8 +59,9 @@ public class FileProcessor {
 	 *
 	 * @param indexPath The path where the index should be written.
 	 */
-	public static void processIndex(Path indexPath) {
+	public static void processIndex(Path inputPath ,Path indexPath) {
 		// Printing path...
+		System.out.println("Processing input:" + inputPath.toString());
 		System.out.println("Processing index: " + indexPath.toString());
 	}
 }

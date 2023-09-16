@@ -110,7 +110,7 @@ public class Driver {
 		System.out.println("Parsed Output Path: " + (outputPath == null ? "null" : outputPath.toString()));
 
 		if (indexPath != null) {
-			FileProcessor.processIndex(indexPath);
+			FileProcessor.processIndex(inputPath, indexPath);
 		}
 		if (outputPath != null) {
 			FileProcessor.processInput(inputPath, outputPath);

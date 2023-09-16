@@ -32,7 +32,7 @@ public class Driver {
 	 */
 	public static void main(String[] args) {
 
-		// Print initial args for debugging
+		// Print initial arguments for debugging
 		System.out.println("Initial args: " + Arrays.toString(args));
 		ArgumentParser parser = new ArgumentParser(args);
 

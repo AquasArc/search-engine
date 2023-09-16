@@ -40,7 +40,8 @@ public class Driver {
 		Path outputPath = null;
 		Path indexPath = null;
 		boolean countsFlagProvided = parser.hasFlag("-counts");
-
+		boolean indexFlagProvided = parser.hasFlag("-index");
+		
 		// If -text flag is provided
 		if (parser.hasFlag("-text")) {
 			inputPath = parser.getPath("-text");
@@ -66,6 +67,21 @@ public class Driver {
 				System.out.println("Failed to write to the output file: " + outputPath);
 			}
 		}
+		
+		if (indexFlagProvided) {
+			indexPath = parser.getPath("-index");
+			
+			// Set default index path only if both -text and -counts are provided
+			if (indexPath == null && inputPath != null) {
+				indexPath = Paths.get("index.json"); // Default
+			}
+			
+			try {
+				// Handle index...
+			} catch (Exception e) {
+				System.out.println("Failed to write to the index file: " + indexPath);
+			}
+		}
 
 		// If only -counts flag is provided, write an empty file
 		if (inputPath == null && countsFlagProvided) {
@@ -81,18 +97,9 @@ public class Driver {
 		}
 		
 
-		// If only -text is provided and neither -counts nor -output is present
-		// Check if -index is provided, if it isn't return and do nothing
-		if (inputPath != null && outputPath == null && !countsFlagProvided) {
-			// Handle -index flag
-			if (parser.hasFlag("-index")) {
-				indexPath = parser.getPath("-index");
-				if (indexPath == null) {
-					indexPath = Paths.get("index.json"); // Default
-				}
-			} else {
-				return;
-			}
+		// If only -text is provided and neither -counts nor -output is present return for now..
+		// [Maybe] Check if -index is provided, if it isn't return and do nothing
+		if (inputPath != null && outputPath == null && !countsFlagProvided && !indexFlagProvided) {
 			return;
 		}
 
@@ -101,12 +108,13 @@ public class Driver {
 		// Print the paths for debugging
 		System.out.println("Parsed Input Path: " + (inputPath == null ? "null" : inputPath.toString()));
 		System.out.println("Parsed Output Path: " + (outputPath == null ? "null" : outputPath.toString()));
-		
+
 		if (indexPath != null) {
-			  FileProcessor.processIndex(indexPath);
-			} else {
-			  FileProcessor.processInput(inputPath, outputPath);
-			}
+			FileProcessor.processIndex(indexPath);
+		}
+		if (outputPath != null) {
+			FileProcessor.processInput(inputPath, outputPath);
+		}
 
 	}
 

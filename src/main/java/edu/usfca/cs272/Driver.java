@@ -24,13 +24,6 @@ import java.io.FileWriter;
  * @version Fall 2023
  */
 public class Driver {
-	/* Important Self-Reminder: 
-	 * Maybe for a design idea, create a helper function to deal
-	 * with exception handling.
-	 * Also, I currently am some what hard coding the counts,
-	 * input and output flags. I need to figure out later how to 
-	 * make it more universal...
-	 */
 
 	/**
 	 * Start of the program.
@@ -39,38 +32,45 @@ public class Driver {
 	 */
 	public static void main(String[] args) {
 
-		/* TODO 
-	  	ArgumentParser parser = new ArgumentParser(args);
-
-	  	if (parser.hasFlag("-text")) {
-	  		Path inputPath = parser.getPath("-text");
-
-	  		try {
-	  			1 or 2 lines of code
-	  		}
-	  		catch ( ) {
-	  			System.out.println("Could not process the file(s) at the input path: ...");
-	  		}
-	  	}
-
-	  	if (-counts) {
-			...
-	  	}
-		 */
-
 		// Print initial args for debugging
 		System.out.println("Initial args: " + Arrays.toString(args));
-
-		// Create ArgumentParser with the command-line args
 		ArgumentParser parser = new ArgumentParser(args);
 
+		Path inputPath = null;
+		Path outputPath = null;
 		boolean countsFlagProvided = parser.hasFlag("-counts");
 
-		// Get the input and output paths
-		Path inputPath = parser.getPath("-text");
-		Path outputPath = parser.getPath("-counts");
+		// If -text flag is provided
+		if (parser.hasFlag("-text")) {
+			inputPath = parser.getPath("-text");
+			try {
+				// Handle input...
+			} catch (Exception e) {
+				System.out.println("Could not process the file(s) at the input path: " + inputPath);
+			}
+		}
 
-		// Self-Note: If only -counts flag is provided, maybe solution is to write an empty file?
+		// If only -text is provided, don't create any output files
+		if (inputPath != null && outputPath == null && !countsFlagProvided) {
+			return;
+		}
+
+		// If -counts flag is provided
+		if (countsFlagProvided) {
+			outputPath = parser.getPath("-counts");
+
+			// Set default output path only if both -text and -counts are provided
+			if (outputPath == null && inputPath != null) {
+				outputPath = Paths.get("counts.json"); // Default
+			}
+
+			try {
+				// Handle output...
+			} catch (Exception e) {
+				System.out.println("Failed to write to the output file: " + outputPath);
+			}
+		}
+
 		// If only -counts flag is provided, write an empty file
 		if (inputPath == null && countsFlagProvided) {
 			if (outputPath == null) {
@@ -83,18 +83,6 @@ public class Driver {
 			}
 			return;
 		}
-
-
-		// If only -text is provided, don't create any output files
-		if (inputPath != null && outputPath == null && !countsFlagProvided) {
-			return;
-		}
-
-		// Set default output path only if both -text and -counts are provided
-		if (outputPath == null && inputPath != null && countsFlagProvided) {
-			outputPath = Paths.get("counts.json");  // Default
-		}
-
 
 		// Print the paths for debugging
 		System.out.println("Parsed Input Path: " + (inputPath == null ? "null" : inputPath.toString()));
@@ -135,7 +123,6 @@ public class Driver {
 	 * @param outputPath Path of the output file
 	 */
 	public static void processDirectory(Path dirPath, Path outputPath) {
-		// TODO Avoid functional at this stage
 		try (Stream<Path> paths = Files.walk(dirPath, FileVisitOption.FOLLOW_LINKS)) {
 			List<Path> filteredPaths = paths
 					.filter(Files::isRegularFile)
@@ -174,7 +161,6 @@ public class Driver {
 			System.out.println("An error occurred while reading the directory: " + dirPath);
 		}
 	}
-
 
 	/**
 	 * Counts the number of words in a file.

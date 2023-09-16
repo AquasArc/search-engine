@@ -6,6 +6,12 @@ import java.io.IOException;
 
 public class FileProcessor {
 
+	/**
+	 * Processes the input path and writes output if needed.
+	 * 
+	 * @param inputPath  The path of the file or directory to process.
+	 * @param outputPath The path where the output should be written.
+	 */
 	public static void processInput(Path inputPath, Path outputPath) {
 		if (inputPath != null) {
 			if (Files.isRegularFile(inputPath)) {
@@ -24,6 +30,13 @@ public class FileProcessor {
 		}
 	}
 
+	/**
+	 * Writes the word count output to a file.
+	 * 
+	 * @param inputPath  The path of the input file.
+	 * @param outputPath The path where the output should be written.
+	 * @param wordCount  The word count to write.
+	 */
 	private static void writeOutput(Path inputPath, Path outputPath, long wordCount) {
 		String jsonOutput;
 		if (wordCount == 0) {

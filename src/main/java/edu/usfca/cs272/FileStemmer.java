@@ -10,9 +10,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.Normalizer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
@@ -86,13 +86,12 @@ public class FileStemmer {
 	 */
 	public static void addStems(String line, Stemmer stemmer, Collection<String>stems) {
 		// Parse the input to individual words
-		
 		String[] words = parse(line);
-		
+
 		// Loop through the series of words and apply the stemmer algorithm
 		for (String word : words) {
 			String stemWord = (String)stemmer.stem(word);
-			
+
 			// Add the stem word into the collection
 			stems.add(stemWord);
 		}

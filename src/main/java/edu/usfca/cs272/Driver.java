@@ -81,9 +81,10 @@ public class Driver {
 			}
 			
 			try {
-				updateInvertedIndex(inputPath, indexMap);
+				FileProcessor.fileOrDirIndex(inputPath,indexPath, indexMap);
+				//updateInvertedIndex(inputPath, indexMap);
 				System.out.println("Main to see indexMap: " + indexMap);
-				writeNestedMapToFile(indexMap, indexPath);
+				//writeNestedMapToFile(indexMap, indexPath);
 			} catch (Exception e) {
 				System.out.println("Failed to write to the index file(index1) : " + indexPath);
 			}

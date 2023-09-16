@@ -1,7 +1,12 @@
 package edu.usfca.cs272;
 
+import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.io.IOException;
 
 public class FileProcessor {
@@ -30,18 +35,13 @@ public class FileProcessor {
 		}
 	}
 	
-	public static void fileOrDirIndex(Path inputPath,Path outputPath) {
+	public static void fileOrDirIndex(Path inputPath,Path indexPath, Map<String, Map<String, List<Integer>>> indexMap ) {
 		if (inputPath != null) {
 			if (Files.isRegularFile(inputPath)) {
-				long wordCount = Driver.processFile(inputPath);
-
-				if (outputPath != null) {
-					// Code to do stuff...
-				}
+				Driver.updateInvertedIndex(inputPath, indexMap);
+				Driver.writeNestedMapToFile(indexMap, indexPath);
 			} else if (Files.isDirectory(inputPath)) {
-				if (outputPath != null) {
-					// Code to do stuff...
-				}
+				processDirectoryIndex(inputPath, indexPath, indexMap);
 			} else {
 				System.out.println("Invalid input path");
 			}
@@ -69,6 +69,24 @@ public class FileProcessor {
 			Files.writeString(outputPath, jsonOutput);
 		} catch (IOException e) {
 			System.out.println("Error writing to output file: " + outputPath);
+		}
+	}
+	
+	public static void processDirectoryIndex(Path inputDir, Path indexPath, Map<String, Map<String, List<Integer>>> indexMap) {
+		try (Stream<Path> paths = Files.walk(inputDir, FileVisitOption.FOLLOW_LINKS)) {
+			List<Path> fileList = paths
+					.filter(Files::isRegularFile)
+					.filter(path -> path.toString().toLowerCase().endsWith(".txt") || path.toString().toLowerCase().endsWith(".text"))
+					.collect(Collectors.toList());
+
+			fileList.forEach(file -> {
+				Driver.updateInvertedIndex(file, indexMap);
+			});
+
+			Driver.writeNestedMapToFile(indexMap, indexPath);
+
+		} catch (IOException e) {
+			System.out.println("Failed to read the directory: " + inputDir);
 		}
 	}
 }

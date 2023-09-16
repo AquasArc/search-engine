@@ -89,11 +89,25 @@ public class Driver {
 				System.out.println("Failed to write to the index file(index1) : " + indexPath);
 			}
 		}
+		
 
 		// If only -counts flag is provided, write an empty file
 		if (inputPath == null && countsFlagProvided) {
 			if (outputPath == null) {
 				outputPath = Paths.get("counts.json"); // Set a default if none provided
+			}
+			try {
+				Files.writeString(outputPath, "{}");
+			} catch (IOException e) {
+				System.out.println("Failed to write empty JSON file.");
+			}
+			return;
+		}
+
+		// If only -index flag is provided, write an empty file
+		if (inputPath == null && indexFlagProvided) {
+			if (outputPath == null) {
+				outputPath = Paths.get("index.json"); // Set a default if none provided
 			}
 			try {
 				Files.writeString(outputPath, "{}");

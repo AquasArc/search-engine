@@ -17,7 +17,7 @@ public class FileProcessor {
 	 * @param inputPath  The path of the file or directory to process.
 	 * @param outputPath The path where the output should be written.
 	 */
-	public static void processInput(Path inputPath, Path outputPath) {
+	public static void fileOrDirCount(Path inputPath, Path outputPath) {
 		if (inputPath != null) {
 			if (Files.isRegularFile(inputPath)) {
 				long wordCount = Driver.processFile(inputPath);
@@ -39,7 +39,7 @@ public class FileProcessor {
 		if (inputPath != null) {
 			if (Files.isRegularFile(inputPath)) {
 				Driver.updateInvertedIndex(inputPath, indexMap);
-				Driver.writeNestedMapToFile(indexMap, indexPath);
+				JsonWriter.writeNestedMapToFile(indexMap, indexPath);
 			} else if (Files.isDirectory(inputPath)) {
 				processDirectoryIndex(inputPath, indexPath, indexMap);
 			} else {
@@ -83,7 +83,7 @@ public class FileProcessor {
 				Driver.updateInvertedIndex(file, indexMap);
 			});
 
-			Driver.writeNestedMapToFile(indexMap, indexPath);
+			JsonWriter.writeNestedMapToFile(indexMap, indexPath);
 
 		} catch (IOException e) {
 			System.out.println("Failed to read the directory: " + inputDir);

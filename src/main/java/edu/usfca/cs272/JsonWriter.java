@@ -437,4 +437,50 @@ public class JsonWriter {
 			return null;
 		}
 	}
+	
+
+	public static void writeNestedMapToFile(Map<String, Map<String, List<Integer>>> indexMap, Path indexPath) {
+		try (BufferedWriter writer = Files.newBufferedWriter(indexPath)) {
+			// Check if the map is empty
+			if (indexMap.isEmpty()) {
+				writer.write("{\n}");
+				return;
+			}
+			writer.write("{\n");  // Start of the JSON object
+
+			boolean isFirstOuter = true;
+			for (Map.Entry<String, Map<String, List<Integer>>> outerEntry : indexMap.entrySet()) {
+				if (!isFirstOuter) {
+					writer.write(",\n");
+				}
+				isFirstOuter = false;
+
+				writer.write("  \"" + outerEntry.getKey() + "\": {\n");  // Outer key
+
+				boolean isFirstInner = true;
+				for (Map.Entry<String, List<Integer>> innerEntry : outerEntry.getValue().entrySet()) {
+					if (!isFirstInner) {
+						writer.write(",\n");
+					}
+					isFirstInner = false;
+
+					writer.write("    \"" + innerEntry.getKey() + "\": [\n");  // Inner key
+
+					List<Integer> values = innerEntry.getValue();
+					for (int i = 0; i < values.size(); i++) {
+						writer.write("      " + values.get(i));
+						if (i < values.size() - 1) {
+							writer.write(",\n");
+						} else {
+							writer.write("\n    ]");  // Close the array and indent it
+						}
+					}
+				}
+				writer.write("\n  }");  // Close inner JSON object
+			}
+			writer.write("\n}");  // Close outer JSON object
+		} catch (IOException e) {
+			System.out.println("Failed to write to the file: " + indexPath);
+		}
+	}
 }

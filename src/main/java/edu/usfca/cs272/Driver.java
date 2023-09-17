@@ -46,14 +46,9 @@ public class Driver {
 		boolean indexFlagProvided = parser.hasFlag("-index");
 		Map<String, Map<String, List<Integer>>> indexMap = new TreeMap<String, Map<String, List<Integer>>>();
 		
-		// If -text flag is provided
+		// If -text flag is provided, parse & get the path
 		if (parser.hasFlag("-text")) {
 			inputPath = parser.getPath("-text");
-			try {
-				// Handle input...
-			} catch (Exception e) {
-				System.out.println("Could not process the file(s) at the input path: " + inputPath);
-			}
 		}
 
 		// If -counts flag is provided
@@ -66,7 +61,7 @@ public class Driver {
 			}
 
 			try {
-				// Handle output...
+				FileProcessor.fileOrDirCount(inputPath, outputPath);
 			} catch (Exception e) {
 				System.out.println("Failed to write to the output file: " + outputPath);
 			}
@@ -82,9 +77,7 @@ public class Driver {
 			
 			try {
 				FileProcessor.fileOrDirIndex(inputPath,indexPath, indexMap);
-				//updateInvertedIndex(inputPath, indexMap);
 				System.out.println("Main to see indexMap: " + indexMap);
-				//writeNestedMapToFile(indexMap, indexPath);
 			} catch (Exception e) {
 				System.out.println("Failed to write to the index file(index1) : " + indexPath);
 			}
@@ -118,8 +111,7 @@ public class Driver {
 		}
 		
 
-		// If only -text is provided and neither -counts nor -output is present return for now..
-		// [Maybe] Check if -index is provided, if it isn't return and do nothing
+		// If only -text is provided and neither -counts, output, or -index is present return for now..
 		if (inputPath != null && outputPath == null && !countsFlagProvided && !indexFlagProvided) {
 			return;
 		}
@@ -131,12 +123,6 @@ public class Driver {
 		System.out.println("Parsed Output Path: " + (outputPath == null ? "null" : outputPath.toString()));
 		System.out.println("Parsed Index Path: " + (indexPath == null ? "null" : indexPath.toString()));
 		
-		if (indexPath != null) {
-			//FileProcessor.processIndex(inputPath, indexPath);
-		}
-		if (outputPath != null) {
-			FileProcessor.processInput(inputPath, outputPath);
-		}
 
 	}
 
@@ -255,50 +241,5 @@ public class Driver {
 	        indexMap.get(word).putIfAbsent(filePath.toString(), new ArrayList<>());
 	        indexMap.get(word).get(filePath.toString()).add(wordPosition);
 	    }
-	}
-
-	public static void writeNestedMapToFile(Map<String, Map<String, List<Integer>>> indexMap, Path indexPath) {
-		try (BufferedWriter writer = Files.newBufferedWriter(indexPath)) {
-			// Check if the map is empty
-			if (indexMap.isEmpty()) {
-				writer.write("{\n}");
-				return;
-			}
-			writer.write("{\n");  // Start of the JSON object
-
-			boolean isFirstOuter = true;
-			for (Map.Entry<String, Map<String, List<Integer>>> outerEntry : indexMap.entrySet()) {
-				if (!isFirstOuter) {
-					writer.write(",\n");
-				}
-				isFirstOuter = false;
-
-				writer.write("  \"" + outerEntry.getKey() + "\": {\n");  // Outer key
-
-				boolean isFirstInner = true;
-				for (Map.Entry<String, List<Integer>> innerEntry : outerEntry.getValue().entrySet()) {
-					if (!isFirstInner) {
-						writer.write(",\n");
-					}
-					isFirstInner = false;
-
-					writer.write("    \"" + innerEntry.getKey() + "\": [\n");  // Inner key
-
-					List<Integer> values = innerEntry.getValue();
-					for (int i = 0; i < values.size(); i++) {
-						writer.write("      " + values.get(i));
-						if (i < values.size() - 1) {
-							writer.write(",\n");
-						} else {
-							writer.write("\n    ]");  // Close the array and indent it
-						}
-					}
-				}
-				writer.write("\n  }");  // Close inner JSON object
-			}
-			writer.write("\n}");  // Close outer JSON object
-		} catch (IOException e) {
-			System.out.println("Failed to write to the file: " + indexPath);
-		}
 	}
 }

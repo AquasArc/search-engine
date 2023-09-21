@@ -85,7 +85,7 @@ public class FileProcessor {
 	 * and if necessary all of the children directories and their files,
 	 * and applying the file helper method that is used to write to a file
 	 * 
-	 * @param inputPath  The path of the input directory.
+	 * @param inputDir  The path of the input directory.
 	 * @param indexPath The path where the output should be written.
 	 * @param indexMap The nested map with all the data...
 	 */

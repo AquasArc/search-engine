@@ -110,10 +110,10 @@ public class FileStemmer {
 	public static ArrayList<String> listStems(String line, Stemmer stemmer) {
 		// Creating an Array List to hold the list of stemmed words
 		ArrayList<String> stemmedWords = new ArrayList<>();
-		
+
 		// Using the method addStems to add stemmedWords into ArrayList
 		addStems(line, stemmer, stemmedWords);
-		
+
 		// Return the array list of stemmed words
 		return stemmedWords;
 	}
@@ -132,14 +132,14 @@ public class FileStemmer {
 	public static ArrayList<String> listStems(String line) {
 		// Create an ArrayList to hold the stemmed words
 		ArrayList<String> stemmedWords = new ArrayList<>();
-		
+
 		// The Stemmer using the snowball algo
 		Stemmer stemmer = new SnowballStemmer(ENGLISH);
-		
+
 		// Use the addStems() method & return the collection of stemmed words
 		addStems(line, stemmer, stemmedWords);
 		return stemmedWords;
-	
+
 	}
 
 	/**
@@ -159,12 +159,12 @@ public class FileStemmer {
 		ArrayList<String> stemWords = new ArrayList<>();
 		Stemmer stemmer = new SnowballStemmer(ENGLISH);
 
-	    try (BufferedReader bufferreader = Files.newBufferedReader(input)) {
-	        String line;
-	        while ((line = bufferreader.readLine()) != null) {
-	            addStems(line, stemmer, stemWords);
-	        }
-	    }
+		try (BufferedReader bufferreader = Files.newBufferedReader(input)) {
+			String line;
+			while ((line = bufferreader.readLine()) != null) {
+				addStems(line, stemmer, stemWords);
+			}
+		}
 		return stemWords;
 	}
 
@@ -182,7 +182,7 @@ public class FileStemmer {
 	public static TreeSet<String> uniqueStems(String line, Stemmer stemmer) {
 		TreeSet<String> uniqueStems = new TreeSet<>();
 		String[] words = parse(line);
-		
+
 		for (String word : words) {
 			String stemmedWord = stemmer.stem(word).toString();
 			if (stemmedWord != null) {
@@ -205,7 +205,7 @@ public class FileStemmer {
 	 */
 	public static TreeSet<String> uniqueStems(String line) {
 		Stemmer stemmer = new SnowballStemmer(ENGLISH);
-		
+
 		return uniqueStems(line, stemmer);
 	}
 
@@ -225,9 +225,9 @@ public class FileStemmer {
 	public static TreeSet<String> uniqueStems(Path input) throws IOException {
 		TreeSet<String> uniqueStems = new TreeSet<>();
 		Stemmer stemmer = new SnowballStemmer(ENGLISH);
-		
+
 		List<String> lines = Files.readAllLines(input, UTF_8);
-		
+
 		for (int x = 0; x < lines.size(); x++) {
 			addStems(lines.get(x), stemmer, uniqueStems);
 		}
@@ -252,7 +252,7 @@ public class FileStemmer {
 	public static ArrayList<TreeSet<String>> listUniqueStems(Path input) throws IOException {
 		ArrayList<TreeSet<String>> uniqueStemsList = new ArrayList<>();
 		Stemmer stemmer = new SnowballStemmer(ENGLISH);
-		
+
 		List<String> lines = Files.readAllLines(input, UTF_8);
 		for (int x = 0; x < lines.size(); x++) {
 			TreeSet<String> uniqueStems = new TreeSet<>();

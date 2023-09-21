@@ -45,7 +45,7 @@ public class Driver {
 		boolean countsFlagProvided = parser.hasFlag("-counts");
 		boolean indexFlagProvided = parser.hasFlag("-index");
 		Map<String, Map<String, List<Integer>>> indexMap = new TreeMap<String, Map<String, List<Integer>>>();
-		
+
 		// If -text flag is provided, parse & get the path
 		if (parser.hasFlag("-text")) {
 			inputPath = parser.getPath("-text");
@@ -66,15 +66,14 @@ public class Driver {
 				System.out.println("Failed to write to the output file: " + outputPath);
 			}
 		}
-		
+
 		if (indexFlagProvided) {
 			indexPath = parser.getPath("-index");
-			
 			// Set default index path only if both -text and -counts are provided
 			if (indexPath == null && inputPath != null) {
 				indexPath = Paths.get("index.json"); // Default
 			}
-			
+
 			try {
 				FileProcessor.fileOrDirIndex(inputPath,indexPath, indexMap);
 				System.out.println("Main to see indexMap: " + indexMap);
@@ -82,7 +81,6 @@ public class Driver {
 				System.out.println("Failed to write to the index file(index1) : " + indexPath);
 			}
 		}
-		
 
 		// If only -counts flag is provided, write an empty file
 		if (inputPath == null && countsFlagProvided) {
@@ -109,20 +107,16 @@ public class Driver {
 			}
 			return;
 		}
-		
 
 		// If only -text is provided and neither -counts, output, or -index is present return for now..
 		if (inputPath != null && outputPath == null && !countsFlagProvided && !indexFlagProvided) {
 			return;
 		}
 
-
-
-		// Print the paths for debugging
+		// Printing the paths for debugging
 		System.out.println("Parsed Input Path: " + (inputPath == null ? "null" : inputPath.toString()));
 		System.out.println("Parsed Output Path: " + (outputPath == null ? "null" : outputPath.toString()));
 		System.out.println("Parsed Index Path: " + (indexPath == null ? "null" : indexPath.toString()));
-		
 
 	}
 
@@ -219,27 +213,33 @@ public class Driver {
 
 		return wordCount;
 	}
-	
 
+	/**
+	 * Reads the given text file, stems the words, and then adds them to 
+	 * the nested Map 'indexMap' along with their positions
+	 *
+	 * @param filePath The Path of the text file to read
+	 * @param indexMap The nested Map to update with stemmed words and their positions
+	 */
 	public static void updateInvertedIndex(Path filePath, Map<String, Map<String, List<Integer>>> indexMap) {
-	    ArrayList<String> stemmedWords;
-	    System.out.println("This is the filepath: " + filePath.toString());
-	    try {
-	        stemmedWords = FileStemmer.listStems(filePath);
-	        System.out.println("Stemmed words: " + stemmedWords);  // Debugging line
-	    } catch (IOException e) {
-	        System.out.println("Error reading file(uII): " + filePath.toString());
-	        System.out.println("Exception: " + e.getMessage());  // Debugging line
-	        return;
-	    }
+		ArrayList<String> stemmedWords;
+		System.out.println("This is the filepath: " + filePath.toString());
+		try {
+			stemmedWords = FileStemmer.listStems(filePath);
+			System.out.println("Stemmed words: " + stemmedWords);  // Debugging line
+		} catch (IOException e) {
+			System.out.println("Error reading file(uII): " + filePath.toString());
+			System.out.println("Exception: " + e.getMessage());  // Debugging line
+			return;
+		}
 
-	    int wordPosition = 0;
-	    for (String word : stemmedWords) {
-	        wordPosition++;
+		int wordPosition = 0;
+		for (String word : stemmedWords) {
+			wordPosition++;
 
-	        indexMap.putIfAbsent(word, new TreeMap<>());
-	        indexMap.get(word).putIfAbsent(filePath.toString(), new ArrayList<>());
-	        indexMap.get(word).get(filePath.toString()).add(wordPosition);
-	    }
+			indexMap.putIfAbsent(word, new TreeMap<>());
+			indexMap.get(word).putIfAbsent(filePath.toString(), new ArrayList<>());
+			indexMap.get(word).get(filePath.toString()).add(wordPosition);
+		}
 	}
 }

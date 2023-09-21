@@ -83,14 +83,14 @@ public class JsonWriter {
 	 */
 	public static void writeArray(Collection<? extends Number> elements, Writer writer, int indent) throws IOException {
 		writer.write("[\n");
-		
+
 		int i = 0;
 
-		
+
 		for (Number number : elements) {
 			writeIndent(writer, indent + 1);
 			writer.write(number.toString());
-			
+
 			if (i < elements.size() - 1) {
 				writer.write(",\n");
 			} else {
@@ -98,10 +98,10 @@ public class JsonWriter {
 			}
 			i++;
 		}
-		
+
 		writeIndent(writer, indent);
 		writer.write("]\n");
-		
+
 	}
 
 	/**
@@ -157,12 +157,12 @@ public class JsonWriter {
 	 */
 	public static void writeObject(Map<String, ? extends Number> elements, Writer writer, int indent) throws IOException {
 		writer.write("{\n");
-		
+
 		int i = 0;
 		for (Map.Entry<String, ? extends Number> entry : elements.entrySet()) {
 			writeIndent(writer, indent + 1);
 			writer.write("\"" + entry.getKey() + "\": " + entry.getValue().toString());
-			
+
 			// Adding a comma only if its not the last element
 			if (i < elements.size() - 1)  {
 				writer.write(",\n");
@@ -171,7 +171,7 @@ public class JsonWriter {
 			}
 			i++;
 		}
-		
+
 		writeIndent(writer, indent);
 		writer.write("}\n");
 	}
@@ -233,58 +233,58 @@ public class JsonWriter {
 
 
 	public static void writeObjectArrays(Map<String, ? extends Collection<? extends Number>> elements, Writer writer, int indent) throws IOException {
-	    // Start JSON object
-	    writer.write("{\n");
-	    
-	    // Create an iterator for the entries in the map
-	    var entryIterator = elements.entrySet().iterator();
-	    
-	    // Iterate through each entry in the map
-	    while (entryIterator.hasNext()) {
-	        var currentEntry = entryIterator.next();
-	        
-	        // Add indentation for the JSON key
-	        writeIndent(writer, indent + 1);
-	        
-	        // Write the key and the opening bracket for its array
-	        writer.write("\"" + currentEntry.getKey() + "\": [\n");
-	        
-	        // Create an iterator for the numbers in the current entry
-	        var numberIterator = currentEntry.getValue().iterator();
-	        
-	        // Iterate through each number in the current entry
-	        while (numberIterator.hasNext()) {
-	            // Add indentation for the JSON array element
-	            writeIndent(writer, indent + 2);
-	            
-	            // Write the current number
-	            writer.write(numberIterator.next().toString());
-	            
-	            // If more numbers exist, append a comma and new line
-	            if (numberIterator.hasNext()) {
-	                writer.write(",\n");
-	            } else {
-	                // Otherwise, just add a new line
-	                writer.write("\n");
-	            }
-	        }
-	        
-	        // Add indentation and close the JSON array for the current entry
-	        writeIndent(writer, indent + 1);
-	        writer.write("]");
-	        
-	        // If more entries exist, append a comma and new line
-	        if (entryIterator.hasNext()) {
-	            writer.write(",\n");
-	        } else {
-	            // Otherwise, just add a new line
-	            writer.write("\n");
-	        }
-	    }
-	    
-	    // Add indentation and close the JSON object
-	    writeIndent(writer, indent);
-	    writer.write("}\n");
+		// Start JSON object
+		writer.write("{\n");
+
+		// Create an iterator for the entries in the map
+		var entryIterator = elements.entrySet().iterator();
+
+		// Iterate through each entry in the map
+		while (entryIterator.hasNext()) {
+			var currentEntry = entryIterator.next();
+
+			// Add indentation for the JSON key
+			writeIndent(writer, indent + 1);
+
+			// Write the key and the opening bracket for its array
+			writer.write("\"" + currentEntry.getKey() + "\": [\n");
+
+			// Create an iterator for the numbers in the current entry
+			var numberIterator = currentEntry.getValue().iterator();
+
+			// Iterate through each number in the current entry
+			while (numberIterator.hasNext()) {
+				// Add indentation for the JSON array element
+				writeIndent(writer, indent + 2);
+
+				// Write the current number
+				writer.write(numberIterator.next().toString());
+
+				// If more numbers exist, append a comma and new line
+				if (numberIterator.hasNext()) {
+					writer.write(",\n");
+				} else {
+					// Otherwise, just add a new line
+					writer.write("\n");
+				}
+			}
+
+			// Add indentation and close the JSON array for the current entry
+			writeIndent(writer, indent + 1);
+			writer.write("]");
+
+			// If more entries exist, append a comma and new line
+			if (entryIterator.hasNext()) {
+				writer.write(",\n");
+			} else {
+				// Otherwise, just add a new line
+				writer.write("\n");
+			}
+		}
+
+		// Add indentation and close the JSON object
+		writeIndent(writer, indent);
+		writer.write("}\n");
 	}
 
 
@@ -343,48 +343,48 @@ public class JsonWriter {
 	 * @see #writeObject(Map)
 	 */
 	public static void writeArrayObjects(Collection<? extends Map<String, ? extends Number>> elements, Writer writer, int indent) throws IOException {
-	    // Check if the collection is empty and return an empty JSON array
-	    if (elements.isEmpty()) {
-	        writer.write("[\n]");
-	        return;
-	    }
+		// Check if the collection is empty and return an empty JSON array
+		if (elements.isEmpty()) {
+			writer.write("[\n]");
+			return;
+		}
 
-	    // Write the opening bracket of the JSON array
-	    writer.write("[\n");
+		// Write the opening bracket of the JSON array
+		writer.write("[\n");
 
-	    boolean isFirstMap = true; // Flag to check if we're at the first map in the collection
-	    for (var currentMap : elements) {
-	        // Add a comma if this isn't the first map
-	        if (!isFirstMap) {
-	            writer.write(",\n");
-	        }
+		boolean isFirstMap = true; // Flag to check if we're at the first map in the collection
+		for (var currentMap : elements) {
+			// Add a comma if this isn't the first map
+			if (!isFirstMap) {
+				writer.write(",\n");
+			}
 
-	        writeIndent(writer, indent + 1); // Indent for the map opening bracket
-	        writer.write("{\n");
+			writeIndent(writer, indent + 1); // Indent for the map opening bracket
+			writer.write("{\n");
 
-	        boolean isFirstEntry = true; // Flag to check if we're at the first entry in the map
-	        for (var entry : currentMap.entrySet()) {
-	            // Add a comma if this isn't the first entry
-	            if (!isFirstEntry) {
-	                writer.write(",\n");
-	            }
+			boolean isFirstEntry = true; // Flag to check if we're at the first entry in the map
+			for (var entry : currentMap.entrySet()) {
+				// Add a comma if this isn't the first entry
+				if (!isFirstEntry) {
+					writer.write(",\n");
+				}
 
-	            // Write the key-value pair
-	            writeMapEntry(writer, entry, indent + 2);
-	            isFirstEntry = false;
-	        }
+				// Write the key-value pair
+				writeMapEntry(writer, entry, indent + 2);
+				isFirstEntry = false;
+			}
 
-	        // Close the current map
-	        writer.write("\n");
-	        writeIndent(writer, indent + 1);
-	        writer.write("}");
-	        isFirstMap = false; // Set flag to false as we have processed at least one map
-	    }
+			// Close the current map
+			writer.write("\n");
+			writeIndent(writer, indent + 1);
+			writer.write("}");
+			isFirstMap = false; // Set flag to false as we have processed at least one map
+		}
 
-	    // Close the JSON array
-	    writer.write("\n");
-	    writeIndent(writer, indent);
-	    writer.write("]\n");
+		// Close the JSON array
+		writer.write("\n");
+		writeIndent(writer, indent);
+		writer.write("]\n");
 	}
 
 	/**
@@ -396,8 +396,8 @@ public class JsonWriter {
 	 * @throws IOException If writing fails
 	 */
 	private static void writeMapEntry(Writer writer, Map.Entry<String, ? extends Number> entry, int indent) throws IOException {
-	    writeIndent(writer, indent); // Add appropriate indentation
-	    writer.write(String.format("\"%s\": %s", entry.getKey(), entry.getValue())); // Write the key-value pair
+		writeIndent(writer, indent); // Add appropriate indentation
+		writer.write(String.format("\"%s\": %s", entry.getKey(), entry.getValue())); // Write the key-value pair
 	}
 
 
@@ -437,8 +437,17 @@ public class JsonWriter {
 			return null;
 		}
 	}
-	
 
+	/**
+	 * Writes a nested Map structure to a file in a JSON format.
+	 *
+	 * Takes in a nested map with all the values of the words
+	 * and their positions in a given file. Then writes the date
+	 * into a file in a pretty JSON format
+	 * 
+	 * @param indexMap The nested Map to write to file.
+	 * @param indexPath The Path of the file where the Map will be written.
+	 */
 	public static void writeNestedMapToFile(Map<String, Map<String, List<Integer>>> indexMap, Path indexPath) {
 		try (BufferedWriter writer = Files.newBufferedWriter(indexPath)) {
 			// Check if the map is empty

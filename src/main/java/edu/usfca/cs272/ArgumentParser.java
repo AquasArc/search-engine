@@ -52,13 +52,13 @@ public class ArgumentParser {
 	 */
 	public static boolean isFlag(String arg) {
 		if (arg == null) { // If argument is null, return false
-	        return false;
-	    }
-	    if (arg.startsWith("-") && arg.length() > 1) {
-	        int nextChar = arg.codePointAt(1);
-	        return !Character.isDigit(nextChar) && !Character.isWhitespace(nextChar);
-	    }
-	    return false;
+			return false;
+		}
+		if (arg.startsWith("-") && arg.length() > 1) {
+			int nextChar = arg.codePointAt(1);
+			return !Character.isDigit(nextChar) && !Character.isWhitespace(nextChar);
+		}
+		return false;
 	}
 
 	/**
@@ -79,18 +79,18 @@ public class ArgumentParser {
 	 * @param args the command line arguments to parse
 	 */
 	public void parse(String[] args) {
-	    String lastFlag = null;
-	    for (String arg : args) {
-	        if (isFlag(arg)) {
-	            map.put(arg, null);
-	            lastFlag = arg;
-	        } else if (isValue(arg)) {
-	            if (lastFlag != null) {
-	                map.put(lastFlag, arg);
-	                lastFlag = null;  // Reset the last flag
-	            }
-	        }
-	    }
+		String lastFlag = null;
+		for (String arg : args) {
+			if (isFlag(arg)) {
+				map.put(arg, null);
+				lastFlag = arg;
+			} else if (isValue(arg)) {
+				if (lastFlag != null) {
+					map.put(lastFlag, arg);
+					lastFlag = null;  // Reset the last flag
+				}
+			}
+		}
 	}
 
 
@@ -134,14 +134,14 @@ public class ArgumentParser {
 	 *   if there is no mapping
 	 */
 	public String getString(String flag, String backup) {
-	    // Check if the flag has a value
-	    if (hasValue(flag)) {
-	        // If it does, return that value
-	        return map.get(flag);
-	    } else {
-	        // If it doesn't, return the backup value
-	        return backup;
-	    }
+		// Check if the flag has a value
+		if (hasValue(flag)) {
+			// If it does, return that value
+			return map.get(flag);
+		} else {
+			// If it doesn't, return the backup value
+			return backup;
+		}
 	}
 
 	/**
@@ -171,14 +171,14 @@ public class ArgumentParser {
 	 * @see Path#of(String, String...)
 	 */
 	public Path getPath(String flag, Path backup) {
-	    if (hasValue(flag)) {
-	        try {
-	            return Path.of(getString(flag));
-	        } catch (InvalidPathException e) {
-	            // Log the exception if needed
-	        }
-	    }
-	    return backup;
+		if (hasValue(flag)) {
+			try {
+				return Path.of(getString(flag));
+			} catch (InvalidPathException e) {
+				// Log the exception if needed
+			}
+		}
+		return backup;
 	}
 
 	/**
@@ -211,14 +211,14 @@ public class ArgumentParser {
 	 * @see Integer#parseInt(String)
 	 */
 	public int getInteger(String flag, int backup) {
-	    if (hasValue(flag)) {
-	        try {
-	            return Integer.parseInt(getString(flag));
-	        } catch (NumberFormatException e) {
-	            // Log the exception if needed
-	        }
-	    }
-	    return backup;
+		if (hasValue(flag)) {
+			try {
+				return Integer.parseInt(getString(flag));
+			} catch (NumberFormatException e) {
+				// Log the exception if needed
+			}
+		}
+		return backup;
 	}
 
 	/**

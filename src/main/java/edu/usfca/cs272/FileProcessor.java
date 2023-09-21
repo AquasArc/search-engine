@@ -6,6 +6,16 @@ import java.util.List;
 import java.util.Map;
 import java.io.IOException;
 
+/**
+ * The FileProcessor class is responsible for differentiating/splitting
+ * the responsibilities of handling files and directories.
+ * 
+ * 
+ * 
+ *
+ * @author Anton Lim
+ * @version Fall 2023
+ */
 public class FileProcessor {
 
 	/**

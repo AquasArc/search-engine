@@ -42,6 +42,18 @@ public class FileProcessor {
 		}
 	}
 
+	// TODO None of the methods should take both an input and output path at the same time
+	
+	/* TODO 
+	public static void processFile(Path file, InvertedIndex index) throws IOException {
+		stem add to the index and update the count
+	}
+	
+	public static void processDirectory(...) throws IOException {
+		calls processFile on all text files found		
+	}
+	*/
+	
 	/**
 	 * Takes in a inputPath to check if it is null, if its not
 	 * then it checks the inputPath. Checks if its a file or directory.

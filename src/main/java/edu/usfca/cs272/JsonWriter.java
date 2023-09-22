@@ -84,8 +84,8 @@ public class JsonWriter {
 	public static void writeArray(Collection<? extends Number> elements, Writer writer, int indent) throws IOException {
 		writer.write("[\n");
 
+		// TODO Refactor to be more efficient based on the group code review discussion and the CampusWire post
 		int i = 0;
-
 
 		for (Number number : elements) {
 			writeIndent(writer, indent + 1);
@@ -249,6 +249,8 @@ public class JsonWriter {
 			// Write the key and the opening bracket for its array
 			writer.write("\"" + currentEntry.getKey() + "\": [\n");
 
+			// TODO Reuse writeArray here instead
+			
 			// Create an iterator for the numbers in the current entry
 			var numberIterator = currentEntry.getValue().iterator();
 
@@ -448,6 +450,7 @@ public class JsonWriter {
 	 * @param indexMap The nested Map to write to file.
 	 * @param indexPath The Path of the file where the Map will be written.
 	 */
+	// TODO Use the other methods as an example to create a more reusable version... and then a version that creates the writer for you
 	public static void writeNestedMapToFile(Map<String, Map<String, List<Integer>>> indexMap, Path indexPath) {
 		try (BufferedWriter writer = Files.newBufferedWriter(indexPath)) {
 			// Check if the map is empty

@@ -16,7 +16,7 @@ import java.io.Writer;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 
-
+// TODO Driver should just have a main method.... everything else is generally useful and should be in another class
 
 /**
  * Class responsible for running this project based on the provided command-line
@@ -34,18 +34,30 @@ public class Driver {
 	 * @param args Command-line arguments
 	 */
 	public static void main(String[] args) {
-
 		// Print initial arguments for debugging
 		System.out.println("Initial args: " + Arrays.toString(args));
 		ArgumentParser parser = new ArgumentParser(args);
 
-		Path inputPath = null;
+		Path inputPath = null; // TODO Move into the if statements needed
 		Path outputPath = null;
 		Path indexPath = null;
 		boolean countsFlagProvided = parser.hasFlag("-counts");
 		boolean indexFlagProvided = parser.hasFlag("-index");
+		
+		/*
+		 * TODO 
+		 * 
+		 * TreeMap<String, TreeMap<String, TreeSet<Integer>>> indexMap
+		 * 
+		 *  ...move this into a data structure class called InvertedIndex and add with it the word counts map
+		 */
 		Map<String, Map<String, List<Integer>>> indexMap = new TreeMap<String, Map<String, List<Integer>>>();
 
+		/*
+		 * TODO Reduce down to 1 if statement per flag
+		 * And don't test for valid combinations of flags
+		 */
+		
 		// If -text flag is provided, parse & get the path
 		if (parser.hasFlag("-text")) {
 			inputPath = parser.getPath("-text");
@@ -167,6 +179,7 @@ public class Driver {
 
 				boolean firstEntry = true;
 				for (Path path : filteredPaths) {
+					// TODO Wrong place to calculate, the specification stated this needs to be calculated with the index when you read a file for the first time
 					long wordCount = countWordsInFile(path);  // Check existing word methods
 
 					if (wordCount > 0) {
@@ -227,7 +240,7 @@ public class Driver {
 		try {
 			stemmedWords = FileStemmer.listStems(filePath);
 			System.out.println("Stemmed words: " + stemmedWords);  // Debugging line
-		} catch (IOException e) {
+		} catch (IOException e) { // TODO Wrong place for try/catch... most methods will throw exceptions (except Driver.main)
 			System.out.println("Error reading file(uII): " + filePath.toString());
 			System.out.println("Exception: " + e.getMessage());  // Debugging line
 			return;
@@ -237,9 +250,12 @@ public class Driver {
 		for (String word : stemmedWords) {
 			wordPosition++;
 
+			// TODO Make this a method in your new inverted index class
 			indexMap.putIfAbsent(word, new TreeMap<>());
 			indexMap.get(word).putIfAbsent(filePath.toString(), new ArrayList<>());
 			indexMap.get(word).get(filePath.toString()).add(wordPosition);
 		}
+		
+		// TODO update the word count here based on the wordPosition
 	}
 }

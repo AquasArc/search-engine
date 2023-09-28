@@ -38,9 +38,6 @@ public class Driver {
 		System.out.println("Initial args: " + Arrays.toString(args));
 		ArgumentParser parser = new ArgumentParser(args);
 
-		Path inputPath = null; // TODO Move into the if statements needed
-		Path outputPath = null;
-		Path indexPath = null;
 		boolean countsFlagProvided = parser.hasFlag("-counts");
 		boolean indexFlagProvided = parser.hasFlag("-index");
 		
@@ -52,84 +49,65 @@ public class Driver {
 		 *  ...move this into a data structure class called InvertedIndex and add with it the word counts map
 		 */
 		Map<String, Map<String, List<Integer>>> indexMap = new TreeMap<String, Map<String, List<Integer>>>();
-
-		/*
-		 * TODO Reduce down to 1 if statement per flag
-		 * And don't test for valid combinations of flags
-		 */
 		
 		// If -text flag is provided, parse & get the path
 		if (parser.hasFlag("-text")) {
-			inputPath = parser.getPath("-text");
-		}
-
-		// If -counts flag is provided
-		if (countsFlagProvided) {
-			outputPath = parser.getPath("-counts");
-
-			// Set default output path only if both -text and -counts are provided
-			if (outputPath == null && inputPath != null) {
-				outputPath = Paths.get("counts.json"); // Default
-			}
-
-			try {
+			Path inputPath = parser.getPath("-text");
+			
+			// Check if counts flag is provided
+			if(countsFlagProvided) {
+				Path outputPath = parser.getPath("-counts");
+				
+				// Check if the path wasn't provided, if not create a default...
+				if (outputPath == null) {
+					outputPath = Paths.get("counts.json"); // Default
+				}
+				
 				FileProcessor.fileOrDirCount(inputPath, outputPath);
-			} catch (Exception e) {
-				System.out.println("Failed to write to the output file: " + outputPath);
+			}
+			
+			// Check if index flag is provided
+			if (indexFlagProvided) {
+				Path indexPath = parser.getPath("-index");
+				
+				// Check if the path wasn't provided, if not create a default...
+				if(indexPath == null) {
+					indexPath = Paths.get("index.json");
+				}
+				
+				FileProcessor.fileOrDirIndex(inputPath, indexPath, indexMap);
+			}
+		} else {
+			if (!parser.hasFlag("-text")) {
+				if (countsFlagProvided) {
+					Path outputPath = parser.getPath("-counts");
+					
+					if (outputPath == null) {
+						outputPath = Paths.get("counts.json");
+					}
+					
+					try {
+						Files.writeString(outputPath, "{}");
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+				
+				if(indexFlagProvided) {
+					Path indexPath = parser.getPath("index.json");
+					
+					if (indexPath == null) {
+						indexPath = Paths.get("index.json");
+					}
+					
+					try {
+						Files.writeString(indexPath, "{}");
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
 			}
 		}
-
-		if (indexFlagProvided) {
-			indexPath = parser.getPath("-index");
-			// Set default index path only if both -text and -counts are provided
-			if (indexPath == null && inputPath != null) {
-				indexPath = Paths.get("index.json"); // Default
-			}
-
-			try {
-				FileProcessor.fileOrDirIndex(inputPath,indexPath, indexMap);
-				System.out.println("Main to see indexMap: " + indexMap);
-			} catch (Exception e) {
-				System.out.println("Failed to write to the index file(index1) : " + indexPath);
-			}
-		}
-
-		// If only -counts flag is provided, write an empty file
-		if (inputPath == null && countsFlagProvided) {
-			if (outputPath == null) {
-				outputPath = Paths.get("counts.json"); // Set a default if none provided
-			}
-			try {
-				Files.writeString(outputPath, "{}");
-			} catch (IOException e) {
-				System.out.println("Failed to write empty JSON file.");
-			}
-			return;
-		}
-
-		// If only -index flag is provided, write an empty file
-		if (inputPath == null && indexFlagProvided) {
-			if (outputPath == null) {
-				outputPath = Paths.get("index.json"); // Set a default if none provided
-			}
-			try {
-				Files.writeString(outputPath, "{}");
-			} catch (IOException e) {
-				System.out.println("Failed to write empty JSON file.");
-			}
-			return;
-		}
-
-		// If only -text is provided and neither -counts, output, or -index is present return for now..
-		if (inputPath != null && outputPath == null && !countsFlagProvided && !indexFlagProvided) {
-			return;
-		}
-
-		// Printing the paths for debugging
-		System.out.println("Parsed Input Path: " + (inputPath == null ? "null" : inputPath.toString()));
-		System.out.println("Parsed Output Path: " + (outputPath == null ? "null" : outputPath.toString()));
-		System.out.println("Parsed Index Path: " + (indexPath == null ? "null" : indexPath.toString()));
-
 	}
 
 	/**

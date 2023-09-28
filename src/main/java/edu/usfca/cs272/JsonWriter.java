@@ -82,25 +82,21 @@ public class JsonWriter {
 	 * @see #writeIndent(String, Writer, int)
 	 */
 	public static void writeArray(Collection<? extends Number> elements, Writer writer, int indent) throws IOException {
-		writer.write("[\n");
+		writer.write("[");
+		writer.write("\n");
 
-		// TODO Refactor to be more efficient based on the group code review discussion and the CampusWire post
-		int i = 0;
+		int count = 1;
 
-		for (Number number : elements) {
-			writeIndent(writer, indent + 1);
-			writer.write(number.toString());
+		for (var element : elements) {
+			writeIndent(element.toString(), writer, indent + 1);
 
-			if (i < elements.size() - 1) {
-				writer.write(",\n");
-			} else {
-				writer.write("\n");
+			if (count++ != elements.size()) {
+				writer.write(",");
 			}
-			i++;
+			writer.write("\n");
 		}
 
-		writeIndent(writer, indent);
-		writer.write("]\n");
+		writeIndent("]", writer, indent);
 
 	}
 
@@ -230,61 +226,21 @@ public class JsonWriter {
 	 * @see #writeIndent(String, Writer, int)
 	 * @see #writeArray(Collection)
 	 */
-
-
 	public static void writeObjectArrays(Map<String, ? extends Collection<? extends Number>> elements, Writer writer, int indent) throws IOException {
-		// Start JSON object
 		writer.write("{\n");
-
-		// Create an iterator for the entries in the map
-		var entryIterator = elements.entrySet().iterator();
-
-		// Iterate through each entry in the map
-		while (entryIterator.hasNext()) {
-			var currentEntry = entryIterator.next();
-
-			// Add indentation for the JSON key
-			writeIndent(writer, indent + 1);
-
-			// Write the key and the opening bracket for its array
-			writer.write("\"" + currentEntry.getKey() + "\": [\n");
-
-			// TODO Reuse writeArray here instead
-			
-			// Create an iterator for the numbers in the current entry
-			var numberIterator = currentEntry.getValue().iterator();
-
-			// Iterate through each number in the current entry
-			while (numberIterator.hasNext()) {
-				// Add indentation for the JSON array element
-				writeIndent(writer, indent + 2);
-
-				// Write the current number
-				writer.write(numberIterator.next().toString());
-
-				// If more numbers exist, append a comma and new line
-				if (numberIterator.hasNext()) {
-					writer.write(",\n");
-				} else {
-					// Otherwise, just add a new line
-					writer.write("\n");
-				}
-			}
-
-			// Add indentation and close the JSON array for the current entry
-			writeIndent(writer, indent + 1);
-			writer.write("]");
-
-			// If more entries exist, append a comma and new line
-			if (entryIterator.hasNext()) {
+		// Changed to a boolean entry check
+		boolean firstEntry = true;
+		// Changed to use the Map and its entries
+		for (Map.Entry<String, ? extends Collection<? extends Number>> entry : elements.entrySet()) {
+			if (!firstEntry) {
 				writer.write(",\n");
-			} else {
-				// Otherwise, just add a new line
-				writer.write("\n");
 			}
+			// Changed to utilize the other methods in the class
+			writeQuote(entry.getKey() + ":", writer, indent + 1);
+			writeArray(entry.getValue(), writer, indent + 1);
+			firstEntry = false;
 		}
-
-		// Add indentation and close the JSON object
+		writer.write("\n");
 		writeIndent(writer, indent);
 		writer.write("}\n");
 	}

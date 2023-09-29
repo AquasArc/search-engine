@@ -23,7 +23,7 @@ public class FileProcessor {
 	 * 
 	 * @param inputPath  The path of the file or directory to process.
 	 * @param outputPath The path where the output should be written.
-	 * @throws IOException 
+	 * @throws IOException If an error occurs while reading the file
 	 */
 	public static void fileOrDirCount(Path inputPath, Path outputPath) throws IOException {
 		if (inputPath != null) {
@@ -56,7 +56,7 @@ public class FileProcessor {
 	 *
 	 * @param filePath Path of the file to process
 	 * @return The word count of the file
-	 * @throws IOException 
+	 * @throws IOException If an error occurs while reading the file
 	 */
 	public static long processFile(Path filePath) throws IOException {
 		long wordCount = 0;
@@ -91,7 +91,7 @@ public class FileProcessor {
 	 * @param inputPath: The path of the file or directory to process.
 	 * @param indexPath: The path where the output should be written.
 	 * @param indexMap: The nested map that contains all of the words and their positions 
-	 * @throws IOException 
+	 * @throws IOException If an error occurs while reading the file
 	 */
 	public static void fileOrDirIndex(Path inputPath,Path indexPath, Map<String, Map<String, List<Integer>>> indexMap ) throws IOException {
 		if (inputPath != null) {

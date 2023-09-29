@@ -29,7 +29,7 @@ public class Driver {
 	 * Start of the program.
 	 *
 	 * @param args Command-line arguments
-	 * @throws IOException 
+	 * @throws IOException If an error occurs while reading the file
 	 */
 	public static void main(String[] args) throws IOException {
 		ArgumentParser parser = new ArgumentParser(args);

@@ -40,6 +40,7 @@ public class InvertedIndex {
 	 *
 	 * @param filePath The Path of the text file to read
 	 * @param indexMap The nested Map to update with stemmed words and their positions
+	 * @throws IOException If an error occurs while reading the file
 	 */
 	public static void updateInvertedIndex(Path filePath, Map<String, Map<String, List<Integer>>> indexMap) throws IOException {
 		ArrayList<String> stemmedWords;

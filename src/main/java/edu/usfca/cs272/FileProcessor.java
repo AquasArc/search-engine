@@ -23,11 +23,12 @@ public class FileProcessor {
 	 * 
 	 * @param inputPath  The path of the file or directory to process.
 	 * @param outputPath The path where the output should be written.
+	 * @throws IOException 
 	 */
-	public static void fileOrDirCount(Path inputPath, Path outputPath) {
+	public static void fileOrDirCount(Path inputPath, Path outputPath) throws IOException {
 		if (inputPath != null) {
 			if (Files.isRegularFile(inputPath)) {
-				long wordCount = Driver.processFile(inputPath);
+				long wordCount = processFile(inputPath);
 
 				if (outputPath != null) {
 					writeOutput(inputPath, outputPath, wordCount);
@@ -43,17 +44,42 @@ public class FileProcessor {
 	}
 
 	// TODO None of the methods should take both an input and output path at the same time
-	
+
 	/* TODO 
 	public static void processFile(Path file, InvertedIndex index) throws IOException {
 		stem add to the index and update the count
 	}
-	
+	/**
+	 * Processes a single file and returns its word count.
+	 *
+	 * @param filePath Path of the file to process
+	 * @return The word count of the file
+	 */
+	public static long processFile(Path filePath) throws IOException {
+		long wordCount = 0;
+
+		// Check if the filePath is a regular file
+		if (!Files.isRegularFile(filePath)) {
+			System.out.println("The provided path is not a file: " + filePath);
+			return 0;
+		}
+
+		try {
+			// Count words in the file
+			wordCount = countWordsInFile(filePath);
+		} catch (IOException e) {
+			System.out.println("An error occurred while reading the file: " + filePath);
+		}
+
+		return wordCount;
+	}
+
+	/*
 	public static void processDirectory(...) throws IOException {
 		calls processFile on all text files found		
 	}
-	*/
-	
+	 */
+
 	/**
 	 * Takes in a inputPath to check if it is null, if its not
 	 * then it checks the inputPath. Checks if its a file or directory.
@@ -62,11 +88,12 @@ public class FileProcessor {
 	 * @param inputPath: The path of the file or directory to process.
 	 * @param indexPath: The path where the output should be written.
 	 * @param indexMap: The nested map that contains all of the words and their positions 
+	 * @throws IOException 
 	 */
-	public static void fileOrDirIndex(Path inputPath,Path indexPath, Map<String, Map<String, List<Integer>>> indexMap ) {
+	public static void fileOrDirIndex(Path inputPath,Path indexPath, Map<String, Map<String, List<Integer>>> indexMap ) throws IOException {
 		if (inputPath != null) {
 			if (Files.isRegularFile(inputPath)) {
-				Driver.updateInvertedIndex(inputPath, indexMap);
+				InvertedIndex.updateInvertedIndex(inputPath, indexMap);
 				JsonWriter.writeNestedMapToFile(indexMap, indexPath);
 			} else if (Files.isDirectory(inputPath)) {
 				processDirectoryIndex(inputPath, indexPath, indexMap);
@@ -118,7 +145,11 @@ public class FileProcessor {
 				if (Files.isRegularFile(path)) {
 					String fileName = path.toString().toLowerCase();
 					if (fileName.endsWith(".txt") || fileName.endsWith(".text")) {
-						Driver.updateInvertedIndex(path, indexMap);
+						try {
+							InvertedIndex.updateInvertedIndex(path, indexMap);
+						} catch (IOException e) {
+							System.out.println("FileProcessor 150: Error updating inverted index.");
+						}
 					}
 				}
 			});
@@ -126,5 +157,29 @@ public class FileProcessor {
 		} catch (IOException e) {
 			System.out.println("Failed to read the directory: " + inputDir);
 		}
+	}
+
+
+	/**
+	 * Counts the number of words in a file.
+	 *
+	 * @param filePath Path of the file to count words in
+	 * @return The word count of the file
+	 * @throws IOException If file reading fails
+	 */
+	public static long countWordsInFile(Path filePath) throws IOException {
+		List<String> lines = Files.readAllLines(filePath);
+		long wordCount = 0;
+
+		for (String line : lines) {
+			// Using the FileStemmer methods
+			String cleanedLine = FileStemmer.clean(line);  
+			String[] words = FileStemmer.split(cleanedLine);
+
+			// Count the words
+			wordCount += words.length;
+		}
+
+		return wordCount;
 	}
 }

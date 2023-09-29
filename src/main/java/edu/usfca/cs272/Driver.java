@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -16,7 +14,6 @@ import java.io.Writer;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 
-// TODO Driver should just have a main method.... everything else is generally useful and should be in another class
 
 /**
  * Class responsible for running this project based on the provided command-line
@@ -32,15 +29,14 @@ public class Driver {
 	 * Start of the program.
 	 *
 	 * @param args Command-line arguments
+	 * @throws IOException 
 	 */
-	public static void main(String[] args) {
-		// Print initial arguments for debugging
-		System.out.println("Initial args: " + Arrays.toString(args));
+	public static void main(String[] args) throws IOException {
 		ArgumentParser parser = new ArgumentParser(args);
 
 		boolean countsFlagProvided = parser.hasFlag("-counts");
 		boolean indexFlagProvided = parser.hasFlag("-index");
-		
+
 		/*
 		 * TODO 
 		 * 
@@ -49,90 +45,65 @@ public class Driver {
 		 *  ...move this into a data structure class called InvertedIndex and add with it the word counts map
 		 */
 		Map<String, Map<String, List<Integer>>> indexMap = new TreeMap<String, Map<String, List<Integer>>>();
-		
+
 		// If -text flag is provided, parse & get the path
 		if (parser.hasFlag("-text")) {
 			Path inputPath = parser.getPath("-text");
-			
+
 			// Check if counts flag is provided
 			if(countsFlagProvided) {
 				Path outputPath = parser.getPath("-counts");
-				
+
 				// Check if the path wasn't provided, if not create a default...
 				if (outputPath == null) {
 					outputPath = Paths.get("counts.json"); // Default
 				}
-				
+
 				FileProcessor.fileOrDirCount(inputPath, outputPath);
 			}
-			
+
 			// Check if index flag is provided
 			if (indexFlagProvided) {
 				Path indexPath = parser.getPath("-index");
-				
+
 				// Check if the path wasn't provided, if not create a default...
 				if(indexPath == null) {
 					indexPath = Paths.get("index.json");
 				}
-				
+
 				FileProcessor.fileOrDirIndex(inputPath, indexPath, indexMap);
 			}
 		} else {
 			if (!parser.hasFlag("-text")) {
 				if (countsFlagProvided) {
 					Path outputPath = parser.getPath("-counts");
-					
+
 					if (outputPath == null) {
 						outputPath = Paths.get("counts.json");
 					}
-					
+
 					try {
 						Files.writeString(outputPath, "{}");
 					} catch (IOException e) {
-						e.printStackTrace();
+						System.out.println("Failed to write empty JSON file");
 					}
 				}
-				
+
 				if(indexFlagProvided) {
 					Path indexPath = parser.getPath("index.json");
-					
+
 					if (indexPath == null) {
 						indexPath = Paths.get("index.json");
 					}
-					
+
 					try {
 						Files.writeString(indexPath, "{}");
 					} catch (IOException e) {
-						e.printStackTrace();
+						System.out.println("Failed to write empty JSON file");
 					}
 				}
 			}
 		}
-	}
-
-	/**
-	 * Processes a single file and returns its word count.
-	 *
-	 * @param filePath Path of the file to process
-	 * @return The word count of the file
-	 */
-	public static long processFile(Path filePath) {
-		long wordCount = 0;
-
-		// Check if the filePath is a regular file
-		if (!Files.isRegularFile(filePath)) {
-			System.out.println("The provided path is not a file: " + filePath);
-			return 0;
-		}
-
-		try {
-			// Count words in the file
-			wordCount = countWordsInFile(filePath);
-		} catch (IOException e) {
-			System.out.println("An error occurred while reading the file: " + filePath);
-		}
-
-		return wordCount;
 	}
 
 	/**
@@ -158,7 +129,7 @@ public class Driver {
 				boolean firstEntry = true;
 				for (Path path : filteredPaths) {
 					// TODO Wrong place to calculate, the specification stated this needs to be calculated with the index when you read a file for the first time
-					long wordCount = countWordsInFile(path);  // Check existing word methods
+					long wordCount = FileProcessor.countWordsInFile(path);  // Check existing word methods
 
 					if (wordCount > 0) {
 						if (!firstEntry) {
@@ -180,60 +151,5 @@ public class Driver {
 		} catch (IOException e) {
 			System.out.println("An error occurred while reading the directory: " + dirPath);
 		}
-	}
-
-	/**
-	 * Counts the number of words in a file.
-	 *
-	 * @param filePath Path of the file to count words in
-	 * @return The word count of the file
-	 * @throws IOException If file reading fails
-	 */
-	public static long countWordsInFile(Path filePath) throws IOException {
-		List<String> lines = Files.readAllLines(filePath);
-		long wordCount = 0;
-
-		for (String line : lines) {
-			// Using the FileStemmer methods
-			String cleanedLine = FileStemmer.clean(line);  
-			String[] words = FileStemmer.split(cleanedLine);
-
-			// Count the words
-			wordCount += words.length;
-		}
-
-		return wordCount;
-	}
-
-	/**
-	 * Reads the given text file, stems the words, and then adds them to 
-	 * the nested Map 'indexMap' along with their positions
-	 *
-	 * @param filePath The Path of the text file to read
-	 * @param indexMap The nested Map to update with stemmed words and their positions
-	 */
-	public static void updateInvertedIndex(Path filePath, Map<String, Map<String, List<Integer>>> indexMap) {
-		ArrayList<String> stemmedWords;
-		System.out.println("This is the filepath: " + filePath.toString());
-		try {
-			stemmedWords = FileStemmer.listStems(filePath);
-			System.out.println("Stemmed words: " + stemmedWords);  // Debugging line
-		} catch (IOException e) { // TODO Wrong place for try/catch... most methods will throw exceptions (except Driver.main)
-			System.out.println("Error reading file(uII): " + filePath.toString());
-			System.out.println("Exception: " + e.getMessage());  // Debugging line
-			return;
-		}
-
-		int wordPosition = 0;
-		for (String word : stemmedWords) {
-			wordPosition++;
-
-			// TODO Make this a method in your new inverted index class
-			indexMap.putIfAbsent(word, new TreeMap<>());
-			indexMap.get(word).putIfAbsent(filePath.toString(), new ArrayList<>());
-			indexMap.get(word).get(filePath.toString()).add(wordPosition);
-		}
-		
-		// TODO update the word count here based on the wordPosition
 	}
 }

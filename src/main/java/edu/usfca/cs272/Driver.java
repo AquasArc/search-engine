@@ -109,6 +109,7 @@ public class Driver {
 
 	/**
 	 * Processes a directory and writes word counts to an output file.
+	 * I need to update it to just call processFile per file...
 	 *
 	 * @param dirPath Path of the directory to process
 	 * @param outputPath Path of the output file

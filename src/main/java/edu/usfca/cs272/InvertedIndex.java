@@ -19,11 +19,12 @@ public class InvertedIndex {
 
 
 	/**
-	 * Method for updating a nested map
-	 * @param word
-	 * @param filePath
-	 * @param wordPosition
-	 * @param indexMap
+	 * Updates a nested map with a word, its file path, and its position in the file.
+	 * 
+	 * @param word         The word to be added to the map.
+	 * @param filePath     The path of the file where the word is located.
+	 * @param wordPosition The position of the word in the file.
+	 * @param indexMap     The nested map to be updated.
 	 */
 	private static void updateNestedMap(String word, String filePath, int wordPosition, Map<String, Map<String, List<Integer>>> indexMap) {
 		indexMap.putIfAbsent(word, new TreeMap<>());
@@ -54,6 +55,6 @@ public class InvertedIndex {
 			updateNestedMap(word, filePath.toString(), wordPosition, indexMap);
 		}
 
-		// TODO: Update the word count here based on wordPosition
+		// Need to:  Update the word count here based on wordPosition
 	}
 }

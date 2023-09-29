@@ -49,11 +49,14 @@ public class FileProcessor {
 	public static void processFile(Path file, InvertedIndex index) throws IOException {
 		stem add to the index and update the count
 	}
+	*/
+	
 	/**
 	 * Processes a single file and returns its word count.
 	 *
 	 * @param filePath Path of the file to process
 	 * @return The word count of the file
+	 * @throws IOException 
 	 */
 	public static long processFile(Path filePath) throws IOException {
 		long wordCount = 0;

@@ -43,9 +43,9 @@ public class FileProcessor {
 		}
 	}
 
-	// TODO None of the methods should take both an input and output path at the same time
+	// Reminder: None of the methods should take both an input and output path at the same time
 
-	/* TODO 
+	/* Working on
 	public static void processFile(Path file, InvertedIndex index) throws IOException {
 		stem add to the index and update the count
 	}

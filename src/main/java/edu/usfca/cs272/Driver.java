@@ -38,7 +38,7 @@ public class Driver {
 		boolean indexFlagProvided = parser.hasFlag("-index");
 
 		/*
-		 * TODO 
+		 * Ask Professor for Clarification:
 		 * 
 		 * TreeMap<String, TreeMap<String, TreeSet<Integer>>> indexMap
 		 * 

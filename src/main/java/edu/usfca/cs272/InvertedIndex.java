@@ -16,6 +16,11 @@ import java.util.TreeMap;
  * @version Fall 2023
  */
 public class InvertedIndex {
+	
+	// TODO Move the data structure into here as a member
+	// TODO Add data structure like methods (PrefixMap and FileIndex are good examples)
+	
+	// TODO Add the word count data structure in here too
 
 
 	/**

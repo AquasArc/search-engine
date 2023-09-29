@@ -129,7 +129,7 @@ public class Driver {
 
 				boolean firstEntry = true;
 				for (Path path : filteredPaths) {
-					// TODO Wrong place to calculate, the specification stated this needs to be calculated with the index when you read a file for the first time
+					// Reminder Must Change: Wrong place to calculate, the specification stated this needs to be calculated with the index when you read a file for the first time
 					long wordCount = FileProcessor.countWordsInFile(path);  // Check existing word methods
 
 					if (wordCount > 0) {

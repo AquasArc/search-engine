@@ -35,6 +35,7 @@ public class InvertedIndex {
 	/**
 	 * Reads the given text file, stems the words, and then adds them to 
 	 * the nested Map 'indexMap' along with their positions
+	 * 
 	 *
 	 * @param filePath The Path of the text file to read
 	 * @param indexMap The nested Map to update with stemmed words and their positions

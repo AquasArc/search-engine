@@ -406,7 +406,7 @@ public class JsonWriter {
 	 * @param indexMap The nested Map to write to file.
 	 * @param indexPath The Path of the file where the Map will be written.
 	 */
-	// TODO Use the other methods as an example to create a more reusable version... and then a version that creates the writer for you
+	// Reminder: Use the other methods as an example to create a more reusable version... and then a version that creates the writer for you
 	public static void writeNestedMapToFile(Map<String, Map<String, List<Integer>>> indexMap, Path indexPath) {
 		try (BufferedWriter writer = Files.newBufferedWriter(indexPath)) {
 			// Check if the map is empty

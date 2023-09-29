@@ -42,6 +42,7 @@ public class Driver {
 		 * 
 		 * TreeMap<String, TreeMap<String, TreeSet<Integer>>> indexMap
 		 * 
+		 * Reminder:
 		 *  ...move this into a data structure class called InvertedIndex and add with it the word counts map
 		 */
 		Map<String, Map<String, List<Integer>>> indexMap = new TreeMap<String, Map<String, List<Integer>>>();

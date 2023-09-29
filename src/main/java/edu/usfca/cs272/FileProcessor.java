@@ -160,7 +160,7 @@ public class FileProcessor {
 	}
 
 
-	/**
+	/**Reminder, might need to replace in future
 	 * Counts the number of words in a file.
 	 *
 	 * @param filePath Path of the file to count words in

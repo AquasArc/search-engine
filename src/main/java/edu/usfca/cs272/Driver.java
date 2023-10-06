@@ -31,14 +31,46 @@ public class Driver {
 	 * @param args Command-line arguments
 	 * @throws IOException If an error occurs while reading the file
 	 */
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws IOException { // TODO This is the one method that should not throw exceptions (most other methods will throw exceptions)
+		/* TODO 
+		ArgumentParser parser = new ArgumentParser(args);
+		InvertedIndex index = new InvertedIndex();
+		
+		if (parser.hasFlag("-text")) {
+			Path inputPath = parser.getPath("-text");
+			
+			try {
+				call a method in your file processor class
+			}
+			catch (...) {
+				System.out.println("Unable to build the inverted index from path: " + inputPath);
+			}
+		}
+		
+		if (parser.hasFlag("-counts")) {
+			Path countPath = parser.getPath("-counts", Path.of("counts.json"));
+			
+			try {
+				1 method call
+			}
+			catch (...) {
+				System.out.println("Unable to write the word counts to path: " + countPath);
+			}
+		}
+
+		if (parser.hasFlag("-index")) {
+			...
+		}
+		*/
+
+		
 		ArgumentParser parser = new ArgumentParser(args);
 
 		boolean countsFlagProvided = parser.hasFlag("-counts");
 		boolean indexFlagProvided = parser.hasFlag("-index");
 
 		/*
-		 * Ask Professor for Clarification:
+		 * Ask Professor for Clarification: TODO
 		 * 
 		 * TreeMap<String, TreeMap<String, TreeSet<Integer>>> indexMap
 		 * 
@@ -114,7 +146,8 @@ public class Driver {
 	 * @param dirPath Path of the directory to process
 	 * @param outputPath Path of the output file
 	 */
-	public static void processDirectory(Path dirPath, Path outputPath) {
+	public static void processDirectory(Path dirPath, Path outputPath) { // TODO Don't create methods that both process input and produce output
+		// TODO Avoid functional for project 1
 		try (Stream<Path> paths = Files.walk(dirPath, FileVisitOption.FOLLOW_LINKS)) {
 			List<Path> filteredPaths = paths
 					.filter(Files::isRegularFile)

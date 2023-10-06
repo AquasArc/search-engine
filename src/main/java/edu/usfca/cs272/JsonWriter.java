@@ -82,6 +82,8 @@ public class JsonWriter {
 	 * @see #writeIndent(String, Writer, int)
 	 */
 	public static void writeArray(Collection<? extends Number> elements, Writer writer, int indent) throws IOException {
+		// TODO Use the CampusWire post to refactor this to make more efficient (do it for all the methods here too)
+		
 		writer.write("[");
 		writer.write("\n");
 
@@ -408,6 +410,10 @@ public class JsonWriter {
 	 */
 	// Reminder: Use the other methods as an example to create a more reusable version... and then a version that creates the writer for you
 	public static void writeNestedMapToFile(Map<String, Map<String, List<Integer>>> indexMap, Path indexPath) {
+		/*
+		 * TODO Reuse your other methods for the inner data structures
+		 * Generalize this method so it works if you need to output to any kind of writer
+		 */
 		try (BufferedWriter writer = Files.newBufferedWriter(indexPath)) {
 			// Check if the map is empty
 			if (indexMap.isEmpty()) {

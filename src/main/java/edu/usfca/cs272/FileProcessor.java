@@ -1,12 +1,15 @@
 package edu.usfca.cs272;
 
+import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
-
-// TODO https://github.com/usf-cs272-fall2023/project-AquasArc/blob/cf8d5499fb8aecfdf1a63ebc403e2162ef6a4c98/src/main/java/edu/usfca/cs272/FileProcessor.java
+import java.io.Writer;
 
 /**
  * The FileProcessor class is responsible for differentiating/splitting
@@ -37,7 +40,7 @@ public class FileProcessor {
 				}
 			} else if (Files.isDirectory(inputPath)) {
 				if (outputPath != null) {
-					Driver.processDirectory(inputPath, outputPath);
+					processDirectory(inputPath, outputPath);
 				}
 			} else {
 				System.out.println("Invalid input path");
@@ -51,8 +54,8 @@ public class FileProcessor {
 	public static void processFile(Path file, InvertedIndex index) throws IOException {
 		stem add to the index and update the count
 	}
-	*/
-	
+	 */
+
 	/**
 	 * Processes a single file and returns its word count.
 	 *
@@ -79,32 +82,53 @@ public class FileProcessor {
 		return wordCount;
 	}
 
-	/*
-	public static void processDirectory(...) throws IOException {
-		calls processFile on all text files found		
-	}
-	 */
 
 	/**
-	 * Takes in a inputPath to check if it is null, if its not
-	 * then it checks the inputPath. Checks if its a file or directory.
-	 * Depending on what it is, direct the inputs to the corresponding helper method
-	 * 
-	 * @param inputPath: The path of the file or directory to process.
-	 * @param indexPath: The path where the output should be written.
-	 * @param indexMap: The nested map that contains all of the words and their positions 
-	 * @throws IOException If an error occurs while reading the file
+	 * Processes a directory and writes word counts to an output file.
+	 * I need to update it to just call processFile per file...
+	 *
+	 * @param dirPath Path of the directory to process
+	 * @param outputPath Path of the output file
 	 */
-	public static void fileOrDirIndex(Path inputPath,Path indexPath, Map<String, Map<String, List<Integer>>> indexMap ) throws IOException {
-		if (inputPath != null) {
-			if (Files.isRegularFile(inputPath)) {
-				InvertedIndex.updateInvertedIndex(inputPath, indexMap);
-				JsonWriter.writeNestedMapToFile(indexMap, indexPath);
-			} else if (Files.isDirectory(inputPath)) {
-				processDirectoryIndex(inputPath, indexPath, indexMap);
-			} else {
-				System.out.println("Invalid input path");
+	public static void processDirectory(Path dirPath, Path outputPath) { // TODO Don't create methods that both process input and produce output
+		// TODO Avoid functional for project 1
+		try (Stream<Path> paths = Files.walk(dirPath, FileVisitOption.FOLLOW_LINKS)) {
+			List<Path> filteredPaths = paths
+					.filter(Files::isRegularFile)
+					.filter(path -> path.toString().toLowerCase().endsWith(".txt") || path.toString().toLowerCase().endsWith(".text"))
+					.collect(Collectors.toList());
+
+			filteredPaths.sort((p1, p2) -> p1.toString().compareTo(p2.toString()));  // Sorting the string representations
+
+
+
+			try (Writer writer = new BufferedWriter(new FileWriter(outputPath.toFile()))) {
+				writer.write("{\n"); // Opening curly brace for JSON object
+
+				boolean firstEntry = true;
+				for (Path path : filteredPaths) {
+					// Reminder Must Change: Wrong place to calculate, the specification stated this needs to be calculated with the index when you read a file for the first time
+					long wordCount = FileProcessor.countWordsInFile(path);  // Check existing word methods
+
+					if (wordCount > 0) {
+						if (!firstEntry) {
+							writer.write(",\n");  // Comma and newline for previous entry
+						}
+						firstEntry = false;
+
+						writer.write("  \"");  // Indent and start of key
+						writer.write(path.toString());
+						writer.write("\": ");
+						writer.write(Long.toString(wordCount));
+					}
+				}
+
+				writer.write("\n}");  // Close the JSON object
+			} catch (IOException e) {
+				System.out.println("An error occurred while writing to the output file: " + outputPath);
 			}
+		} catch (IOException e) {
+			System.out.println("An error occurred while reading the directory: " + dirPath);
 		}
 	}
 
@@ -129,38 +153,6 @@ public class FileProcessor {
 			Files.writeString(outputPath, jsonOutput);
 		} catch (IOException e) {
 			System.out.println("Error writing to output file: " + outputPath);
-		}
-	}
-
-	/**
-	 * Writes the data that is in a nested map into a given file in a pretty json format
-	 * It does this by, taking in a directory as an argument
-	 * Then looping through the directory going to each file,
-	 * and if necessary all of the children directories and their files,
-	 * and applying the file helper method that is used to write to a file
-	 * 
-	 * @param inputDir  The path of the input directory.
-	 * @param indexPath The path where the output should be written.
-	 * @param indexMap The nested map with all the data...
-	 */
-	public static void processDirectoryIndex(Path inputDir, Path indexPath, Map<String, Map<String, List<Integer>>> indexMap) {
-		try {
-			Files.walk(inputDir)
-			.forEach(path -> {
-				if (Files.isRegularFile(path)) {
-					String fileName = path.toString().toLowerCase();
-					if (fileName.endsWith(".txt") || fileName.endsWith(".text")) {
-						try {
-							InvertedIndex.updateInvertedIndex(path, indexMap);
-						} catch (IOException e) {
-							System.out.println("FileProcessor 150: Error updating inverted index.");
-						}
-					}
-				}
-			});
-			JsonWriter.writeNestedMapToFile(indexMap, indexPath);
-		} catch (IOException e) {
-			System.out.println("Failed to read the directory: " + inputDir);
 		}
 	}
 

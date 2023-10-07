@@ -10,8 +10,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 /**
  * Outputs several simple data structures in "pretty" JSON format where newlines
@@ -83,7 +84,7 @@ public class JsonWriter {
 	 */
 	public static void writeArray(Collection<? extends Number> elements, Writer writer, int indent) throws IOException {
 		// TODO Use the CampusWire post to refactor this to make more efficient (do it for all the methods here too)
-		
+
 		writer.write("[");
 		writer.write("\n");
 
@@ -409,11 +410,7 @@ public class JsonWriter {
 	 * @param indexPath The Path of the file where the Map will be written.
 	 */
 	// Reminder: Use the other methods as an example to create a more reusable version... and then a version that creates the writer for you
-	public static void writeNestedMapToFile(Map<String, Map<String, List<Integer>>> indexMap, Path indexPath) {
-		/*
-		 * TODO Reuse your other methods for the inner data structures
-		 * Generalize this method so it works if you need to output to any kind of writer
-		 */
+	public static void writeNestedMapToFile(TreeMap<String, TreeMap<String, TreeSet<Integer>>> indexMap, Path indexPath) {
 		try (BufferedWriter writer = Files.newBufferedWriter(indexPath)) {
 			// Check if the map is empty
 			if (indexMap.isEmpty()) {
@@ -423,7 +420,7 @@ public class JsonWriter {
 			writer.write("{\n");  // Start of the JSON object
 
 			boolean isFirstOuter = true;
-			for (Map.Entry<String, Map<String, List<Integer>>> outerEntry : indexMap.entrySet()) {
+			for (Map.Entry<String, TreeMap<String, TreeSet<Integer>>> outerEntry : indexMap.entrySet()) {
 				if (!isFirstOuter) {
 					writer.write(",\n");
 				}
@@ -432,7 +429,7 @@ public class JsonWriter {
 				writer.write("  \"" + outerEntry.getKey() + "\": {\n");  // Outer key
 
 				boolean isFirstInner = true;
-				for (Map.Entry<String, List<Integer>> innerEntry : outerEntry.getValue().entrySet()) {
+				for (Map.Entry<String, TreeSet<Integer>> innerEntry : outerEntry.getValue().entrySet()) {
 					if (!isFirstInner) {
 						writer.write(",\n");
 					}
@@ -440,14 +437,16 @@ public class JsonWriter {
 
 					writer.write("    \"" + innerEntry.getKey() + "\": [\n");  // Inner key
 
-					List<Integer> values = innerEntry.getValue();
-					for (int i = 0; i < values.size(); i++) {
-						writer.write("      " + values.get(i));
-						if (i < values.size() - 1) {
+					TreeSet<Integer> values = innerEntry.getValue();
+					int counter = 0;
+					for (Integer value : values) {
+						writer.write("      " + value);
+						if (counter < values.size() - 1) {
 							writer.write(",\n");
 						} else {
 							writer.write("\n    ]");  // Close the array and indent it
 						}
+						counter++;
 					}
 				}
 				writer.write("\n  }");  // Close inner JSON object
@@ -457,4 +456,5 @@ public class JsonWriter {
 			System.out.println("Failed to write to the file: " + indexPath);
 		}
 	}
+
 }

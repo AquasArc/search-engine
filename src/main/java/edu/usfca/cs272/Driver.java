@@ -4,15 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-import java.nio.file.FileVisitOption;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.io.Writer;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
+
 
 
 /**
@@ -34,7 +26,7 @@ public class Driver {
 	public static void main(String[] args) throws IOException { // TODO This is the one method that should not throw exceptions (most other methods will throw exceptions)
 		/* TODO 
 		ArgumentParser parser = new ArgumentParser(args);
-		InvertedIndex index = new InvertedIndex();
+		InvertedIndex index = new InvertedIndex(); 
 		
 		if (parser.hasFlag("-text")) {
 			Path inputPath = parser.getPath("-text");
@@ -69,16 +61,8 @@ public class Driver {
 		boolean countsFlagProvided = parser.hasFlag("-counts");
 		boolean indexFlagProvided = parser.hasFlag("-index");
 
-		/*
-		 * Ask Professor for Clarification: TODO
-		 * 
-		 * TreeMap<String, TreeMap<String, TreeSet<Integer>>> indexMap
-		 * 
-		 * Reminder:
-		 *  ...move this into a data structure class called InvertedIndex and add with it the word counts map
-		 */
-		Map<String, Map<String, List<Integer>>> indexMap = new TreeMap<String, Map<String, List<Integer>>>();
-
+		InvertedIndex index = new InvertedIndex();
+		
 		// If -text flag is provided, parse & get the path
 		if (parser.hasFlag("-text")) {
 			Path inputPath = parser.getPath("-text");
@@ -103,8 +87,7 @@ public class Driver {
 				if(indexPath == null) {
 					indexPath = Paths.get("index.json");
 				}
-
-				FileProcessor.fileOrDirIndex(inputPath, indexPath, indexMap);
+				index.fileOrDirIndex(inputPath, indexPath);
 			}
 		} else {
 			if (!parser.hasFlag("-text")) {
@@ -136,55 +119,6 @@ public class Driver {
 					}
 				}
 			}
-		}
-	}
-
-	/**
-	 * Processes a directory and writes word counts to an output file.
-	 * I need to update it to just call processFile per file...
-	 *
-	 * @param dirPath Path of the directory to process
-	 * @param outputPath Path of the output file
-	 */
-	public static void processDirectory(Path dirPath, Path outputPath) { // TODO Don't create methods that both process input and produce output
-		// TODO Avoid functional for project 1
-		try (Stream<Path> paths = Files.walk(dirPath, FileVisitOption.FOLLOW_LINKS)) {
-			List<Path> filteredPaths = paths
-					.filter(Files::isRegularFile)
-					.filter(path -> path.toString().toLowerCase().endsWith(".txt") || path.toString().toLowerCase().endsWith(".text"))
-					.collect(Collectors.toList());
-
-			filteredPaths.sort((p1, p2) -> p1.toString().compareTo(p2.toString()));  // Sorting the string representations
-
-
-
-			try (Writer writer = new BufferedWriter(new FileWriter(outputPath.toFile()))) {
-				writer.write("{\n"); // Opening curly brace for JSON object
-
-				boolean firstEntry = true;
-				for (Path path : filteredPaths) {
-					// Reminder Must Change: Wrong place to calculate, the specification stated this needs to be calculated with the index when you read a file for the first time
-					long wordCount = FileProcessor.countWordsInFile(path);  // Check existing word methods
-
-					if (wordCount > 0) {
-						if (!firstEntry) {
-							writer.write(",\n");  // Comma and newline for previous entry
-						}
-						firstEntry = false;
-
-						writer.write("  \"");  // Indent and start of key
-						writer.write(path.toString());
-						writer.write("\": ");
-						writer.write(Long.toString(wordCount));
-					}
-				}
-
-				writer.write("\n}");  // Close the JSON object
-			} catch (IOException e) {
-				System.out.println("An error occurred while writing to the output file: " + outputPath);
-			}
-		} catch (IOException e) {
-			System.out.println("An error occurred while reading the directory: " + dirPath);
 		}
 	}
 }

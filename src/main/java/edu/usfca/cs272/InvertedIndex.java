@@ -1,11 +1,11 @@
 package edu.usfca.cs272;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 
 /**
@@ -16,12 +16,42 @@ import java.util.TreeMap;
  * @version Fall 2023
  */
 public class InvertedIndex {
-	
-	// TODO Move the data structure into here as a member
-	// TODO Add data structure like methods (PrefixMap and FileIndex are good examples)
-	
+
+	// The core data structure of the inverted index
+	private final TreeMap<String, TreeMap<String, TreeSet<Integer>>> indexMap;
+
+	// Constructor initializes the data structure
+	public InvertedIndex() {
+		this.indexMap = new TreeMap<>();
+	}
 	// TODO Add the word count data structure in here too
 
+
+	/**
+	 * Takes in a inputPath to check if it is null, if its not
+	 * then it checks the inputPath. Checks if its a file or directory.
+	 * Depending on what it is, direct the inputs to the corresponding helper method
+	 * 
+	 * @param inputPath: The path of the file or directory to process.
+	 * @param indexPath: The path where the output should be written.
+	 * @throws IOException If an error occurs while reading the file
+	 */
+	public void fileOrDirIndex(Path inputPath,Path indexPath) throws IOException {
+		if (inputPath != null) {
+			if (Files.isRegularFile(inputPath)) {
+				try {
+					processFileInvertedIndex(inputPath);
+				} catch (IOException e) {
+					System.out.println("Error in attempting to use information from indexMap to updateFile");
+				}
+				JsonWriter.writeNestedMapToFile(indexMap, indexPath);
+			} else if (Files.isDirectory(inputPath)) {
+				processDirectoryInvertedIndex(inputPath, indexPath);
+			} else {
+				System.out.println("Invalid input path");
+			}
+		}
+	}
 
 	/**
 	 * Updates a nested map with a word, its file path, and its position in the file.
@@ -29,11 +59,10 @@ public class InvertedIndex {
 	 * @param word         The word to be added to the map.
 	 * @param filePath     The path of the file where the word is located.
 	 * @param wordPosition The position of the word in the file.
-	 * @param indexMap     The nested map to be updated.
 	 */
-	private static void updateNestedMap(String word, String filePath, int wordPosition, Map<String, Map<String, List<Integer>>> indexMap) {
+	private void updateNestedMap(String word, String filePath, int wordPosition) {
 		indexMap.putIfAbsent(word, new TreeMap<>());
-		indexMap.get(word).putIfAbsent(filePath, new ArrayList<>());
+		indexMap.get(word).putIfAbsent(filePath, new TreeSet<>());
 		indexMap.get(word).get(filePath).add(wordPosition);
 	}
 
@@ -44,23 +73,46 @@ public class InvertedIndex {
 	 * 
 	 *
 	 * @param filePath The Path of the text file to read
-	 * @param indexMap The nested Map to update with stemmed words and their positions
 	 * @throws IOException If an error occurs while reading the file
 	 */
-	public static void updateInvertedIndex(Path filePath, Map<String, Map<String, List<Integer>>> indexMap) throws IOException {
-		ArrayList<String> stemmedWords;
-		System.out.println("This is the filepath: " + filePath.toString());
-
-		// Moved try/catch logic out of this method
-		stemmedWords = FileStemmer.listStems(filePath);
-		System.out.println("Stemmed words: " + stemmedWords);  // Debugging line
+	public void processFileInvertedIndex(Path filePath) throws IOException {
+		ArrayList<String> stemmedWords = FileStemmer.listStems(filePath);
 
 		int wordPosition = 0;
 		for (String word : stemmedWords) {
 			wordPosition++;
-			updateNestedMap(word, filePath.toString(), wordPosition, indexMap);
+			updateNestedMap(word, filePath.toString(), wordPosition);
 		}
+	}
 
-		// Need to:  Update the word count here based on wordPosition
+	/**
+	 * Writes the data that is in a nested map into a given file in a pretty json format
+	 * It does this by, taking in a directory as an argument
+	 * Then looping through the directory going to each file,
+	 * and if necessary all of the children directories and their files,
+	 * and applying the file helper method that is used to write to a file
+	 * 
+	 * @param inputDir  The path of the input directory.
+	 * @param indexPath The path where the output should be written.
+	 */
+	public void processDirectoryInvertedIndex(Path inputDir, Path indexPath) {
+		try {
+			Files.walk(inputDir)
+			.forEach(path -> {
+				if (Files.isRegularFile(path)) {
+					String fileName = path.toString().toLowerCase();
+					if (fileName.endsWith(".txt") || fileName.endsWith(".text")) {
+						try {
+							processFileInvertedIndex(path);
+						} catch (IOException e) {
+							System.out.println("FileProcessor 150: Error updating inverted index.");
+						}
+					}
+				}
+			});
+			JsonWriter.writeNestedMapToFile(indexMap, indexPath);
+		} catch (IOException e) {
+			System.out.println("Failed to read the directory: " + inputDir);
+		}
 	}
 }

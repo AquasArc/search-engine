@@ -24,36 +24,6 @@ public class Driver {
 	 * @throws IOException If an error occurs while reading the file
 	 */
 	public static void main(String[] args) throws IOException { // TODO This is the one method that should not throw exceptions (most other methods will throw exceptions)
-		/* TODO 
-		ArgumentParser parser = new ArgumentParser(args);
-		InvertedIndex index = new InvertedIndex(); 
-		
-		if (parser.hasFlag("-text")) {
-			Path inputPath = parser.getPath("-text");
-			
-			try {
-				call a method in your file processor class
-			}
-			catch (...) {
-				System.out.println("Unable to build the inverted index from path: " + inputPath);
-			}
-		}
-		
-		if (parser.hasFlag("-counts")) {
-			Path countPath = parser.getPath("-counts", Path.of("counts.json"));
-			
-			try {
-				1 method call
-			}
-			catch (...) {
-				System.out.println("Unable to write the word counts to path: " + countPath);
-			}
-		}
-
-		if (parser.hasFlag("-index")) {
-			...
-		}
-		*/
 
 		
 		ArgumentParser parser = new ArgumentParser(args);

@@ -83,25 +83,23 @@ public class JsonWriter {
 	 * @see #writeIndent(String, Writer, int)
 	 */
 	public static void writeArray(Collection<? extends Number> elements, Writer writer, int indent) throws IOException {
-		// TODO Use the CampusWire post to refactor this to make more efficient (do it for all the methods here too)
+	    java.util.Iterator<? extends Number> iterator = elements.iterator();
 
-		writer.write("[");
-		writer.write("\n");
+	    writer.write("[\n");
 
-		int count = 1;
+	    while (iterator.hasNext()) {
+	        writeIndent(iterator.next().toString(), writer, indent + 1);
 
-		for (var element : elements) {
-			writeIndent(element.toString(), writer, indent + 1);
+	        if (iterator.hasNext()) {
+	            writer.write(",");
+	        }
+	        
+	        writer.write("\n");
+	    }
 
-			if (count++ != elements.size()) {
-				writer.write(",");
-			}
-			writer.write("\n");
-		}
-
-		writeIndent("]", writer, indent);
-
+	    writeIndent("]", writer, indent);
 	}
+
 
 	/**
 	 * Writes the elements as a pretty JSON array to file.
@@ -400,58 +398,55 @@ public class JsonWriter {
 	}
 
 	/**
-	 * Writes a nested Map structure to a file in a JSON format.
-	 *
-	 * Takes in a nested map with all the values of the words
-	 * and their positions in a given file. Then writes the date
-	 * into a file in a pretty JSON format
+	 * Efficiently writes the provided nested map into the given writer in a JSON format.
+	 * Utilizes existing methods for indentation and structure formatting.
 	 * 
-	 * @param indexMap The nested Map to write to file.
-	 * @param indexPath The Path of the file where the Map will be written.
+	 * @param indexMap The nested map containing words and their positions in a file.
+	 * @param writer The writer to which the JSON will be written.
+	 * @throws IOException If there's an error during writing.
 	 */
-	// Reminder: Use the other methods as an example to create a more reusable version... and then a version that creates the writer for you
+	public static void writeNestedMapToFile(TreeMap<String, TreeMap<String, TreeSet<Integer>>> indexMap, Writer writer) throws IOException {
+	    if (indexMap.isEmpty()) {
+	        writer.write("{\n}");
+	        return;
+	    }
+	    writer.write("{\n");
+	    boolean isFirstOuter = true;
+	    for (Map.Entry<String, TreeMap<String, TreeSet<Integer>>> outerEntry : indexMap.entrySet()) {
+	        if (!isFirstOuter) {
+	            writer.write(",\n");
+	        }
+	        writeQuote(outerEntry.getKey(), writer, 1);
+	        writer.write(": {\n");
+
+	        boolean isFirstInner = true;
+	        for (Map.Entry<String, TreeSet<Integer>> innerEntry : outerEntry.getValue().entrySet()) {
+	            if (!isFirstInner) {
+	                writer.write(",\n");
+	            }
+	            
+	            writeQuote(innerEntry.getKey(), writer, 2);
+	            writer.write(": ");
+	            writeArray(innerEntry.getValue(), writer, 2);
+
+	            isFirstInner = false;
+	        }
+	        writer.write("\n  }");
+	        isFirstOuter = false;
+	    }
+	    writer.write("\n}");
+	}
+
+	/**
+	 * Writes the provided nested map to a file in a JSON format.
+	 * This version initializes its own writer, aiming for ease of use.
+	 *
+	 * @param indexMap The nested map containing words and their positions in a file.
+	 * @param indexPath The path of the file to which the JSON will be written.
+	 */
 	public static void writeNestedMapToFile(TreeMap<String, TreeMap<String, TreeSet<Integer>>> indexMap, Path indexPath) {
-		try (BufferedWriter writer = Files.newBufferedWriter(indexPath)) {
-			// Check if the map is empty
-			if (indexMap.isEmpty()) {
-				writer.write("{\n}");
-				return;
-			}
-			writer.write("{\n");  // Start of the JSON object
-
-			boolean isFirstOuter = true;
-			for (Map.Entry<String, TreeMap<String, TreeSet<Integer>>> outerEntry : indexMap.entrySet()) {
-				if (!isFirstOuter) {
-					writer.write(",\n");
-				}
-				isFirstOuter = false;
-
-				writer.write("  \"" + outerEntry.getKey() + "\": {\n");  // Outer key
-
-				boolean isFirstInner = true;
-				for (Map.Entry<String, TreeSet<Integer>> innerEntry : outerEntry.getValue().entrySet()) {
-					if (!isFirstInner) {
-						writer.write(",\n");
-					}
-					isFirstInner = false;
-
-					writer.write("    \"" + innerEntry.getKey() + "\": [\n");  // Inner key
-
-					TreeSet<Integer> values = innerEntry.getValue();
-					int counter = 0;
-					for (Integer value : values) {
-						writer.write("      " + value);
-						if (counter < values.size() - 1) {
-							writer.write(",\n");
-						} else {
-							writer.write("\n    ]");  // Close the array and indent it
-						}
-						counter++;
-					}
-				}
-				writer.write("\n  }");  // Close inner JSON object
-			}
-			writer.write("\n}");  // Close outer JSON object
+		try (BufferedWriter writer = Files.newBufferedWriter(indexPath, UTF_8)) {
+			writeNestedMapToFile(indexMap, writer);
 		} catch (IOException e) {
 			System.out.println("Failed to write to the file: " + indexPath);
 		}

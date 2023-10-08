@@ -1,9 +1,7 @@
 package edu.usfca.cs272;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 
 
@@ -21,73 +19,35 @@ public class Driver {
 	 * Start of the program.
 	 *
 	 * @param args Command-line arguments
-	 * @throws IOException If an error occurs while reading the file
 	 */
-	public static void main(String[] args) throws IOException { // TODO This is the one method that should not throw exceptions (most other methods will throw exceptions)
-
-		
+	public static void main(String[] args){
 		ArgumentParser parser = new ArgumentParser(args);
 
-		boolean countsFlagProvided = parser.hasFlag("-counts");
-		boolean indexFlagProvided = parser.hasFlag("-index");
-
 		InvertedIndex index = new InvertedIndex();
-		
-		// If -text flag is provided, parse & get the path
+
 		if (parser.hasFlag("-text")) {
 			Path inputPath = parser.getPath("-text");
-
-			// Check if counts flag is provided
-			if(countsFlagProvided) {
-				Path outputPath = parser.getPath("-counts");
-
-				// Check if the path wasn't provided, if not create a default...
-				if (outputPath == null) {
-					outputPath = Paths.get("counts.json"); // Default
-				}
-
-				FileProcessor.fileOrDirCount(inputPath, outputPath);
+			try {
+				FileProcessor.processText(inputPath, index);
+			} catch (IOException | NullPointerException e) {
+				System.out.println("Error Detected:");
+				System.out.println("Error processing text: " + e.getMessage());
 			}
+		}
 
-			// Check if index flag is provided
-			if (indexFlagProvided) {
-				Path indexPath = parser.getPath("-index");
-
-				// Check if the path wasn't provided, if not create a default...
-				if(indexPath == null) {
-					indexPath = Paths.get("index.json");
-				}
-				index.fileOrDirIndex(inputPath, indexPath);
+		if (parser.hasFlag("-counts")) {
+			try {
+				FileProcessor.processCounts(parser.getPath("-counts", Path.of("counts.json")), index);
+			} catch (IOException e) {
+				System.out.println("Error processing counts: " + e.getMessage());
 			}
-		} else {
-			if (!parser.hasFlag("-text")) {
-				if (countsFlagProvided) {
-					Path outputPath = parser.getPath("-counts");
+		}
 
-					if (outputPath == null) {
-						outputPath = Paths.get("counts.json");
-					}
-
-					try {
-						Files.writeString(outputPath, "{}");
-					} catch (IOException e) {
-						System.out.println("Failed to write empty JSON file");
-					}
-				}
-
-				if(indexFlagProvided) {
-					Path indexPath = parser.getPath("index.json");
-
-					if (indexPath == null) {
-						indexPath = Paths.get("index.json");
-					}
-
-					try {
-						Files.writeString(indexPath, "{}");
-					} catch (IOException e) {
-						System.out.println("Failed to write empty JSON file");
-					}
-				}
+		if (parser.hasFlag("-index")) {
+			try {
+				FileProcessor.processIndex(parser.getPath("-index", Path.of("index.json")), index);
+			} catch (IOException e) {
+				System.out.println("Error processing index: " + e.getMessage());
 			}
 		}
 	}

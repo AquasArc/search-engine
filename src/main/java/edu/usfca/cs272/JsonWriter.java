@@ -3,6 +3,7 @@ package edu.usfca.cs272;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -83,21 +84,21 @@ public class JsonWriter {
 	 * @see #writeIndent(String, Writer, int)
 	 */
 	public static void writeArray(Collection<? extends Number> elements, Writer writer, int indent) throws IOException {
-	    java.util.Iterator<? extends Number> iterator = elements.iterator();
+		java.util.Iterator<? extends Number> iterator = elements.iterator();
 
-	    writer.write("[\n");
+		writer.write("[\n");
 
-	    while (iterator.hasNext()) {
-	        writeIndent(iterator.next().toString(), writer, indent + 1);
+		while (iterator.hasNext()) {
+			writeIndent(iterator.next().toString(), writer, indent + 1);
 
-	        if (iterator.hasNext()) {
-	            writer.write(",");
-	        }
-	        
-	        writer.write("\n");
-	    }
+			if (iterator.hasNext()) {
+				writer.write(",");
+			}
 
-	    writeIndent("]", writer, indent);
+			writer.write("\n");
+		}
+
+		writeIndent("]", writer, indent);
 	}
 
 
@@ -398,58 +399,78 @@ public class JsonWriter {
 	}
 
 	/**
-	 * Efficiently writes the provided nested map into the given writer in a JSON format.
-	 * Utilizes existing methods for indentation and structure formatting.
-	 * 
-	 * @param indexMap The nested map containing words and their positions in a file.
-	 * @param writer The writer to which the JSON will be written.
-	 * @throws IOException If there's an error during writing.
-	 */
-	public static void writeNestedMapToFile(TreeMap<String, TreeMap<String, TreeSet<Integer>>> indexMap, Writer writer) throws IOException {
-	    if (indexMap.isEmpty()) {
-	        writer.write("{\n}");
-	        return;
-	    }
-	    writer.write("{\n");
-	    boolean isFirstOuter = true;
-	    for (Map.Entry<String, TreeMap<String, TreeSet<Integer>>> outerEntry : indexMap.entrySet()) {
-	        if (!isFirstOuter) {
-	            writer.write(",\n");
-	        }
-	        writeQuote(outerEntry.getKey(), writer, 1);
-	        writer.write(": {\n");
-
-	        boolean isFirstInner = true;
-	        for (Map.Entry<String, TreeSet<Integer>> innerEntry : outerEntry.getValue().entrySet()) {
-	            if (!isFirstInner) {
-	                writer.write(",\n");
-	            }
-	            
-	            writeQuote(innerEntry.getKey(), writer, 2);
-	            writer.write(": ");
-	            writeArray(innerEntry.getValue(), writer, 2);
-
-	            isFirstInner = false;
-	        }
-	        writer.write("\n  }");
-	        isFirstOuter = false;
-	    }
-	    writer.write("\n}");
-	}
-
-	/**
-	 * Writes the provided nested map to a file in a JSON format.
-	 * This version initializes its own writer, aiming for ease of use.
+	 * Writes the inverted index data structure to the specified output path in JSON format.
 	 *
-	 * @param indexMap The nested map containing words and their positions in a file.
-	 * @param indexPath The path of the file to which the JSON will be written.
+	 * @param index      The nested map representing the inverted index.
+	 * @param outputPath The path where the output should be written.
+	 * @throws IOException If an error occurs while writing to the file.
 	 */
-	public static void writeNestedMapToFile(TreeMap<String, TreeMap<String, TreeSet<Integer>>> indexMap, Path indexPath) {
-		try (BufferedWriter writer = Files.newBufferedWriter(indexPath, UTF_8)) {
-			writeNestedMapToFile(indexMap, writer);
+	public static void writeIndexToFile(TreeMap<String, TreeMap<String, TreeSet<Integer>>> index, Path outputPath) throws IOException {
+		try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputPath.toFile()))) {
+			writeNestedMap(index, writer, 0);
 		} catch (IOException e) {
-			System.out.println("Failed to write to the file: " + indexPath);
+			throw new IOException("Failed to write index to: " + outputPath, e);
 		}
 	}
 
+	/**
+	 * Helper method to format and write the inverted index data structure as a pretty-printed JSON.
+	 *
+	 * @param index  The nested map representing the inverted index.
+	 * @param writer The writer object to output the formatted data.
+	 * @param indent The indentation level to use for pretty-printing.
+	 * @throws IOException If an error occurs during writing.
+	 */
+	public static void writeNestedMap(TreeMap<String, TreeMap<String, TreeSet<Integer>>> index, Writer writer, int indent) throws IOException {
+		writer.write("{\n");
+
+		int outerCount = 0;
+		for (Map.Entry<String, TreeMap<String, TreeSet<Integer>>> wordEntry : index.entrySet()) {
+			writeQuote(wordEntry.getKey(), writer, indent + 1);
+			writer.write(": {");
+			writer.write("\n");
+
+			int innerCount = 0;
+			for (Map.Entry<String, TreeSet<Integer>> fileEntry : wordEntry.getValue().entrySet()) {
+				String correctedPath = fileEntry.getKey().replace("/", "\\");
+				writeQuote(correctedPath, writer, indent + 2);
+				writer.write(": ");
+				writeArray(fileEntry.getValue(), writer, indent + 2);
+
+				// Check for trailing comma
+				if (innerCount < wordEntry.getValue().size() - 1) {
+					writer.write(",");
+				}
+				writer.write("\n");
+				innerCount++;
+			}
+
+			writeIndent("}", writer, indent + 1);
+
+			// Check for trailing comma
+			if (outerCount < index.size() - 1) {
+				writer.write(",");
+			}
+			writer.write("\n");
+			outerCount++;
+		}
+
+		writeIndent("}", writer, indent);
+	}
+
+
+	/**
+	 * Writes the word counts to the specified output path in JSON format.
+	 *
+	 * @param wordCounts The map containing words and their counts.
+	 * @param outputPath The path where the output should be written.
+	 * @throws IOException If an error occurs while writing to the file.
+	 */
+	public static void writeWordCountsToFile(Map<String, Long> wordCounts, Path outputPath) throws IOException {
+		try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputPath.toFile()))) {
+			JsonWriter.writeObject(wordCounts, writer, 0);
+		} catch (IOException e) {
+			throw new IOException("Failed to write word counts to: " + outputPath, e);
+		}
+	}
 }

@@ -1,182 +1,75 @@
 package edu.usfca.cs272;
 
-import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.Writer;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
- * The FileProcessor class is responsible for differentiating/splitting
- * the responsibilities of handling files and directories.
+ * Provides utility functions for processing files, directories, and generating data outputs.
+ * Utilizes the InvertedIndex to handle and manage the indexing of words within files.
  * 
- * 
- * 
- *
  * @author Anton Lim
+ * @author CS 272 Software Development (University of San Francisco)
  * @version Fall 2023
  */
 public class FileProcessor {
 
 	/**
-	 * Processes the input path and writes output if needed.
+	 * Processes a given input path, checking whether it's a regular file or a directory,
+	 * and delegates the task to the appropriate method in the InvertedIndex.
 	 * 
-	 * @param inputPath  The path of the file or directory to process.
-	 * @param outputPath The path where the output should be written.
-	 * @throws IOException If an error occurs while reading the file
+	 * @param inputPath The path to either a single file or a directory to process.
+	 * @param index The InvertedIndex instance to use for processing.
+	 * @throws IOException If an error occurs during file or directory processing.
 	 */
-	public static void fileOrDirCount(Path inputPath, Path outputPath) throws IOException {
-		if (inputPath != null) {
-			if (Files.isRegularFile(inputPath)) {
-				long wordCount = processFile(inputPath);
-
-				if (outputPath != null) {
-					writeOutput(inputPath, outputPath, wordCount);
-				}
-			} else if (Files.isDirectory(inputPath)) {
-				if (outputPath != null) {
-					processDirectory(inputPath, outputPath);
-				}
-			} else {
-				System.out.println("Invalid input path");
-			}
-		}
-	}
-
-	// Reminder: None of the methods should take both an input and output path at the same time
-
-	/* Working on
-	public static void processFile(Path file, InvertedIndex index) throws IOException {
-		stem add to the index and update the count
-	}
-	 */
-
-	/**
-	 * Processes a single file and returns its word count.
-	 *
-	 * @param filePath Path of the file to process
-	 * @return The word count of the file
-	 * @throws IOException If an error occurs while reading the file
-	 */
-	public static long processFile(Path filePath) throws IOException {
-		long wordCount = 0;
-
-		// Check if the filePath is a regular file
-		if (!Files.isRegularFile(filePath)) {
-			System.out.println("The provided path is not a file: " + filePath);
-			return 0;
-		}
-
-		try {
-			// Count words in the file
-			wordCount = countWordsInFile(filePath);
-		} catch (IOException e) {
-			System.out.println("An error occurred while reading the file: " + filePath);
-		}
-
-		return wordCount;
-	}
-
-
-	/**
-	 * Processes a directory and writes word counts to an output file.
-	 * I need to update it to just call processFile per file...
-	 *
-	 * @param dirPath Path of the directory to process
-	 * @param outputPath Path of the output file
-	 */
-	public static void processDirectory(Path dirPath, Path outputPath) { // TODO Don't create methods that both process input and produce output
-		// TODO Avoid functional for project 1
-		try (Stream<Path> paths = Files.walk(dirPath, FileVisitOption.FOLLOW_LINKS)) {
-			List<Path> filteredPaths = paths
-					.filter(Files::isRegularFile)
-					.filter(path -> path.toString().toLowerCase().endsWith(".txt") || path.toString().toLowerCase().endsWith(".text"))
-					.collect(Collectors.toList());
-
-			filteredPaths.sort((p1, p2) -> p1.toString().compareTo(p2.toString()));  // Sorting the string representations
-
-
-
-			try (Writer writer = new BufferedWriter(new FileWriter(outputPath.toFile()))) {
-				writer.write("{\n"); // Opening curly brace for JSON object
-
-				boolean firstEntry = true;
-				for (Path path : filteredPaths) {
-					// Reminder Must Change: Wrong place to calculate, the specification stated this needs to be calculated with the index when you read a file for the first time
-					long wordCount = FileProcessor.countWordsInFile(path);  // Check existing word methods
-
-					if (wordCount > 0) {
-						if (!firstEntry) {
-							writer.write(",\n");  // Comma and newline for previous entry
-						}
-						firstEntry = false;
-
-						writer.write("  \"");  // Indent and start of key
-						writer.write(path.toString());
-						writer.write("\": ");
-						writer.write(Long.toString(wordCount));
-					}
-				}
-
-				writer.write("\n}");  // Close the JSON object
-			} catch (IOException e) {
-				System.out.println("An error occurred while writing to the output file: " + outputPath);
-			}
-		} catch (IOException e) {
-			System.out.println("An error occurred while reading the directory: " + dirPath);
-		}
-	}
-
-	/**
-	 * Writes the word count output to a file.
-	 * 
-	 * @param inputPath  The path of the input file.
-	 * @param outputPath The path where the output should be written.
-	 * @param wordCount  The word count to write.
-	 */
-	private static void writeOutput(Path inputPath, Path outputPath, long wordCount) {
-		String jsonOutput;
-		if (wordCount == 0) {
-			jsonOutput = "{\n}";
+	public static void processText(Path inputPath, InvertedIndex index) throws IOException {
+		if (Files.isRegularFile(inputPath)) {
+			index.processFile(inputPath);
+		} else if (Files.isDirectory(inputPath)) {
+			index.processDirectory(inputPath);
 		} else {
-			jsonOutput = String.format("{\n  \"%s\": %d\n}", inputPath.toString(), wordCount);
-		}
-
-		try {
-			System.out.println("About to write to: " + outputPath.toString());
-			System.out.println("Content to write: \n" + jsonOutput);
-			Files.writeString(outputPath, jsonOutput);
-		} catch (IOException e) {
-			System.out.println("Error writing to output file: " + outputPath);
+			throw new IOException("Invalid input path: " + inputPath);
 		}
 	}
 
-
-	/**Reminder, might need to replace in future
-	 * Counts the number of words in a file.
-	 *
-	 * @param filePath Path of the file to count words in
-	 * @return The word count of the file
-	 * @throws IOException If file reading fails
+	/**
+	 * Converts the indexed words and their occurrences into word counts and writes them to a file.
+	 * 
+	 * @param countPath The path where word counts should be written in JSON format.
+	 * @param index The InvertedIndex instance containing the indexed data.
+	 * @throws IOException If an error occurs during file writing.
 	 */
-	public static long countWordsInFile(Path filePath) throws IOException {
-		List<String> lines = Files.readAllLines(filePath);
-		long wordCount = 0;
+	public static void processCounts(Path countPath, InvertedIndex index) throws IOException {
+		Map<String, Long> wordCounts = generateWordCounts(index);
+		JsonWriter.writeWordCountsToFile(wordCounts, countPath);
+	}
 
-		for (String line : lines) {
-			// Using the FileStemmer methods
-			String cleanedLine = FileStemmer.clean(line);  
-			String[] words = FileStemmer.split(cleanedLine);
+	/**
+	 * Writes the indexed words, their occurrences, and positions within files to a file in a specific JSON format.
+	 * 
+	 * @param indexPath The path where the index should be written in JSON format.
+	 * @param index The InvertedIndex instance containing the indexed data.
+	 * @throws IOException If an error occurs during file writing.
+	 */
+	public static void processIndex(Path indexPath, InvertedIndex index) throws IOException {
+		JsonWriter.writeIndexToFile(index.getIndexMap(), indexPath);
+	}
 
-			// Count the words
-			wordCount += words.length;
+	/**
+	 * Generates word counts for each file based on the indexed data.
+	 * 
+	 * @param index The InvertedIndex instance containing the indexed data.
+	 * @return A map where each file path is mapped to its respective word count.
+	 */
+	private static Map<String, Long> generateWordCounts(InvertedIndex index) {
+		Map<String, Long> wordCounts = new TreeMap<>();
+		for (String word : index.getIndexMap().keySet()) {
+			for (String file : index.getIndexMap().get(word).keySet()) {
+				wordCounts.put(file, wordCounts.getOrDefault(file, 0L) + index.getIndexMap().get(word).get(file).size());
+			}
 		}
-
-		return wordCount;
+		return wordCounts;
 	}
 }

@@ -50,5 +50,14 @@ public class Driver {
 				System.out.println("Error processing index: " + e.getMessage());
 			}
 		}
+		/*
+		 * For new flag... 
+		if (parser.hasFlag("-")) {
+			try {
+				FileProcessor.process____(parser.getPath("-", Path.of(".json")), index);
+			} catch (IOException e) {
+				System.out.println("Error processing ______: " + e.getMessage());
+			}
+		*/
 	}
 }

@@ -10,6 +10,7 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
@@ -432,8 +433,8 @@ public class JsonWriter {
 
 			int innerCount = 0;
 			for (Map.Entry<String, TreeSet<Integer>> fileEntry : wordEntry.getValue().entrySet()) {
-				String correctedPath = fileEntry.getKey().replace("/", "\\");
-				writeQuote(correctedPath, writer, indent + 2);
+				Path correctedPath = Paths.get(fileEntry.getKey());
+				writeQuote(correctedPath.toString(), writer, indent + 2);
 				writer.write(": ");
 				writeArray(fileEntry.getValue(), writer, indent + 2);
 

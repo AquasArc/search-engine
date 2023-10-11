@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -23,6 +24,8 @@ public class InvertedIndex {
 	 */
 	private final TreeMap<String, TreeMap<String, TreeSet<Integer>>> indexMap;
 
+	// TODO Map<String, Long> wordCounts
+	
 	/**
 	 * Initializes the inverted index data structure.
 	 */
@@ -30,6 +33,27 @@ public class InvertedIndex {
 	public InvertedIndex() {
 		this.indexMap = new TreeMap<>();
 	}
+	
+	/*
+	 * TODO 
+	 * Remove processFile and processDirectory into FileProcessor
+	 * 
+	 * Create a data structure class here instead
+	 * 
+	 * add(String word, String location, int position)
+	 * addAll(List<String> words, String location, int start)
+	 * 
+	 * hasWord(String word)
+	 * hasLocation(String word, String location)
+	 * hasPosition(String word, String location, int position)
+	 * 
+	 * num methods...
+	 * get methods...
+	 * 
+	 * toString()
+	 * 
+	 * PrefixMap and FileIndex
+	 */
 
 	/**
 	 * Processes a file, stems its words, and updates the inverted index data structure.
@@ -57,6 +81,8 @@ public class InvertedIndex {
 	 * @throws IOException If an error occurs while reading files within the directory.
 	 */
 	public void processDirectory(Path dirPath) throws IOException {
+		// TODO Avoid a functional approach for this project, use a DirectoryStream etc. 
+		
 		Files.walk(dirPath)
 		.filter(Files::isRegularFile)
 		.filter(file -> {

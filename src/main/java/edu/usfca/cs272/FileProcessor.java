@@ -44,7 +44,7 @@ public class FileProcessor {
 	 * @throws IOException If an error occurs during file writing.
 	 */
 	public static void processCounts(Path countPath, InvertedIndex index) throws IOException {
-		Map<String, Long> wordCounts = generateWordCounts(index);
+		Map<String, Long> wordCounts = generateWordCounts(index); // TODO Problematic
 		JsonWriter.writeWordCountsToFile(wordCounts, countPath);
 	}
 

@@ -45,12 +45,14 @@ public class Driver {
 
 		if (parser.hasFlag("-index")) {
 			try {
+				// TODO JsonWriter.writeIndexToFile(index.getIndexMap(), indexPath);
 				FileProcessor.processIndex(parser.getPath("-index", Path.of("index.json")), index);
 			} catch (IOException e) {
 				System.out.println("Error processing index: " + e.getMessage());
 			}
 		}
-		/*
+		
+		/* TODO Remove
 		 * For new flag... 
 		if (parser.hasFlag("-")) {
 			try {

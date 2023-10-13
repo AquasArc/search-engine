@@ -88,6 +88,8 @@ public class JsonWriter {
 		java.util.Iterator<? extends Number> iterator = elements.iterator();
 
 		writer.write("[\n");
+		
+		// TODO Need to take an if/while approach here instead (same with the other methods)
 
 		while (iterator.hasNext()) {
 			writeIndent(iterator.next().toString(), writer, indent + 1);
@@ -157,6 +159,8 @@ public class JsonWriter {
 	public static void writeObject(Map<String, ? extends Number> elements, Writer writer, int indent) throws IOException {
 		writer.write("{\n");
 
+		// TODO All of these methods need to use a more efficent approach
+		
 		int i = 0;
 		for (Map.Entry<String, ? extends Number> entry : elements.entrySet()) {
 			writeIndent(writer, indent + 1);
@@ -309,6 +313,8 @@ public class JsonWriter {
 			writer.write("[\n]");
 			return;
 		}
+		
+		// TODO reuse writeObject for the inner Map data structure
 
 		// Write the opening bracket of the JSON array
 		writer.write("[\n");
@@ -407,13 +413,14 @@ public class JsonWriter {
 	 * @throws IOException If an error occurs while writing to the file.
 	 */
 	public static void writeIndexToFile(TreeMap<String, TreeMap<String, TreeSet<Integer>>> index, Path outputPath) throws IOException {
-		try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputPath.toFile()))) {
+		try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputPath.toFile()))) { // TODO File.newBufferedReader
 			writeNestedMap(index, writer, 0);
 		} catch (IOException e) {
 			throw new IOException("Failed to write index to: " + outputPath, e);
 		}
 	}
 
+	// TODO Figure out the generic type for the index
 	/**
 	 * Helper method to format and write the inverted index data structure as a pretty-printed JSON.
 	 *
@@ -430,6 +437,8 @@ public class JsonWriter {
 			writeQuote(wordEntry.getKey(), writer, indent + 1);
 			writer.write(": {");
 			writer.write("\n");
+			
+			// TODO Should be able to reuse writeObjectArrays on the inner data structure
 
 			int innerCount = 0;
 			for (Map.Entry<String, TreeSet<Integer>> fileEntry : wordEntry.getValue().entrySet()) {

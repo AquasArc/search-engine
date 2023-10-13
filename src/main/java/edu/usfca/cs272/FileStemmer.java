@@ -89,6 +89,7 @@ public class FileStemmer {
 
 		// Loop through the series of words and apply the stemmer algorithm
 		for (String word : words) {
+			// TODO String stemWord = stemmer.stem(word).toString();
 			String stemWord = (String)stemmer.stem(word);
 
 			// Add the stem word into the collection
@@ -130,6 +131,7 @@ public class FileStemmer {
 	 * @see #listStems(String, Stemmer)
 	 */
 	public static ArrayList<String> listStems(String line) {
+		// TODO return listStems(line, new SnowballStemmer(ENGLISH));
 		// Create an ArrayList to hold the stemmed words
 		ArrayList<String> stemmedWords = new ArrayList<>();
 
@@ -181,6 +183,8 @@ public class FileStemmer {
 	 */
 	public static TreeSet<String> uniqueStems(String line, Stemmer stemmer) {
 		TreeSet<String> uniqueStems = new TreeSet<>();
+		
+		// TODO Reuse your other code so you don't need this repeated loop
 		String[] words = parse(line);
 
 		for (String word : words) {
@@ -205,7 +209,6 @@ public class FileStemmer {
 	 */
 	public static TreeSet<String> uniqueStems(String line) {
 		Stemmer stemmer = new SnowballStemmer(ENGLISH);
-
 		return uniqueStems(line, stemmer);
 	}
 
@@ -226,6 +229,8 @@ public class FileStemmer {
 		TreeSet<String> uniqueStems = new TreeSet<>();
 		Stemmer stemmer = new SnowballStemmer(ENGLISH);
 
+		// TODO Take the same approach as listStems(Path)
+		
 		List<String> lines = Files.readAllLines(input, UTF_8);
 
 		for (int x = 0; x < lines.size(); x++) {
@@ -252,12 +257,14 @@ public class FileStemmer {
 	public static ArrayList<TreeSet<String>> listUniqueStems(Path input) throws IOException {
 		ArrayList<TreeSet<String>> uniqueStemsList = new ArrayList<>();
 		Stemmer stemmer = new SnowballStemmer(ENGLISH);
+		
+		// TODO Take an approach closer to listStems(Path) but not exactly
 
 		List<String> lines = Files.readAllLines(input, UTF_8);
 		for (int x = 0; x < lines.size(); x++) {
 			TreeSet<String> uniqueStems = new TreeSet<>();
 			addStems(lines.get(x), stemmer, uniqueStems);
-			uniqueStemsList.add(uniqueStems);			
+			uniqueStemsList.add(uniqueStems);
 		}
 		return uniqueStemsList;
 	}

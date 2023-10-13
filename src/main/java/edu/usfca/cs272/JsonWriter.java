@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -476,4 +477,52 @@ public class JsonWriter {
 			throw new IOException("Failed to write word counts to: " + outputPath, e);
 		}
 	}
+
+	public static void writeResultsToFile(Map<String, List<FileResult>> results, Path outputPath) throws IOException {
+		try (BufferedWriter writer = Files.newBufferedWriter(outputPath, UTF_8)) {
+			writer.write("{\n");
+			int outerCount = 0;
+
+			for (Map.Entry<String, List<FileResult>> entry : results.entrySet()) {
+				writeQuote(entry.getKey(), writer, 1);
+				writer.write(": [\n");
+
+				int innerCount = 0;
+				for (FileResult fileResult : entry.getValue()) {
+					writeIndent(writer, 2);
+					writer.write("{\n");
+
+					writeQuote("count", writer, 3);
+					writer.write(": " + fileResult.getCount() + ",\n");
+
+					writeQuote("score", writer, 3);
+					writer.write(": " + String.format("%.8f", fileResult.getScore()) + ",\n");
+
+					writeQuote("where", writer, 3);
+					writer.write(": \"" + fileResult.getWhere() + "\"\n");
+
+					writeIndent(writer, 2);
+					writer.write("}");
+
+					if (innerCount < entry.getValue().size() - 1) {
+						writer.write(",");
+					}
+					writer.write("\n");
+					innerCount++;
+				}
+
+				writeIndent(writer, 1);
+				writer.write("]");
+
+				if (outerCount < results.size() - 1) {
+					writer.write(",");
+				}
+				writer.write("\n");
+				outerCount++;
+			}
+
+			writer.write("}");
+		}
+	}
+
 }

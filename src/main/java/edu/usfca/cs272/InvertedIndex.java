@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -31,6 +33,8 @@ public class InvertedIndex {
 		this.indexMap = new TreeMap<>();
 	}
 
+	private final Map<String, Integer> totalWordsPerFile = new HashMap<>();
+
 	/**
 	 * Processes a file, stems its words, and updates the inverted index data structure.
 	 * 
@@ -40,13 +44,16 @@ public class InvertedIndex {
 	public void processFile(Path filePath) throws IOException {
 		ArrayList<String> stemmedWords = FileStemmer.listStems(filePath);
 		int position = 0;
+		int totalWordsForThisFile = 0;
 
 		for (String word : stemmedWords) {
 			position++;
+			totalWordsForThisFile++;
 			indexMap.putIfAbsent(word, new TreeMap<>());
 			indexMap.get(word).putIfAbsent(filePath.toString(), new TreeSet<>());
 			indexMap.get(word).get(filePath.toString()).add(position);
 		}
+		totalWordsPerFile.put(filePath.toString(), totalWordsForThisFile);
 	}
 
 	/**
@@ -80,4 +87,14 @@ public class InvertedIndex {
 	public TreeMap<String, TreeMap<String, TreeSet<Integer>>> getIndexMap() {
 		return indexMap;
 	}
+
+	public Map<String, TreeSet<Integer>> getLocations(String word) {
+		return indexMap.getOrDefault(word, new TreeMap<>());
+	}
+
+	// Getter method to fetch the total word count for a specific file
+	public int getTotalWordsForLocation(String location) {
+		return totalWordsPerFile.getOrDefault(location, 0);
+	}
+
 }

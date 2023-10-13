@@ -2,6 +2,9 @@ package edu.usfca.cs272;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 
@@ -24,6 +27,9 @@ public class Driver {
 		ArgumentParser parser = new ArgumentParser(args);
 
 		InvertedIndex index = new InvertedIndex();
+		QueryProcessor processor = new QueryProcessor(index);
+		Map<String, List<FileResult>> results = new HashMap<>();
+
 
 		if (parser.hasFlag("-text")) {
 			Path inputPath = parser.getPath("-text");
@@ -50,14 +56,22 @@ public class Driver {
 				System.out.println("Error processing index: " + e.getMessage());
 			}
 		}
-		/*
-		 * For new flag... 
-		if (parser.hasFlag("-")) {
+
+		if (parser.hasFlag("-query")) {
+			Path queryPath = parser.getPath("-query");
 			try {
-				FileProcessor.process____(parser.getPath("-", Path.of(".json")), index);
+				results = processor.processQuery(queryPath);
 			} catch (IOException e) {
-				System.out.println("Error processing ______: " + e.getMessage());
+				System.out.println("Error processing query: " + e.getMessage());
 			}
-		*/
+		}
+
+		if (parser.hasFlag("-results")) {
+			try {
+				processor.writeResults(results, parser.getPath("-results", Path.of("results.json")));
+			} catch (IOException e) {
+				System.out.println("Error processing results: " + e.getMessage());
+			}
+		}
 	}
 }

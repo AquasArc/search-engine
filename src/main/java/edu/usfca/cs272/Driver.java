@@ -59,10 +59,14 @@ public class Driver {
 
 		if (parser.hasFlag("-query")) {
 			Path queryPath = parser.getPath("-query");
-			try {
-				results = processor.processQuery(queryPath);
-			} catch (IOException e) {
-				System.out.println("Error processing query: " + e.getMessage());
+			if (queryPath == null) {
+				System.out.println("Error: Missing value for -query flag");
+			} else {
+				try {
+					results = processor.processQuery(queryPath);
+				} catch (IOException e) {
+					System.out.println("Error processing query: " + e.getMessage());
+				}
 			}
 		}
 

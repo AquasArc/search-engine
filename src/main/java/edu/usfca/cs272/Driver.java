@@ -1,6 +1,7 @@
 package edu.usfca.cs272;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
@@ -59,7 +60,7 @@ public class Driver {
 
 		if (parser.hasFlag("-query")) {
 			Path queryPath = parser.getPath("-query");
-			if (queryPath == null) {
+			if (queryPath == null || !Files.exists(queryPath) || !Files.isRegularFile(queryPath)) {
 				System.out.println("Error: Missing value for -query flag");
 			} else {
 				try {

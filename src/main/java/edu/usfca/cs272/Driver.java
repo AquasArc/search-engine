@@ -31,6 +31,7 @@ public class Driver {
 		QueryProcessor processor = new QueryProcessor(index);
 		Map<String, List<FileResult>> results = new HashMap<>();
 
+		boolean isPartial = parser.hasFlag("-partial");
 
 		if (parser.hasFlag("-text")) {
 			Path inputPath = parser.getPath("-text");
@@ -64,7 +65,7 @@ public class Driver {
 				System.out.println("Error: Missing value for -query flag");
 			} else {
 				try {
-					results = processor.processQuery(queryPath);
+					results = processor.processQuery(queryPath, isPartial);
 				} catch (IOException e) {
 					System.out.println("Error processing query: " + e.getMessage());
 				}

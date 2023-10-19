@@ -3,6 +3,8 @@ package edu.usfca.cs272;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -24,15 +26,18 @@ public class QueryProcessor {
 				.collect(Collectors.toList());
 	}
 
-	public Map<String, List<FileResult>> processQuery(Path queryPath) throws IOException {
+	public Map<String, List<FileResult>> processQuery(Path queryPath, boolean isPartial) throws IOException {
 
 		Map<String, List<FileResult>> resultMap = new TreeMap<>();
 		List<String> queries = readQueries(queryPath);
 
 		for (String query : queries) {
-			if (!query.isEmpty()) { // Ensure the query isn't empty
+			if (!query.isEmpty()) {
 				TreeSet<String> processedQuery = new TreeSet<>(processSingleQuery(query));
-				List<FileResult> sortedResults = searchExact(processedQuery);
+				List<FileResult> sortedResults;
+
+				sortedResults = isPartial ? searchPartial(processedQuery) : searchExact(processedQuery);
+
 				resultMap.put(String.join(" ", processedQuery), sortedResults);
 			}
 		}
@@ -62,6 +67,31 @@ public class QueryProcessor {
 				.sorted()
 				.collect(Collectors.toList());
 	}
+	
+	public List<FileResult> searchPartial(TreeSet<String> processedQuery) {
+	      Map<String, FileResult> resultsMap = new TreeMap<>();
+
+	      for (String word : processedQuery) {
+
+	        // Word within invertedIndex
+	        // Checking to see if the query word starts with the inverted index word.
+	        for (String w : index.getIndexMap().keySet()) {
+	          if (w.startsWith(word)) {
+	            Map<String, TreeSet<Integer>> locations = index.getLocations(w);
+	            for (String location : locations.keySet()) {
+	                int totalWords = index.getTotalWordsForLocation(location);
+	                resultsMap.computeIfAbsent(location, k -> new FileResult(k, totalWords))
+	                .incrementCount(locations.get(location).size());
+	            }
+	          }
+	        }
+	      }
+
+	      // Convert the map values to a sorted list
+	      return resultsMap.values().stream()
+	              .sorted()
+	              .collect(Collectors.toList());
+	  }
 
 	public void writeResults(Map<String, List<FileResult>> results, Path outputPath) throws IOException {
 		JsonWriter.writeResultsToFile(results, outputPath);

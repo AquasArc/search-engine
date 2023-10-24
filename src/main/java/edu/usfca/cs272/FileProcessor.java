@@ -1,10 +1,10 @@
 package edu.usfca.cs272;
 
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.io.IOException;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.ArrayList;
 
 /**
  * Provides utility functions for processing files, directories, and generating data outputs.
@@ -18,6 +18,50 @@ import java.util.TreeMap;
  */
 public class FileProcessor {
 
+	
+	
+	/**
+	 * Processes a file, stems its words, and updates the inverted index data structure.
+	 * 
+	 * @param filePath The path to the file to process.
+	 * @throws IOException If an error occurs while reading the file.
+	 */
+	public static void processFile(Path filePath, InvertedIndex index) throws IOException {
+		ArrayList<String> stemmedWords = FileStemmer.listStems(filePath);
+		int position = 0;
+
+		for (String word : stemmedWords) {
+			position++;
+			index.add(word, filePath.toString(), position);
+		}
+	}
+
+	/**
+	 * Processes a directory by iterating through its files and updating the inverted index.
+	 * Only processes files with .txt or .text extensions.
+	 * 
+	 * @param dirPath The path to the directory to process.
+	 * @throws IOException If an error occurs while reading files within the directory.
+	 */
+	public static void processDirectory(Path dirPath, InvertedIndex index) throws IOException { //Changed to use directory streams
+		try (DirectoryStream<Path> stream = Files.newDirectoryStream(dirPath)) {
+			for (Path entry : stream) {
+				if (Files.isDirectory(entry)) {
+					processDirectory(entry, index);
+				} else if (Files.isRegularFile(entry)) {
+					String fileName = entry.toString().toLowerCase();
+					if (fileName.endsWith(".txt") || fileName.endsWith(".text")) {
+						try {
+							processFile(entry, index);
+						} catch (IOException e) {
+							System.out.println("Error Processing file " + entry);
+						}
+					}
+				}
+			}
+		}
+	}
+	
 	/**
 	 * Processes a given input path, checking whether it's a regular file or a directory,
 	 * and delegates the task to the appropriate method in the InvertedIndex.
@@ -28,50 +72,11 @@ public class FileProcessor {
 	 */
 	public static void processText(Path inputPath, InvertedIndex index) throws IOException {
 		if (Files.isRegularFile(inputPath)) {
-			index.processFile(inputPath);
+			processFile(inputPath, index);
 		} else if (Files.isDirectory(inputPath)) {
-			index.processDirectory(inputPath);
+			processDirectory(inputPath, index);
 		} else {
 			throw new IOException("Invalid input path: " + inputPath);
 		}
-	}
-
-	/**
-	 * Converts the indexed words and their occurrences into word counts and writes them to a file.
-	 * 
-	 * @param countPath The path where word counts should be written in JSON format.
-	 * @param index The InvertedIndex instance containing the indexed data.
-	 * @throws IOException If an error occurs during file writing.
-	 */
-	public static void processCounts(Path countPath, InvertedIndex index) throws IOException {
-		Map<String, Long> wordCounts = generateWordCounts(index); // TODO Problematic
-		JsonWriter.writeWordCountsToFile(wordCounts, countPath);
-	}
-
-	/**
-	 * Writes the indexed words, their occurrences, and positions within files to a file in a specific JSON format.
-	 * 
-	 * @param indexPath The path where the index should be written in JSON format.
-	 * @param index The InvertedIndex instance containing the indexed data.
-	 * @throws IOException If an error occurs during file writing.
-	 */
-	public static void processIndex(Path indexPath, InvertedIndex index) throws IOException {
-		JsonWriter.writeIndexToFile(index.getIndexMap(), indexPath);
-	}
-
-	/**
-	 * Generates word counts for each file based on the indexed data.
-	 * 
-	 * @param index The InvertedIndex instance containing the indexed data.
-	 * @return A map where each file path is mapped to its respective word count.
-	 */
-	private static Map<String, Long> generateWordCounts(InvertedIndex index) {
-		Map<String, Long> wordCounts = new TreeMap<>();
-		for (String word : index.getIndexMap().keySet()) {
-			for (String file : index.getIndexMap().get(word).keySet()) {
-				wordCounts.put(file, wordCounts.getOrDefault(file, 0L) + index.getIndexMap().get(word).get(file).size());
-			}
-		}
-		return wordCounts;
 	}
 }

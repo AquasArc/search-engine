@@ -1,9 +1,9 @@
 package edu.usfca.cs272;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -23,8 +23,15 @@ public class InvertedIndex {
 	 * It maps words to file paths and the positions of the words within those files.
 	 */
 	private final TreeMap<String, TreeMap<String, TreeSet<Integer>>> indexMap;
+	// Word : {Address : [1,2,3]}
 
-	// TODO Map<String, Long> wordCounts
+	/**
+	 * Data structure for total words in a file
+	 * Map contains address : total words
+	 */
+	private Map<String, Long> wordCountMap;
+
+	
 	
 	/**
 	 * Initializes the inverted index data structure.
@@ -32,70 +39,44 @@ public class InvertedIndex {
 
 	public InvertedIndex() {
 		this.indexMap = new TreeMap<>();
+		this.wordCountMap = new TreeMap<>();
 	}
 	
-	/*
-	 * TODO 
-	 * Remove processFile and processDirectory into FileProcessor
-	 * 
-	 * Create a data structure class here instead
-	 * 
-	 * add(String word, String location, int position)
-	 * addAll(List<String> words, String location, int start)
-	 * 
-	 * hasWord(String word)
-	 * hasLocation(String word, String location)
-	 * hasPosition(String word, String location, int position)
-	 * 
-	 * num methods...
-	 * get methods...
-	 * 
-	 * toString()
-	 * 
-	 * PrefixMap and FileIndex
-	 */
-
-	/**
-	 * Processes a file, stems its words, and updates the inverted index data structure.
-	 * 
-	 * @param filePath The path to the file to process.
-	 * @throws IOException If an error occurs while reading the file.
-	 */
-	public void processFile(Path filePath) throws IOException {
-		ArrayList<String> stemmedWords = FileStemmer.listStems(filePath);
-		int position = 0;
-
-		for (String word : stemmedWords) {
-			position++;
-			indexMap.putIfAbsent(word, new TreeMap<>());
-			indexMap.get(word).putIfAbsent(filePath.toString(), new TreeSet<>());
-			indexMap.get(word).get(filePath.toString()).add(position);
+	public void add(String word, String location, int position) {
+		//Adds to indexMap
+		indexMap.putIfAbsent(word, new TreeMap<>());
+		indexMap.get(word).putIfAbsent(location, new TreeSet<>());
+		indexMap.get(word).get(location).add(position);
+		
+		//Adds to wordCountMap...
+		wordCountMap.put(location, wordCountMap.getOrDefault(location, 0L) + 1);
+	}
+	
+	public void addAll(List<String> words, String location, int position) {
+		for (String word : words) {
+			add(word, location, position++);
 		}
 	}
-
-	/**
-	 * Processes a directory by iterating through its files and updating the inverted index.
-	 * Only processes files with .txt or .text extensions.
-	 * 
-	 * @param dirPath The path to the directory to process.
-	 * @throws IOException If an error occurs while reading files within the directory.
-	 */
-	public void processDirectory(Path dirPath) throws IOException {
-		// TODO Avoid a functional approach for this project, use a DirectoryStream etc. 
-		
-		Files.walk(dirPath)
-		.filter(Files::isRegularFile)
-		.filter(file -> {
-			String fileName = file.toString().toLowerCase();
-			return fileName.endsWith(".txt") || fileName.endsWith(".text");
-		})
-		.forEach(file -> {
-			try {
-				this.processFile(file);
-			} catch (IOException e) {
-				System.out.println("Error processing file " + file + ": " + e.getMessage());
-			}
-		});
+	
+	public boolean hasWord(String word) {
+		return indexMap.containsKey(word);
+	}
+	
+	public boolean hasLocation(String word, String location) {
+		return hasWord(word) && indexMap.get(word).containsKey(location);
+	}
+	
+	public boolean hasPosition(String word, String location, int position) {
+		return hasLocation(word, location) && indexMap.get(word).get(location).contains(position);
+	}
+	
+	
+	public void writeIndexMap(Path indexPath) throws IOException {
+		JsonWriter.writeIndexToFile(indexMap, indexPath);
+	}
+	
+	public void writeCountsMap(Path countsPath) throws IOException {
+		JsonWriter.writeWordCountsToFile(wordCountMap, countsPath);
 	}
 
 	/**
@@ -103,7 +84,7 @@ public class InvertedIndex {
 	 * 
 	 * @return The inverted index as a nested map.
 	 */
-	public TreeMap<String, TreeMap<String, TreeSet<Integer>>> getIndexMap() {
-		return indexMap;
+	public Map<String, TreeMap<String, TreeSet<Integer>>> getIndexMap() {
+		return Collections.unmodifiableMap(indexMap);
 	}
 }

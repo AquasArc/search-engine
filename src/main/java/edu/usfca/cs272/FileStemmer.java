@@ -11,7 +11,6 @@ import java.nio.file.Path;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
@@ -85,12 +84,12 @@ public class FileStemmer {
 	 */
 	public static void addStems(String line, Stemmer stemmer, Collection<String>stems) {
 		// Parse the input to individual words
+
 		String[] words = parse(line);
 
 		// Loop through the series of words and apply the stemmer algorithm
 		for (String word : words) {
-			// TODO String stemWord = stemmer.stem(word).toString();
-			String stemWord = (String)stemmer.stem(word);
+			String stemWord = stemmer.stem(word).toString();
 
 			// Add the stem word into the collection
 			stems.add(stemWord);
@@ -131,16 +130,7 @@ public class FileStemmer {
 	 * @see #listStems(String, Stemmer)
 	 */
 	public static ArrayList<String> listStems(String line) {
-		// TODO return listStems(line, new SnowballStemmer(ENGLISH));
-		// Create an ArrayList to hold the stemmed words
-		ArrayList<String> stemmedWords = new ArrayList<>();
-
-		// The Stemmer using the snowball algo
-		Stemmer stemmer = new SnowballStemmer(ENGLISH);
-
-		// Use the addStems() method & return the collection of stemmed words
-		addStems(line, stemmer, stemmedWords);
-		return stemmedWords;
+		return listStems(line, new SnowballStemmer(ENGLISH));
 
 	}
 
@@ -183,16 +173,7 @@ public class FileStemmer {
 	 */
 	public static TreeSet<String> uniqueStems(String line, Stemmer stemmer) {
 		TreeSet<String> uniqueStems = new TreeSet<>();
-		
-		// TODO Reuse your other code so you don't need this repeated loop
-		String[] words = parse(line);
-
-		for (String word : words) {
-			String stemmedWord = stemmer.stem(word).toString();
-			if (stemmedWord != null) {
-				uniqueStems.add(stemmedWord);
-			}	
-		}
+		addStems(line, stemmer, uniqueStems);
 		return uniqueStems;
 	}
 
@@ -209,6 +190,7 @@ public class FileStemmer {
 	 */
 	public static TreeSet<String> uniqueStems(String line) {
 		Stemmer stemmer = new SnowballStemmer(ENGLISH);
+
 		return uniqueStems(line, stemmer);
 	}
 
@@ -229,12 +211,11 @@ public class FileStemmer {
 		TreeSet<String> uniqueStems = new TreeSet<>();
 		Stemmer stemmer = new SnowballStemmer(ENGLISH);
 
-		// TODO Take the same approach as listStems(Path)
-		
-		List<String> lines = Files.readAllLines(input, UTF_8);
-
-		for (int x = 0; x < lines.size(); x++) {
-			addStems(lines.get(x), stemmer, uniqueStems);
+		try(BufferedReader reader = Files.newBufferedReader(input, UTF_8)) {
+			String line;
+			while ((line = reader.readLine()) != null) {
+				addStems(line, stemmer, uniqueStems);
+			}
 		}
 		return uniqueStems;
 	}
@@ -257,14 +238,12 @@ public class FileStemmer {
 	public static ArrayList<TreeSet<String>> listUniqueStems(Path input) throws IOException {
 		ArrayList<TreeSet<String>> uniqueStemsList = new ArrayList<>();
 		Stemmer stemmer = new SnowballStemmer(ENGLISH);
-		
-		// TODO Take an approach closer to listStems(Path) but not exactly
 
-		List<String> lines = Files.readAllLines(input, UTF_8);
-		for (int x = 0; x < lines.size(); x++) {
-			TreeSet<String> uniqueStems = new TreeSet<>();
-			addStems(lines.get(x), stemmer, uniqueStems);
-			uniqueStemsList.add(uniqueStems);
+		try(BufferedReader reader = Files.newBufferedReader(input, UTF_8)) {
+			String line;
+			while ((line = reader.readLine()) != null) {
+				uniqueStemsList.add(uniqueStems(line, stemmer));
+			}
 		}
 		return uniqueStemsList;
 	}

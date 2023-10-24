@@ -37,7 +37,7 @@ public class Driver {
 
 		if (parser.hasFlag("-counts")) {
 			try {
-				FileProcessor.processCounts(parser.getPath("-counts", Path.of("counts.json")), index);
+				index.writeCountsMap(parser.getPath("-counts", Path.of("counts.json")));
 			} catch (IOException e) {
 				System.out.println("Error processing counts: " + e.getMessage());
 			}
@@ -46,20 +46,10 @@ public class Driver {
 		if (parser.hasFlag("-index")) {
 			try {
 				// TODO JsonWriter.writeIndexToFile(index.getIndexMap(), indexPath);
-				FileProcessor.processIndex(parser.getPath("-index", Path.of("index.json")), index);
+				index.writeIndexMap(parser.getPath("-index", Path.of("index.json")));
 			} catch (IOException e) {
 				System.out.println("Error processing index: " + e.getMessage());
 			}
 		}
-		
-		/* TODO Remove
-		 * For new flag... 
-		if (parser.hasFlag("-")) {
-			try {
-				FileProcessor.process____(parser.getPath("-", Path.of(".json")), index);
-			} catch (IOException e) {
-				System.out.println("Error processing ______: " + e.getMessage());
-			}
-		*/
 	}
 }

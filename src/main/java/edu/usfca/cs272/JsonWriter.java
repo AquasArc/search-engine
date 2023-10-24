@@ -85,23 +85,22 @@ public class JsonWriter {
 	 * @see #writeIndent(String, Writer, int)
 	 */
 	public static void writeArray(Collection<? extends Number> elements, Writer writer, int indent) throws IOException {
-		java.util.Iterator<? extends Number> iterator = elements.iterator();
+	    java.util.Iterator<? extends Number> iterator = elements.iterator();
 
-		writer.write("[\n");
-		
-		// TODO Need to take an if/while approach here instead (same with the other methods)
+	    writer.write("[");
+	    
+	    if (iterator.hasNext()) {
+	        writer.write("\n");
+	        writeIndent(iterator.next().toString(), writer, indent + 1);
+	    }
 
-		while (iterator.hasNext()) {
-			writeIndent(iterator.next().toString(), writer, indent + 1);
+	    while (iterator.hasNext()) {
+	        writer.write(",\n");
+	        writeIndent(iterator.next().toString(), writer, indent + 1);
+	    }
 
-			if (iterator.hasNext()) {
-				writer.write(",");
-			}
-
-			writer.write("\n");
-		}
-
-		writeIndent("]", writer, indent);
+	    writer.write("\n");
+	    writeIndent("]", writer, indent);
 	}
 
 

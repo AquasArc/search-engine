@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -81,10 +82,24 @@ public class InvertedIndex {
 
 	/**
 	 * Retrieves the current state of the inverted index data structure.
+	 * Then creates an unmodifiable copy and returns that
+	 * 
 	 * 
 	 * @return The inverted index as a nested map.
 	 */
-	public Map<String, TreeMap<String, TreeSet<Integer>>> getIndexMap() {
-		return Collections.unmodifiableMap(indexMap);
+	public Map<String, TreeMap<String, SortedSet<Integer>>> getIndexMap() {
+	    Map<String, TreeMap<String, SortedSet<Integer>>> unmodifiableCopy = new TreeMap<>();
+
+	    for (Map.Entry<String, TreeMap<String, TreeSet<Integer>>> outerEntry : indexMap.entrySet()) {
+	        TreeMap<String, SortedSet<Integer>> innerUnmodifiable = new TreeMap<>();
+	        
+	        for (Map.Entry<String, TreeSet<Integer>> innerEntry : outerEntry.getValue().entrySet()) {
+	            innerUnmodifiable.put(innerEntry.getKey(), Collections.unmodifiableSortedSet(new TreeSet<>(innerEntry.getValue())));
+	        }
+	        
+	        unmodifiableCopy.put(outerEntry.getKey(), innerUnmodifiable);
+	    }
+
+	    return Collections.unmodifiableMap(unmodifiableCopy);
 	}
 }

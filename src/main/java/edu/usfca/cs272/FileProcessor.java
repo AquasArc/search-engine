@@ -24,6 +24,7 @@ public class FileProcessor {
 	 * Processes a file, stems its words, and updates the inverted index data structure.
 	 * 
 	 * @param filePath The path to the file to process.
+	 * @param index The InvertedIndex instance used for updating word occurrences.
 	 * @throws IOException If an error occurs while reading the file.
 	 */
 	public static void processFile(Path filePath, InvertedIndex index) throws IOException {
@@ -40,7 +41,8 @@ public class FileProcessor {
 	 * Processes a directory by iterating through its files and updating the inverted index.
 	 * Only processes files with .txt or .text extensions.
 	 * 
-	 * @param dirPath The path to the directory to process.
+	 * @param dirPath The path to the directory to process
+	 * @param index The InvertedIndex instance used for updating word occurrences.
 	 * @throws IOException If an error occurs while reading files within the directory.
 	 */
 	public static void processDirectory(Path dirPath, InvertedIndex index) throws IOException { //Changed to use directory streams

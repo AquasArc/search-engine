@@ -117,10 +117,21 @@ public class InvertedIndex {
 		JsonWriter.writeWordCountsToFile(wordCountMap, countsPath);
 	}
 
+	/**
+	 * Retrieves a set of all the words in the inverted index.
+	 * 
+	 * @return An unmodifiable set of all words in the index.
+	 */
 	public Set<String> viewWords() {
 		return Collections.unmodifiableSet(indexMap.keySet());
 	}
 
+	/**
+	 * Retrieves all the locations and their positions for a given word.
+	 * 
+	 * @param word The word for which to retrieve locations and positions.
+	 * @return An unmodifiable map containing the locations and positions of the given word.
+	 */
 	public Map<String, TreeSet<Integer>> viewLocations(String word) {
 		if (indexMap.containsKey(word)) {
 			return Collections.unmodifiableMap(indexMap.get(word));
@@ -129,6 +140,13 @@ public class InvertedIndex {
 		return Collections.emptyMap();
 	}
 
+	/**
+	 * Retrieves all the positions for a given word and location.
+	 * 
+	 * @param word The word for which to retrieve positions.
+	 * @param location The location for which to retrieve positions.
+	 * @return An unmodifiable sorted set containing all the positions of the given word in the given location.
+	 */
 	public TreeSet<Integer> viewPositions(String word, String location) {
 		if (hasLocation(word, location)) {
 			return (TreeSet<Integer>) Collections.unmodifiableSortedSet(indexMap.get(word).get(location));
@@ -137,6 +155,11 @@ public class InvertedIndex {
 		return new TreeSet<>();
 	}
 
+	/**
+	 * Provides a complete view of the inverted index map.
+	 * 
+	 * @return An unmodifiable map that represents the complete inverted index.
+	 */
 	public Map<String, TreeMap<String, TreeSet<Integer>>> viewIndexMap() {
 		return Collections.unmodifiableMap(indexMap);
 	}

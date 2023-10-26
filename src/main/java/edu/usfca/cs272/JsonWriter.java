@@ -156,28 +156,33 @@ public class JsonWriter {
 	 * @see #writeIndent(String, Writer, int)
 	 */
 	public static void writeObject(Map<String, ? extends Number> elements, Writer writer, int indent) throws IOException {
-		writer.write("{\n");
+	    writer.write("{\n");
 
-		// TODO All of these methods need to use a more efficent approach
+	    if (!elements.isEmpty()) {
+	    	java.util.Iterator<? extends Map.Entry<String, ? extends Number>> iterator = elements.entrySet().iterator();
+	        Map.Entry<String, ? extends Number> entry = iterator.next();
 
-		int i = 0;
-		for (Map.Entry<String, ? extends Number> entry : elements.entrySet()) {
-			writeIndent(writer, indent + 1);
-			writer.write("\"" + entry.getKey() + "\": " + entry.getValue().toString());
+	        writeIndent(writer, indent + 1);
+	        writeQuote(entry.getKey(), writer, 0);
+	        writer.write(": ");
+	        writer.write(entry.getValue().toString());
 
-			// Adding a comma only if its not the last element
-			if (i < elements.size() - 1)  {
-				writer.write(",\n");
-			} else {
-				writer.write("\n");
-			}
-			i++;
-		}
+	        while (iterator.hasNext()) {
+	            writer.write(",\n");
+	            entry = iterator.next();
 
-		writeIndent(writer, indent);
-		writer.write("}\n");
+	            writeIndent(writer, indent + 1);
+	            writeQuote(entry.getKey(), writer, 0);
+	            writer.write(": ");
+	            writer.write(entry.getValue().toString());
+	        }
+
+	        writer.write("\n");
+	    }
+
+	    writeIndent(writer, indent);
+	    writer.write("}");
 	}
-
 	/**
 	 * Writes the elements as a pretty JSON object to file.
 	 *
@@ -233,22 +238,30 @@ public class JsonWriter {
 	 * @see #writeArray(Collection)
 	 */
 	public static void writeObjectArrays(Map<String, ? extends Collection<? extends Number>> elements, Writer writer, int indent) throws IOException {
-		writer.write("{\n");
-		// Changed to a boolean entry check
-		boolean firstEntry = true;
-		// Changed to use the Map and its entries
-		for (Map.Entry<String, ? extends Collection<? extends Number>> entry : elements.entrySet()) {
-			if (!firstEntry) {
-				writer.write(",\n");
-			}
-			// Changed to utilize the other methods in the class
-			writeQuote(entry.getKey() + ":", writer, indent + 1);
-			writeArray(entry.getValue(), writer, indent + 1);
-			firstEntry = false;
-		}
-		writer.write("\n");
-		writeIndent(writer, indent);
-		writer.write("}\n");
+	    if (elements.isEmpty()) {
+	        writer.write("{\n");
+	        writeIndent(writer, indent);
+	        writer.write("}\n");
+	        return;
+	    }
+
+	    writer.write("{\n");
+
+	    boolean firstEntry = true;
+	    for (Map.Entry<String, ? extends Collection<? extends Number>> entry : elements.entrySet()) {
+	        if (!firstEntry) {
+	            writer.write(",\n");
+	        }
+	        writeIndent(writer, indent + 1);
+	        writeQuote(entry.getKey(), writer, 0);
+	        writer.write(": ");
+	        writeArray(entry.getValue(), writer, indent + 1);
+	        firstEntry = false;
+	    }
+
+	    writer.write("\n");
+	    writeIndent(writer, indent);
+	    writer.write("}");
 	}
 
 
@@ -307,65 +320,30 @@ public class JsonWriter {
 	 * @see #writeObject(Map)
 	 */
 	public static void writeArrayObjects(Collection<? extends Map<String, ? extends Number>> elements, Writer writer, int indent) throws IOException {
-		// Check if the collection is empty and return an empty JSON array
-		if (elements.isEmpty()) {
-			writer.write("[\n]");
-			return;
-		}
+	    writer.write("[");
 
-		// TODO reuse writeObject for the inner Map data structure
+	    if (!elements.isEmpty()) {
+	        writer.write("\n");
+	        
+	        java.util.Iterator<? extends Map<String, ? extends Number>> iterator = elements.iterator();
+	        Map<String, ? extends Number> currentMap = iterator.next();
+	        
+	        writeIndent(writer, indent + 1);
+	        writeObject(currentMap, writer, indent + 1);
 
-		// Write the opening bracket of the JSON array
-		writer.write("[\n");
+	        while (iterator.hasNext()) {
+	            writer.write(",\n");
+	            currentMap = iterator.next();
+	            
+	            writeIndent(writer, indent + 1);
+	            writeObject(currentMap, writer, indent + 1);
+	        }
+	    }
 
-		boolean isFirstMap = true; // Flag to check if we're at the first map in the collection
-		for (var currentMap : elements) {
-			// Add a comma if this isn't the first map
-			if (!isFirstMap) {
-				writer.write(",\n");
-			}
-
-			writeIndent(writer, indent + 1); // Indent for the map opening bracket
-			writer.write("{\n");
-
-			boolean isFirstEntry = true; // Flag to check if we're at the first entry in the map
-			for (var entry : currentMap.entrySet()) {
-				// Add a comma if this isn't the first entry
-				if (!isFirstEntry) {
-					writer.write(",\n");
-				}
-
-				// Write the key-value pair
-				writeMapEntry(writer, entry, indent + 2);
-				isFirstEntry = false;
-			}
-
-			// Close the current map
-			writer.write("\n");
-			writeIndent(writer, indent + 1);
-			writer.write("}");
-			isFirstMap = false; // Set flag to false as we have processed at least one map
-		}
-
-		// Close the JSON array
-		writer.write("\n");
-		writeIndent(writer, indent);
-		writer.write("]\n");
+	    writer.write("\n");
+	    writeIndent(writer, indent);
+	    writer.write("]");
 	}
-
-	/**
-	 * Writes a single map entry as a key value pair in JSON format.
-	 *
-	 * @param writer The writer object used for writing the key value pair
-	 * @param entry The map entry to be written as a key value pair
-	 * @param indent The number of spaces for indentation
-	 * @throws IOException If writing fails
-	 */
-	private static void writeMapEntry(Writer writer, Map.Entry<String, ? extends Number> entry, int indent) throws IOException {
-		writeIndent(writer, indent); // Add appropriate indentation
-		writer.write(String.format("\"%s\": %s", entry.getKey(), entry.getValue())); // Write the key-value pair
-	}
-
 
 	/**
 	 * Writes the elements as a pretty JSON array with nested objects to file.
@@ -405,67 +383,43 @@ public class JsonWriter {
 	}
 
 	/**
-	 * Writes the inverted index data structure to the specified output path in JSON format.
+	 * Writes the given inverted index to a file in JSON format.
 	 *
-	 * @param index      The nested map representing the inverted index.
-	 * @param outputPath The path where the output should be written.
-	 * @throws IOException If an error occurs while writing to the file.
+	 * @param index The inverted index map to write.
+	 * @param outputPath The path where the JSON should be saved.
+	 * @throws IOException If there's an issue writing the file.
 	 */
 	public static void writeIndexToFile(Map<String, TreeMap<String, TreeSet<Integer>>> index, Path outputPath) throws IOException {
-		try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputPath.toFile()))) { // TODO File.newBufferedReader
-			writeNestedMap(index, writer, 0);
-		} catch (IOException e) {
-			throw new IOException("Failed to write index to: " + outputPath, e);
-		}
+	    try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputPath.toFile()))) {
+	        writer.write("{\n");
+
+	        if (index.isEmpty()) {
+	            writer.write("}");
+	            return;
+	        }
+	        
+	        int outerCount = 0;
+	        for (Map.Entry<String, TreeMap<String, TreeSet<Integer>>> wordEntry : index.entrySet()) {
+	            if (outerCount > 0) { // Add a comma if this isn't the first entry
+	                writer.write(",\n");
+	            }
+	            writeQuote(wordEntry.getKey(), writer, 1);
+	            writer.write(": ");
+	            
+	            writeObjectArrays(wordEntry.getValue(), writer, 1);
+
+	            outerCount++;
+	        }
+	        
+	        writer.write("\n}");
+	        
+	    } catch (IOException e) {
+	        throw new IOException("Failed to write index to: " + outputPath, e);
+	    }
 	}
 
-	// TODO Figure out the generic type for the index
-	/**
-	 * Helper method to format and write the inverted index data structure as a pretty-printed JSON.
-	 *
-	 * @param index  The nested map representing the inverted index.
-	 * @param writer The writer object to output the formatted data.
-	 * @param indent The indentation level to use for pretty-printing.
-	 * @throws IOException If an error occurs during writing.
-	 */
-	public static void writeNestedMap(Map<String, TreeMap<String, TreeSet<Integer>>> index, Writer writer, int indent) throws IOException {
-		writer.write("{\n");
 
-		int outerCount = 0;
-		for (Map.Entry<String, TreeMap<String, TreeSet<Integer>>> wordEntry : index.entrySet()) {
-			writeQuote(wordEntry.getKey(), writer, indent + 1);
-			writer.write(": {");
-			writer.write("\n");
 
-			// TODO Should be able to reuse writeObjectArrays on the inner data structure
-
-			int innerCount = 0;
-			for (Map.Entry<String, TreeSet<Integer>> fileEntry : wordEntry.getValue().entrySet()) {
-				Path correctedPath = Paths.get(fileEntry.getKey());
-				writeQuote(correctedPath.toString(), writer, indent + 2);
-				writer.write(": ");
-				writeArray(fileEntry.getValue(), writer, indent + 2);
-
-				// Check for trailing comma
-				if (innerCount < wordEntry.getValue().size() - 1) {
-					writer.write(",");
-				}
-				writer.write("\n");
-				innerCount++;
-			}
-
-			writeIndent("}", writer, indent + 1);
-
-			// Check for trailing comma
-			if (outerCount < index.size() - 1) {
-				writer.write(",");
-			}
-			writer.write("\n");
-			outerCount++;
-		}
-
-		writeIndent("}", writer, indent);
-	}
 
 
 	/**

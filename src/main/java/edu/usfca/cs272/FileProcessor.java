@@ -18,8 +18,8 @@ import java.util.ArrayList;
  */
 public class FileProcessor {
 
-	
-	
+
+
 	/**
 	 * Processes a file, stems its words, and updates the inverted index data structure.
 	 * 
@@ -61,7 +61,7 @@ public class FileProcessor {
 			}
 		}
 	}
-	
+
 	/**
 	 * Processes a given input path, checking whether it's a regular file or a directory,
 	 * and delegates the task to the appropriate method in the InvertedIndex.

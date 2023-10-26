@@ -45,8 +45,7 @@ public class Driver {
 
 		if (parser.hasFlag("-index")) {
 			try {
-				// TODO JsonWriter.writeIndexToFile(index.getIndexMap(), indexPath);
-				index.writeIndexMap(parser.getPath("-index", Path.of("index.json")));
+				JsonWriter.writeIndexToFile(index.viewIndexMap(), parser.getPath("-index", Path.of("index.json")));
 			} catch (IOException e) {
 				System.out.println("Error processing index: " + e.getMessage());
 			}

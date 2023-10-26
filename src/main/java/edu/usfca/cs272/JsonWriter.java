@@ -85,22 +85,22 @@ public class JsonWriter {
 	 * @see #writeIndent(String, Writer, int)
 	 */
 	public static void writeArray(Collection<? extends Number> elements, Writer writer, int indent) throws IOException {
-	    java.util.Iterator<? extends Number> iterator = elements.iterator();
+		java.util.Iterator<? extends Number> iterator = elements.iterator();
 
-	    writer.write("[");
-	    
-	    if (iterator.hasNext()) {
-	        writer.write("\n");
-	        writeIndent(iterator.next().toString(), writer, indent + 1);
-	    }
+		writer.write("[");
 
-	    while (iterator.hasNext()) {
-	        writer.write(",\n");
-	        writeIndent(iterator.next().toString(), writer, indent + 1);
-	    }
+		if (iterator.hasNext()) {
+			writer.write("\n");
+			writeIndent(iterator.next().toString(), writer, indent + 1);
+		}
 
-	    writer.write("\n");
-	    writeIndent("]", writer, indent);
+		while (iterator.hasNext()) {
+			writer.write(",\n");
+			writeIndent(iterator.next().toString(), writer, indent + 1);
+		}
+
+		writer.write("\n");
+		writeIndent("]", writer, indent);
 	}
 
 
@@ -159,7 +159,7 @@ public class JsonWriter {
 		writer.write("{\n");
 
 		// TODO All of these methods need to use a more efficent approach
-		
+
 		int i = 0;
 		for (Map.Entry<String, ? extends Number> entry : elements.entrySet()) {
 			writeIndent(writer, indent + 1);
@@ -312,7 +312,7 @@ public class JsonWriter {
 			writer.write("[\n]");
 			return;
 		}
-		
+
 		// TODO reuse writeObject for the inner Map data structure
 
 		// Write the opening bracket of the JSON array
@@ -411,7 +411,7 @@ public class JsonWriter {
 	 * @param outputPath The path where the output should be written.
 	 * @throws IOException If an error occurs while writing to the file.
 	 */
-	public static void writeIndexToFile(TreeMap<String, TreeMap<String, TreeSet<Integer>>> index, Path outputPath) throws IOException {
+	public static void writeIndexToFile(Map<String, TreeMap<String, TreeSet<Integer>>> index, Path outputPath) throws IOException {
 		try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputPath.toFile()))) { // TODO File.newBufferedReader
 			writeNestedMap(index, writer, 0);
 		} catch (IOException e) {
@@ -428,7 +428,7 @@ public class JsonWriter {
 	 * @param indent The indentation level to use for pretty-printing.
 	 * @throws IOException If an error occurs during writing.
 	 */
-	public static void writeNestedMap(TreeMap<String, TreeMap<String, TreeSet<Integer>>> index, Writer writer, int indent) throws IOException {
+	public static void writeNestedMap(Map<String, TreeMap<String, TreeSet<Integer>>> index, Writer writer, int indent) throws IOException {
 		writer.write("{\n");
 
 		int outerCount = 0;
@@ -436,7 +436,7 @@ public class JsonWriter {
 			writeQuote(wordEntry.getKey(), writer, indent + 1);
 			writer.write(": {");
 			writer.write("\n");
-			
+
 			// TODO Should be able to reuse writeObjectArrays on the inner data structure
 
 			int innerCount = 0;

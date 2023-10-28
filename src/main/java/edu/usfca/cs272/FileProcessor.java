@@ -12,11 +12,11 @@ import java.util.ArrayList;
  * 
  * 
  * 
- * @author Anton Lim
+ * @author Anton Lim TODO What is with the blank lines above and below?
  * @author CS 272 Software Development (University of San Francisco)
  * @version Fall 2023
  */
-public class FileProcessor {
+public class FileProcessor { // TODO Rename to InvertedIndexProcessor now, since all the methods require an index 
 
 
 
@@ -28,12 +28,20 @@ public class FileProcessor {
 	 * @throws IOException If an error occurs while reading the file.
 	 */
 	public static void processFile(Path filePath, InvertedIndex index) throws IOException {
+		/*
+		 * TODO listStems is great for getting the code working, but not so great for
+		 * efficiency. At this point, you need to do something that does not require
+		 * looping through the stems so many times (once to create the list, once to
+		 * move the stems from the list into the index). This means creating a buffered
+		 * reader here, taking a line by line approach, parsing, stemming, and adding
+		 * directly to the inverted index itself (never to a list). 
+		 */
 		ArrayList<String> stemmedWords = FileStemmer.listStems(filePath);
 		int position = 0;
 
 		for (String word : stemmedWords) {
 			position++;
-			index.add(word, filePath.toString(), position);
+			index.add(word, filePath.toString(), position); // TODO Does filePath.toString() need to happen over and over again inside of this loop?
 		}
 	}
 
@@ -51,12 +59,13 @@ public class FileProcessor {
 				if (Files.isDirectory(entry)) {
 					processDirectory(entry, index);
 				} else if (Files.isRegularFile(entry)) {
+					// TODO Make this filter by text files more reusable by making a public static boolean isTextFile method!
 					String fileName = entry.toString().toLowerCase();
 					if (fileName.endsWith(".txt") || fileName.endsWith(".text")) {
 						try {
 							processFile(entry, index);
-						} catch (IOException e) {
-							System.out.println("Error Processing file " + entry);
+						} catch (IOException e) { // TODO Where does this try/catch belong? Why?
+							System.out.println("Error Processing file " + entry); 
 						}
 					}
 				}
@@ -78,7 +87,7 @@ public class FileProcessor {
 		} else if (Files.isDirectory(inputPath)) {
 			processDirectory(inputPath, index);
 		} else {
-			throw new IOException("Invalid input path: " + inputPath);
+			throw new IOException("Invalid input path: " + inputPath); // TODO Remove this else block entirely
 		}
 	}
 }

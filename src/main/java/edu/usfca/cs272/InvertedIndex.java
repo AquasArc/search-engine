@@ -126,6 +126,10 @@ public class InvertedIndex {
 		return Collections.unmodifiableSet(indexMap.keySet());
 	}
 
+	/*
+	 * TODO This is still breaking encapsulation. I'm not clear you understand this concept.
+	 * 
+	 */
 	/**
 	 * Retrieves all the locations and their positions for a given word.
 	 * 
@@ -133,6 +137,15 @@ public class InvertedIndex {
 	 * @return An unmodifiable map containing the locations and positions of the given word.
 	 */
 	public Map<String, TreeSet<Integer>> viewLocations(String word) {
+		/*
+		 * TODO The method below breaks encapsulation. Are you clear on which examples
+		 * in PrefixMap are examples of what to do versus what not to do? Do you
+		 * understand how this breaks encapsulation? You need to ask clarifying
+		 * questions before requesting another code review. The longer you wait to
+		 * understand this concept and ask questions, the longer it is going to take to
+		 * pass this project. Do not request another code review until you understand
+		 * the issue and how to fix it!
+		 */
 		if (indexMap.containsKey(word)) {
 			return Collections.unmodifiableMap(indexMap.get(word));
 		}
@@ -149,10 +162,11 @@ public class InvertedIndex {
 	 */
 	public TreeSet<Integer> viewPositions(String word, String location) {
 		if (hasLocation(word, location)) {
+			// TODO Do not cast. Change the return type instead.
 			return (TreeSet<Integer>) Collections.unmodifiableSortedSet(indexMap.get(word).get(location));
 		}
 
-		return new TreeSet<>();
+		return new TreeSet<>(); // TODO Collections.emptySet
 	}
 
 	/**
@@ -161,6 +175,8 @@ public class InvertedIndex {
 	 * @return An unmodifiable map that represents the complete inverted index.
 	 */
 	public Map<String, TreeMap<String, TreeSet<Integer>>> viewIndexMap() {
-		return Collections.unmodifiableMap(indexMap);
-	}
+		return Collections.unmodifiableMap(indexMap); // TODO Also breaks encapsulation
+	} 
+	
+	// TODO Where are the other methods listed in your last code review?
 }

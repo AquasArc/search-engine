@@ -10,7 +10,7 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.Paths; // TODO Unused import. Do you see the warning here?
 import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
@@ -159,6 +159,7 @@ public class JsonWriter {
 	    writer.write("{\n");
 
 	    if (!elements.isEmpty()) {
+	    	// TODO Use var, and same approach everywhere. The writeArray uses the iterator and checks hasNext instead of isEmpty.
 	    	java.util.Iterator<? extends Map.Entry<String, ? extends Number>> iterator = elements.entrySet().iterator();
 	        Map.Entry<String, ? extends Number> entry = iterator.next();
 
@@ -238,6 +239,7 @@ public class JsonWriter {
 	 * @see #writeArray(Collection)
 	 */
 	public static void writeObjectArrays(Map<String, ? extends Collection<? extends Number>> elements, Writer writer, int indent) throws IOException {
+		// TODO Fix this one too. When I give you a TODO, fix it everywhere in your code. Not just where I put it. 
 	    if (elements.isEmpty()) {
 	        writer.write("{\n");
 	        writeIndent(writer, indent);
@@ -325,6 +327,7 @@ public class JsonWriter {
 	    if (!elements.isEmpty()) {
 	        writer.write("\n");
 	        
+	        // TODO var helps with readability here
 	        java.util.Iterator<? extends Map<String, ? extends Number>> iterator = elements.iterator();
 	        Map<String, ? extends Number> currentMap = iterator.next();
 	        
@@ -382,6 +385,15 @@ public class JsonWriter {
 		}
 	}
 
+	/*
+	 * TODO Think about the design of the other methods. Are you learning from them?
+	 * How is the design of your method below different? What could you change to make
+	 * it more reusable? How about creating the buffered reader? What do you know about
+	 * convering to the File class?
+	 * 
+	 * Apply what you are learning in the class to your code and practice making these
+	 * design choices based on the examples given to you!
+	 */
 	/**
 	 * Writes the given inverted index to a file in JSON format.
 	 *
@@ -421,7 +433,7 @@ public class JsonWriter {
 
 
 
-
+	// TODO Why do you need this method? Don't you already have a writeObject method?
 	/**
 	 * Writes the word counts to the specified output path in JSON format.
 	 *

@@ -45,6 +45,7 @@ public class Driver {
 
 		if (parser.hasFlag("-index")) {
 			try {
+				// TODO This is still breaking encapsulation...
 				JsonWriter.writeIndexToFile(index.viewIndexMap(), parser.getPath("-index", Path.of("index.json")));
 			} catch (IOException e) {
 				System.out.println("Error processing index: " + e.getMessage());

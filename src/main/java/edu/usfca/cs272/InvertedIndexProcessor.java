@@ -16,7 +16,7 @@ import java.util.ArrayList;
  * @author CS 272 Software Development (University of San Francisco)
  * @version Fall 2023
  */
-public class FileProcessor { // TODO Rename to InvertedIndexProcessor now, since all the methods require an index 
+public class InvertedIndexProcessor { // TODO Rename to InvertedIndexProcessor now, since all the methods require an index 
 
 
 

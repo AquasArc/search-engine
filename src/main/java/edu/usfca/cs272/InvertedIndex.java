@@ -23,7 +23,7 @@ public class InvertedIndex {
 	 * The core data structure of the inverted index.
 	 * It maps words to file paths and the positions of the words within those files.
 	 */
-	private final TreeMap<String, TreeMap<String, TreeSet<Integer>>> indexMap;
+	private final TreeMap<String, TreeMap<String, TreeSet<Integer>>> invertedIndex;
 	// Word : {Address : [1,2,3]}
 
 	/**
@@ -32,15 +32,55 @@ public class InvertedIndex {
 	 */
 	private Map<String, Long> wordCountMap;
 
-
-
 	/**
 	 * Initializes the inverted index data structure.
 	 */
 
 	public InvertedIndex() {
-		this.indexMap = new TreeMap<>();
+		this.invertedIndex = new TreeMap<>();
 		this.wordCountMap = new TreeMap<>();
+	}
+
+	
+	/**
+	 * Writes the indexed words, their occurrences, and positions within files to a file in a specific JSON format.
+	 * 
+	 * @param indexPath The path where the index should be written in JSON format.
+	 * @param index The InvertedIndex instance containing the indexed data.
+	 * @throws IOException If an error occurs during file writing.
+	 */
+	public void processIndex(Path indexPath) throws IOException {
+		JsonWriter.writeIndexToFile(invertedIndex, indexPath);
+	}
+	
+	/** A toString method that returns builder which contains values
+	 * from wordcount map and inverted index
+	 * 
+	 */
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		
+		builder.append("Inverted Index: \n");
+		for (Map.Entry<String, TreeMap<String, TreeSet<Integer>>> entry : invertedIndex.entrySet()) {
+			builder.append("\t").append(entry.getKey()).append(" -> ").append(entry.getValue()).append("\n");
+		}
+		
+		builder.append("Word Count Map: \n");
+		for (Map.Entry<String, Long> entry : wordCountMap.entrySet()) {
+			builder.append("\t").append(entry.getKey()).append(" -> ").append(entry.getValue()).append("\n");
+		}
+		
+		return builder.toString();
+	}
+	
+	/**
+	 * Writes the word counts to a file.
+	 * 
+	 * @param countsPath The path to write the word counts.
+	 * @throws IOException If writing fails.
+	 */
+	public void writeCountsMap(Path countsPath) throws IOException {
+		JsonWriter.writeObject(wordCountMap,countsPath);
 	}
 
 
@@ -53,9 +93,9 @@ public class InvertedIndex {
 	 */
 	public void add(String word, String location, int position) {
 		//Adds to indexMap
-		indexMap.putIfAbsent(word, new TreeMap<>());
-		indexMap.get(word).putIfAbsent(location, new TreeSet<>());
-		indexMap.get(word).get(location).add(position);
+		invertedIndex.putIfAbsent(word, new TreeMap<>());
+		invertedIndex.get(word).putIfAbsent(location, new TreeSet<>());
+		invertedIndex.get(word).get(location).add(position);
 
 		//Adds to wordCountMap...
 		wordCountMap.put(location, wordCountMap.getOrDefault(location, 0L) + 1);
@@ -81,7 +121,7 @@ public class InvertedIndex {
 	 * @return True if the word exists, else False.
 	 */
 	public boolean hasWord(String word) {
-		return indexMap.containsKey(word);
+		return invertedIndex.containsKey(word);
 	}
 
 	/**
@@ -92,7 +132,7 @@ public class InvertedIndex {
 	 * @return True if the location exists, else False.
 	 */
 	public boolean hasLocation(String word, String location) {
-		return hasWord(word) && indexMap.get(word).containsKey(location);
+		return hasWord(word) && invertedIndex.get(word).containsKey(location);
 	}
 
 	/**
@@ -104,17 +144,7 @@ public class InvertedIndex {
 	 * @return True if the position exists, else False.
 	 */
 	public boolean hasPosition(String word, String location, int position) {
-		return hasLocation(word, location) && indexMap.get(word).get(location).contains(position);
-	}
-
-	/**
-	 * Writes the word counts to a file.
-	 * 
-	 * @param countsPath The path to write the word counts.
-	 * @throws IOException If writing fails.
-	 */
-	public void writeCountsMap(Path countsPath) throws IOException {
-		JsonWriter.writeWordCountsToFile(wordCountMap, countsPath);
+		return hasLocation(word, location) && invertedIndex.get(word).get(location).contains(position);
 	}
 
 	/**
@@ -123,34 +153,23 @@ public class InvertedIndex {
 	 * @return An unmodifiable set of all words in the index.
 	 */
 	public Set<String> viewWords() {
-		return Collections.unmodifiableSet(indexMap.keySet());
+		return Collections.unmodifiableSet(invertedIndex.keySet());
 	}
 
-	/*
-	 * TODO This is still breaking encapsulation. I'm not clear you understand this concept.
-	 * 
-	 */
 	/**
 	 * Retrieves all the locations and their positions for a given word.
 	 * 
 	 * @param word The word for which to retrieve locations and positions.
 	 * @return An unmodifiable map containing the locations and positions of the given word.
 	 */
-	public Map<String, TreeSet<Integer>> viewLocations(String word) {
-		/*
-		 * TODO The method below breaks encapsulation. Are you clear on which examples
-		 * in PrefixMap are examples of what to do versus what not to do? Do you
-		 * understand how this breaks encapsulation? You need to ask clarifying
-		 * questions before requesting another code review. The longer you wait to
-		 * understand this concept and ask questions, the longer it is going to take to
-		 * pass this project. Do not request another code review until you understand
-		 * the issue and how to fix it!
-		 */
-		if (indexMap.containsKey(word)) {
-			return Collections.unmodifiableMap(indexMap.get(word));
+	public Set<String> viewLocations(String word) {
+		// fix
+		if (invertedIndex.containsKey(word)) {
+			if (invertedIndex.get(word) != null) {
+				return Collections.unmodifiableSet(invertedIndex.get(word).keySet());
+			}
 		}
-
-		return Collections.emptyMap();
+		return Collections.emptySet();
 	}
 
 	/**
@@ -160,23 +179,17 @@ public class InvertedIndex {
 	 * @param location The location for which to retrieve positions.
 	 * @return An unmodifiable sorted set containing all the positions of the given word in the given location.
 	 */
-	public TreeSet<Integer> viewPositions(String word, String location) {
+	public Set<Integer> viewPositions(String word, String location) {
 		if (hasLocation(word, location)) {
-			// TODO Do not cast. Change the return type instead.
-			return (TreeSet<Integer>) Collections.unmodifiableSortedSet(indexMap.get(word).get(location));
+			return Collections.unmodifiableSet(invertedIndex.get(word).get(location));
 		}
 
-		return new TreeSet<>(); // TODO Collections.emptySet
+		return Collections.emptySet();
 	}
 
-	/**
-	 * Provides a complete view of the inverted index map.
-	 * 
-	 * @return An unmodifiable map that represents the complete inverted index.
-	 */
-	public Map<String, TreeMap<String, TreeSet<Integer>>> viewIndexMap() {
-		return Collections.unmodifiableMap(indexMap); // TODO Also breaks encapsulation
-	} 
-	
-	// TODO Where are the other methods listed in your last code review?
+	//Num methods:
+	//For Counts -> total size of indices
+	//Given a certain word, how many files are there
+	//Given a certain word & file, how many positions are there? (similar to view positions)
+	    // Use positions method viewPositions.size();
 }

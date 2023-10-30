@@ -10,12 +10,10 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths; // TODO Unused import. Do you see the warning here?
 import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
-
 /**
  * Outputs several simple data structures in "pretty" JSON format where newlines
  * are used to separate elements and nested elements are indented using spaces.
@@ -155,35 +153,34 @@ public class JsonWriter {
 	 * @see #writeIndent(Writer, int)
 	 * @see #writeIndent(String, Writer, int)
 	 */
+	//Requested fix: Use var and to use same structure for all methods. ex writeArrays
 	public static void writeObject(Map<String, ? extends Number> elements, Writer writer, int indent) throws IOException {
 	    writer.write("{\n");
 
 	    if (!elements.isEmpty()) {
-	    	// TODO Use var, and same approach everywhere. The writeArray uses the iterator and checks hasNext instead of isEmpty.
-	    	java.util.Iterator<? extends Map.Entry<String, ? extends Number>> iterator = elements.entrySet().iterator();
-	        Map.Entry<String, ? extends Number> entry = iterator.next();
-
-	        writeIndent(writer, indent + 1);
-	        writeQuote(entry.getKey(), writer, 0);
-	        writer.write(": ");
-	        writer.write(entry.getValue().toString());
+	        
+	        var iterator = elements.entrySet().iterator();
 
 	        while (iterator.hasNext()) {
-	            writer.write(",\n");
-	            entry = iterator.next();
-
+	            var entry = iterator.next();
+	            
 	            writeIndent(writer, indent + 1);
 	            writeQuote(entry.getKey(), writer, 0);
 	            writer.write(": ");
 	            writer.write(entry.getValue().toString());
-	        }
 
+	            if (iterator.hasNext()) {
+	                writer.write(",\n");
+	            }
+	        }
+	        
 	        writer.write("\n");
 	    }
 
 	    writeIndent(writer, indent);
 	    writer.write("}");
 	}
+
 	/**
 	 * Writes the elements as a pretty JSON object to file.
 	 *
@@ -238,33 +235,38 @@ public class JsonWriter {
 	 * @see #writeIndent(String, Writer, int)
 	 * @see #writeArray(Collection)
 	 */
+	//Requested change: use var, use if-while approach
 	public static void writeObjectArrays(Map<String, ? extends Collection<? extends Number>> elements, Writer writer, int indent) throws IOException {
-		// TODO Fix this one too. When I give you a TODO, fix it everywhere in your code. Not just where I put it. 
-	    if (elements.isEmpty()) {
-	        writer.write("{\n");
-	        writeIndent(writer, indent);
-	        writer.write("}\n");
-	        return;
-	    }
-
 	    writer.write("{\n");
 
-	    boolean firstEntry = true;
-	    for (Map.Entry<String, ? extends Collection<? extends Number>> entry : elements.entrySet()) {
-	        if (!firstEntry) {
-	            writer.write(",\n");
-	        }
+	    if (!elements.isEmpty()) {
+	        var iterator = elements.entrySet().iterator();
+
+	        // handle first entry
+	        var entry = iterator.next();
 	        writeIndent(writer, indent + 1);
 	        writeQuote(entry.getKey(), writer, 0);
 	        writer.write(": ");
 	        writeArray(entry.getValue(), writer, indent + 1);
-	        firstEntry = false;
+
+	        // handle remaining entries
+	        while (iterator.hasNext()) {
+	            writer.write(",\n");
+	            entry = iterator.next();
+
+	            writeIndent(writer, indent + 1);
+	            writeQuote(entry.getKey(), writer, 0);
+	            writer.write(": ");
+	            writeArray(entry.getValue(), writer, indent + 1);
+	        }
+
+	        writer.write("\n");
 	    }
 
-	    writer.write("\n");
 	    writeIndent(writer, indent);
 	    writer.write("}");
 	}
+
 
 
 	/**
@@ -321,15 +323,15 @@ public class JsonWriter {
 	 * @see #writeIndent(String, Writer, int)
 	 * @see #writeObject(Map)
 	 */
+	// requested change: use var for better readability
 	public static void writeArrayObjects(Collection<? extends Map<String, ? extends Number>> elements, Writer writer, int indent) throws IOException {
 	    writer.write("[");
 
 	    if (!elements.isEmpty()) {
 	        writer.write("\n");
 	        
-	        // TODO var helps with readability here
-	        java.util.Iterator<? extends Map<String, ? extends Number>> iterator = elements.iterator();
-	        Map<String, ? extends Number> currentMap = iterator.next();
+	        var iterator = elements.iterator();
+	        var currentMap = iterator.next();
 	        
 	        writeIndent(writer, indent + 1);
 	        writeObject(currentMap, writer, indent + 1);
@@ -347,6 +349,7 @@ public class JsonWriter {
 	    writeIndent(writer, indent);
 	    writer.write("]");
 	}
+
 
 	/**
 	 * Writes the elements as a pretty JSON array with nested objects to file.
@@ -401,7 +404,7 @@ public class JsonWriter {
 	 * @param outputPath The path where the JSON should be saved.
 	 * @throws IOException If there's an issue writing the file.
 	 */
-	public static void writeIndexToFile(Map<String, TreeMap<String, TreeSet<Integer>>> index, Path outputPath) throws IOException {
+	public static void writeIndexToFile(TreeMap<String, TreeMap<String, TreeSet<Integer>>> index, Path outputPath) throws IOException {
 	    try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputPath.toFile()))) {
 	        writer.write("{\n");
 
@@ -428,26 +431,5 @@ public class JsonWriter {
 	    } catch (IOException e) {
 	        throw new IOException("Failed to write index to: " + outputPath, e);
 	    }
-	}
-
-
-
-
-	// TODO Why do you need this method? Don't you already have a writeObject method?
-	/**
-	 * Writes the word counts to the specified output path in JSON format.
-	 *
-	 *
-	 *
-	 * @param wordCounts The map containing words and their counts.
-	 * @param outputPath The path where the output should be written.
-	 * @throws IOException If an error occurs while writing to the file.
-	 */
-	public static void writeWordCountsToFile(Map<String, Long> wordCounts, Path outputPath) throws IOException {
-		try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputPath.toFile()))) {
-			JsonWriter.writeObject(wordCounts, writer, 0);
-		} catch (IOException e) {
-			throw new IOException("Failed to write word counts to: " + outputPath, e);
-		}
 	}
 }

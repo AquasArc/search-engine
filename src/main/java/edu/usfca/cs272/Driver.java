@@ -28,7 +28,7 @@ public class Driver {
 		if (parser.hasFlag("-text")) {
 			Path inputPath = parser.getPath("-text");
 			try {
-				FileProcessor.processText(inputPath, index);
+				InvertedIndexProcessor.processText(inputPath, index);
 			} catch (IOException | NullPointerException e) {
 				System.out.println("Error Detected:");
 				System.out.println("Error processing text: " + e.getMessage());
@@ -45,8 +45,7 @@ public class Driver {
 
 		if (parser.hasFlag("-index")) {
 			try {
-				// TODO This is still breaking encapsulation...
-				JsonWriter.writeIndexToFile(index.viewIndexMap(), parser.getPath("-index", Path.of("index.json")));
+				index.processIndex(parser.getPath("-index", Path.of("index.json")));
 			} catch (IOException e) {
 				System.out.println("Error processing index: " + e.getMessage());
 			}

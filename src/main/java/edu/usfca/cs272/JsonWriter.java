@@ -389,12 +389,8 @@ public class JsonWriter {
 			return null;
 		}
 	}
-
-	/*
-	 * TODO Think about the design of the other methods. Are you learning from them?
-	 * How is the design of your method below different? What could you change to make
-	 * it more reusable? How about creating the buffered reader? What do you know about
-	 * convering to the File class?
+	
+	/**
 	 * 
 	 * Apply what you are learning in the class to your code and practice making these
 	 * design choices based on the examples given to you!

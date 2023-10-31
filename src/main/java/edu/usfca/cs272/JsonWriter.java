@@ -437,5 +437,4 @@ public class JsonWriter {
 			throw new IOException("Failed to write index to: " + outputPath, e);
 		}
 	}
-
 }

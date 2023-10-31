@@ -155,31 +155,33 @@ public class JsonWriter {
 	 */
 	//Requested fix: Use var and to use same structure for all methods. ex writeArrays
 	public static void writeObject(Map<String, ? extends Number> elements, Writer writer, int indent) throws IOException {
-	    writer.write("{\n");
+	    java.util.Iterator<? extends Map.Entry<String, ? extends Number>> iterator = elements.entrySet().iterator();
 
-	    if (!elements.isEmpty()) {
-	        
-	        var iterator = elements.entrySet().iterator();
+	    writer.write("{");
 
-	        while (iterator.hasNext()) {
-	            var entry = iterator.next();
-	            
-	            writeIndent(writer, indent + 1);
-	            writeQuote(entry.getKey(), writer, 0);
-	            writer.write(": ");
-	            writer.write(entry.getValue().toString());
-
-	            if (iterator.hasNext()) {
-	                writer.write(",\n");
-	            }
-	        }
-	        
+	    if (iterator.hasNext()) {
 	        writer.write("\n");
+	        var entry = iterator.next();
+	        writeIndent(writer, indent + 1);
+	        writeQuote(entry.getKey(), writer, 0);
+	        writer.write(": ");
+	        writer.write(entry.getValue().toString());
 	    }
 
+	    while (iterator.hasNext()) {
+	        writer.write(",\n");
+	        var entry = iterator.next();
+	        writeIndent(writer, indent + 1);
+	        writeQuote(entry.getKey(), writer, 0);
+	        writer.write(": ");
+	        writer.write(entry.getValue().toString());
+	    }
+
+	    writer.write("\n");
 	    writeIndent(writer, indent);
 	    writer.write("}");
 	}
+
 
 	/**
 	 * Writes the elements as a pretty JSON object to file.
@@ -408,28 +410,32 @@ public class JsonWriter {
 	    try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputPath.toFile()))) {
 	        writer.write("{\n");
 
-	        if (index.isEmpty()) {
-	            writer.write("}");
-	            return;
-	        }
-	        
-	        int outerCount = 0;
-	        for (Map.Entry<String, TreeMap<String, TreeSet<Integer>>> wordEntry : index.entrySet()) {
-	            if (outerCount > 0) { // Add a comma if this isn't the first entry
-	                writer.write(",\n");
-	            }
+	        if (!index.isEmpty()) {
+	            var iterator = index.entrySet().iterator();
+
+	            // Handle the first entry
+	            var wordEntry = iterator.next();
 	            writeQuote(wordEntry.getKey(), writer, 1);
 	            writer.write(": ");
-	            
 	            writeObjectArrays(wordEntry.getValue(), writer, 1);
 
-	            outerCount++;
+	            // Handle remaining entries
+	            while (iterator.hasNext()) {
+	                writer.write(",\n");
+	                wordEntry = iterator.next();
+
+	                writeQuote(wordEntry.getKey(), writer, 1);
+	                writer.write(": ");
+	                writeObjectArrays(wordEntry.getValue(), writer, 1);
+	            }
+
+	            writer.write("\n");
 	        }
-	        
-	        writer.write("\n}");
-	        
+
+	        writer.write("}");
 	    } catch (IOException e) {
 	        throw new IOException("Failed to write index to: " + outputPath, e);
 	    }
 	}
+
 }

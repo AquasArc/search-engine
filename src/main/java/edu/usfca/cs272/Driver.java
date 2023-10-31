@@ -49,6 +49,7 @@ public class Driver {
 			} catch (IOException e) {
 				System.out.println("Error processing index: " + e.getMessage());
 			}
-		}
+		}		
+		System.out.println(index); //Test toString method
 	}
 }

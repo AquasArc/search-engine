@@ -30,7 +30,7 @@ public class InvertedIndex {
 	 * Data structure for total words in a file
 	 * Map contains address : total words
 	 */
-	private Map<String, Long> wordCountMap;
+	private final Map<String, Long> wordCountMap;
 
 	/**
 	 * Initializes the inverted index data structure.
@@ -41,7 +41,7 @@ public class InvertedIndex {
 		this.wordCountMap = new TreeMap<>();
 	}
 
-	
+
 	/**
 	 * Writes the indexed words, their occurrences, and positions within files to a file in a specific JSON format.
 	 * 
@@ -52,27 +52,19 @@ public class InvertedIndex {
 	public void processIndex(Path indexPath) throws IOException {
 		JsonWriter.writeIndexToFile(invertedIndex, indexPath);
 	}
-	
+
 	/** A toString method that returns builder which contains values
 	 * from wordcount map and inverted index
 	 * 
+	 * 
+	 * 
+	 * 
+	 * Can I get your opinion on this toString?
 	 */
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		
-		builder.append("Inverted Index: \n");
-		for (Map.Entry<String, TreeMap<String, TreeSet<Integer>>> entry : invertedIndex.entrySet()) {
-			builder.append("\t").append(entry.getKey()).append(" -> ").append(entry.getValue()).append("\n");
-		}
-		
-		builder.append("Word Count Map: \n");
-		for (Map.Entry<String, Long> entry : wordCountMap.entrySet()) {
-			builder.append("\t").append(entry.getKey()).append(" -> ").append(entry.getValue()).append("\n");
-		}
-		
-		return builder.toString();
+		return invertedIndex.toString();
 	}
-	
+
 	/**
 	 * Writes the word counts to a file.
 	 * 
@@ -152,7 +144,7 @@ public class InvertedIndex {
 	 * 
 	 * @return An unmodifiable set of all words in the index.
 	 */
-	public Set<String> viewWords() {
+	public Set<String> getWords() {
 		return Collections.unmodifiableSet(invertedIndex.keySet());
 	}
 
@@ -162,13 +154,12 @@ public class InvertedIndex {
 	 * @param word The word for which to retrieve locations and positions.
 	 * @return An unmodifiable map containing the locations and positions of the given word.
 	 */
-	public Set<String> viewLocations(String word) {
-		// fix
-		if (invertedIndex.containsKey(word)) {
-			if (invertedIndex.get(word) != null) {
-				return Collections.unmodifiableSet(invertedIndex.get(word).keySet());
-			}
+	public Set<String> getLocations(String word) {
+		//if (invertedIndex.containsKey(word)) {
+		if (hasWord(word)) {
+			return Collections.unmodifiableSet(invertedIndex.get(word).keySet());
 		}
+		//}
 		return Collections.emptySet();
 	}
 
@@ -179,7 +170,7 @@ public class InvertedIndex {
 	 * @param location The location for which to retrieve positions.
 	 * @return An unmodifiable sorted set containing all the positions of the given word in the given location.
 	 */
-	public Set<Integer> viewPositions(String word, String location) {
+	public Set<Integer> getPositions(String word, String location) {
 		if (hasLocation(word, location)) {
 			return Collections.unmodifiableSet(invertedIndex.get(word).get(location));
 		}
@@ -187,9 +178,56 @@ public class InvertedIndex {
 		return Collections.emptySet();
 	}
 
-	//Num methods:
-	//For Counts -> total size of indices
-	//Given a certain word, how many files are there
-	//Given a certain word & file, how many positions are there? (similar to view positions)
-	    // Use positions method viewPositions.size();
+    /**
+     * Gets the number of unique words in the index.
+     * 
+     * @return The number of unique words in the index.
+     */
+	public int numWords() {
+		return invertedIndex.size();
+	}
+
+	/**
+     * Gets the number of locations for a specific word in the index.
+     * 
+     * @param word The word to query.
+     * @return The number of locations for the given word. Returns 0 if the word does not exist.
+     */
+	public int numLocations(String word) {
+		return hasWord(word) ? invertedIndex.get(word).size() : 0;
+	}
+
+    /**
+     * Gets the number of positions for a specific word at a specific location in the index.
+     * 
+     * @param word The word to query.
+     * @param location The location to query.
+     * @return The number of positions for the word at the location. Returns 0 if the word or location does not exist.
+     */
+	public int numPositions(String word, String location) {
+		return hasLocation(word, location) ? invertedIndex.get(word).get(location).size() : 0;
+	}
+
+    /**
+     * Gets the total number of words in a specific location.
+     * 
+     * @param location The location to query.
+     * @return The total number of words at the location. Returns 0 if the location does not exist.
+     */
+	public long numWordsInLocation(String location) {
+		return wordCountMap.getOrDefault(location, 0L);
+	}
+
+    /**
+     * Retrieves all the locations and their positions for a given word.
+     * 
+     * @param word The word to query.
+     * @return An unmodifiable map containing the locations and positions for the word. Returns an empty map if the word does not exist.
+     */
+	public Map<String, Set<Integer>> getLocationsByWord(String word) {
+		if (hasWord(word)) {
+			return Collections.unmodifiableMap(invertedIndex.get(word));
+		}
+		return Collections.emptyMap();
+	}
 }

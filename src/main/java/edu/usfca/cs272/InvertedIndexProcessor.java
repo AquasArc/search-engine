@@ -3,8 +3,11 @@ package edu.usfca.cs272;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.ArrayList;
+
+import opennlp.tools.stemmer.snowball.SnowballStemmer;
+import static opennlp.tools.stemmer.snowball.SnowballStemmer.ALGORITHM.ENGLISH;
 
 /**
  * Provides utility functions for processing files, directories, and generating data outputs.
@@ -12,14 +15,11 @@ import java.util.ArrayList;
  * 
  * 
  * 
- * @author Anton Lim TODO What is with the blank lines above and below?
+ * @author Anton Lim
  * @author CS 272 Software Development (University of San Francisco)
  * @version Fall 2023
  */
-public class InvertedIndexProcessor { // TODO Rename to InvertedIndexProcessor now, since all the methods require an index 
-
-
-
+public class InvertedIndexProcessor {
 	/**
 	 * Processes a file, stems its words, and updates the inverted index data structure.
 	 * 
@@ -28,20 +28,19 @@ public class InvertedIndexProcessor { // TODO Rename to InvertedIndexProcessor n
 	 * @throws IOException If an error occurs while reading the file.
 	 */
 	public static void processFile(Path filePath, InvertedIndex index) throws IOException {
-		/*
-		 * TODO listStems is great for getting the code working, but not so great for
-		 * efficiency. At this point, you need to do something that does not require
-		 * looping through the stems so many times (once to create the list, once to
-		 * move the stems from the list into the index). This means creating a buffered
-		 * reader here, taking a line by line approach, parsing, stemming, and adding
-		 * directly to the inverted index itself (never to a list). 
-		 */
-		ArrayList<String> stemmedWords = FileStemmer.listStems(filePath);
-		int position = 0;
-
-		for (String word : stemmedWords) {
-			position++;
-			index.add(word, filePath.toString(), position); // TODO Does filePath.toString() need to happen over and over again inside of this loop?
+		try (BufferedReader reader = Files.newBufferedReader(filePath)) {
+			String line;
+			int position = 0;
+			String filePathStr = filePath.toString();
+			SnowballStemmer stemmer = new SnowballStemmer(ENGLISH);
+			while ((line = reader.readLine()) != null) {
+				String[] words = FileStemmer.parse(line);
+				for (String word : words) {
+					String stemmedWord = stemmer.stem(word).toString();
+					position++;
+					index.add(stemmedWord,filePathStr, position);
+				}
+			}
 		}
 	}
 
@@ -53,25 +52,28 @@ public class InvertedIndexProcessor { // TODO Rename to InvertedIndexProcessor n
 	 * @param index The InvertedIndex instance used for updating word occurrences.
 	 * @throws IOException If an error occurs while reading files within the directory.
 	 */
-	public static void processDirectory(Path dirPath, InvertedIndex index) throws IOException { //Changed to use directory streams
+	public static void processDirectory(Path dirPath, InvertedIndex index) throws IOException { 
 		try (DirectoryStream<Path> stream = Files.newDirectoryStream(dirPath)) {
 			for (Path entry : stream) {
 				if (Files.isDirectory(entry)) {
 					processDirectory(entry, index);
-				} else if (Files.isRegularFile(entry)) {
-					// TODO Make this filter by text files more reusable by making a public static boolean isTextFile method!
-					String fileName = entry.toString().toLowerCase();
-					if (fileName.endsWith(".txt") || fileName.endsWith(".text")) {
-						try {
-							processFile(entry, index);
-						} catch (IOException e) { // TODO Where does this try/catch belong? Why?
-							System.out.println("Error Processing file " + entry); 
-						}
-					}
+				} else if (Files.isRegularFile(entry) && isTextFile(entry)) {
+					processFile(entry, index);
 				}
 			}
 		}
 	}
+
+	/**Check to see if the file ends with a .txt or .text
+	 * 
+	 * @param filePath
+	 * @return boolean 
+	 */
+	public static boolean isTextFile(Path filePath) {
+		String fileName = filePath.toString().toLowerCase();
+		return fileName.endsWith(".txt") || fileName.endsWith(".text");
+	}
+
 
 	/**
 	 * Processes a given input path, checking whether it's a regular file or a directory,

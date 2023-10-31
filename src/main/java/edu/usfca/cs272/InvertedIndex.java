@@ -45,21 +45,16 @@ public class InvertedIndex {
 	/**
 	 * Writes the indexed words, their occurrences, and positions within files to a file in a specific JSON format.
 	 * 
-	 * @param indexPath The path where the index should be written in JSON format.
-	 * @param index The InvertedIndex instance containing the indexed data.
+	 * @param indexPath The path where the index should be written in JSON format
 	 * @throws IOException If an error occurs during file writing.
 	 */
 	public void processIndex(Path indexPath) throws IOException {
 		JsonWriter.writeIndexToFile(invertedIndex, indexPath);
 	}
 
-	/** A toString method that returns builder which contains values
-	 * from wordcount map and inverted index
+	/** A toString method prints inverted index contents
 	 * 
-	 * 
-	 * 
-	 * 
-	 * Can I get your opinion on this toString?
+	 *@returns to string value of the inverted index 
 	 */
 	public String toString() {
 		return invertedIndex.toString();

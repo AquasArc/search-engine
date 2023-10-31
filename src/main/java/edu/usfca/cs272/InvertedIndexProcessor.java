@@ -66,8 +66,8 @@ public class InvertedIndexProcessor {
 
 	/**Check to see if the file ends with a .txt or .text
 	 * 
-	 * @param filePath
-	 * @return boolean 
+	 * @param filePath is the argument given
+	 * @return boolean return in regards to .txt or .text
 	 */
 	public static boolean isTextFile(Path filePath) {
 		String fileName = filePath.toString().toLowerCase();

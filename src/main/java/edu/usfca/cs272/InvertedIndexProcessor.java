@@ -88,8 +88,6 @@ public class InvertedIndexProcessor {
 			processFile(inputPath, index);
 		} else if (Files.isDirectory(inputPath)) {
 			processDirectory(inputPath, index);
-		} else {
-			throw new IOException("Invalid input path: " + inputPath); // TODO Remove this else block entirely
 		}
 	}
 }

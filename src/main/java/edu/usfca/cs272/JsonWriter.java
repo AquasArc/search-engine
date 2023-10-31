@@ -155,31 +155,31 @@ public class JsonWriter {
 	 */
 	//Requested fix: Use var and to use same structure for all methods. ex writeArrays
 	public static void writeObject(Map<String, ? extends Number> elements, Writer writer, int indent) throws IOException {
-	    java.util.Iterator<? extends Map.Entry<String, ? extends Number>> iterator = elements.entrySet().iterator();
+		java.util.Iterator<? extends Map.Entry<String, ? extends Number>> iterator = elements.entrySet().iterator();
 
-	    writer.write("{");
+		writer.write("{");
 
-	    if (iterator.hasNext()) {
-	        writer.write("\n");
-	        var entry = iterator.next();
-	        writeIndent(writer, indent + 1);
-	        writeQuote(entry.getKey(), writer, 0);
-	        writer.write(": ");
-	        writer.write(entry.getValue().toString());
-	    }
+		if (iterator.hasNext()) {
+			writer.write("\n");
+			var entry = iterator.next();
+			writeIndent(writer, indent + 1);
+			writeQuote(entry.getKey(), writer, 0);
+			writer.write(": ");
+			writer.write(entry.getValue().toString());
+		}
 
-	    while (iterator.hasNext()) {
-	        writer.write(",\n");
-	        var entry = iterator.next();
-	        writeIndent(writer, indent + 1);
-	        writeQuote(entry.getKey(), writer, 0);
-	        writer.write(": ");
-	        writer.write(entry.getValue().toString());
-	    }
+		while (iterator.hasNext()) {
+			writer.write(",\n");
+			var entry = iterator.next();
+			writeIndent(writer, indent + 1);
+			writeQuote(entry.getKey(), writer, 0);
+			writer.write(": ");
+			writer.write(entry.getValue().toString());
+		}
 
-	    writer.write("\n");
-	    writeIndent(writer, indent);
-	    writer.write("}");
+		writer.write("\n");
+		writeIndent(writer, indent);
+		writer.write("}");
 	}
 
 
@@ -239,34 +239,34 @@ public class JsonWriter {
 	 */
 	//Requested change: use var, use if-while approach
 	public static void writeObjectArrays(Map<String, ? extends Collection<? extends Number>> elements, Writer writer, int indent) throws IOException {
-	    writer.write("{\n");
+		writer.write("{\n");
 
-	    if (!elements.isEmpty()) {
-	        var iterator = elements.entrySet().iterator();
+		if (!elements.isEmpty()) {
+			var iterator = elements.entrySet().iterator();
 
-	        // handle first entry
-	        var entry = iterator.next();
-	        writeIndent(writer, indent + 1);
-	        writeQuote(entry.getKey(), writer, 0);
-	        writer.write(": ");
-	        writeArray(entry.getValue(), writer, indent + 1);
+			// handle first entry
+			var entry = iterator.next();
+			writeIndent(writer, indent + 1);
+			writeQuote(entry.getKey(), writer, 0);
+			writer.write(": ");
+			writeArray(entry.getValue(), writer, indent + 1);
 
-	        // handle remaining entries
-	        while (iterator.hasNext()) {
-	            writer.write(",\n");
-	            entry = iterator.next();
+			// handle remaining entries
+			while (iterator.hasNext()) {
+				writer.write(",\n");
+				entry = iterator.next();
 
-	            writeIndent(writer, indent + 1);
-	            writeQuote(entry.getKey(), writer, 0);
-	            writer.write(": ");
-	            writeArray(entry.getValue(), writer, indent + 1);
-	        }
+				writeIndent(writer, indent + 1);
+				writeQuote(entry.getKey(), writer, 0);
+				writer.write(": ");
+				writeArray(entry.getValue(), writer, indent + 1);
+			}
 
-	        writer.write("\n");
-	    }
+			writer.write("\n");
+		}
 
-	    writeIndent(writer, indent);
-	    writer.write("}");
+		writeIndent(writer, indent);
+		writer.write("}");
 	}
 
 
@@ -327,29 +327,29 @@ public class JsonWriter {
 	 */
 	// requested change: use var for better readability
 	public static void writeArrayObjects(Collection<? extends Map<String, ? extends Number>> elements, Writer writer, int indent) throws IOException {
-	    writer.write("[");
+		writer.write("[");
 
-	    if (!elements.isEmpty()) {
-	        writer.write("\n");
-	        
-	        var iterator = elements.iterator();
-	        var currentMap = iterator.next();
-	        
-	        writeIndent(writer, indent + 1);
-	        writeObject(currentMap, writer, indent + 1);
+		if (!elements.isEmpty()) {
+			writer.write("\n");
 
-	        while (iterator.hasNext()) {
-	            writer.write(",\n");
-	            currentMap = iterator.next();
-	            
-	            writeIndent(writer, indent + 1);
-	            writeObject(currentMap, writer, indent + 1);
-	        }
-	    }
+			var iterator = elements.iterator();
+			var currentMap = iterator.next();
 
-	    writer.write("\n");
-	    writeIndent(writer, indent);
-	    writer.write("]");
+			writeIndent(writer, indent + 1);
+			writeObject(currentMap, writer, indent + 1);
+
+			while (iterator.hasNext()) {
+				writer.write(",\n");
+				currentMap = iterator.next();
+
+				writeIndent(writer, indent + 1);
+				writeObject(currentMap, writer, indent + 1);
+			}
+		}
+
+		writer.write("\n");
+		writeIndent(writer, indent);
+		writer.write("]");
 	}
 
 
@@ -407,35 +407,35 @@ public class JsonWriter {
 	 * @throws IOException If there's an issue writing the file.
 	 */
 	public static void writeIndexToFile(TreeMap<String, TreeMap<String, TreeSet<Integer>>> index, Path outputPath) throws IOException {
-	    try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputPath.toFile()))) {
-	        writer.write("{\n");
+		try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputPath.toFile()))) {
+			writer.write("{\n");
 
-	        if (!index.isEmpty()) {
-	            var iterator = index.entrySet().iterator();
+			if (!index.isEmpty()) {
+				var iterator = index.entrySet().iterator();
 
-	            // Handle the first entry
-	            var wordEntry = iterator.next();
-	            writeQuote(wordEntry.getKey(), writer, 1);
-	            writer.write(": ");
-	            writeObjectArrays(wordEntry.getValue(), writer, 1);
+				// Handle the first entry
+				var wordEntry = iterator.next();
+				writeQuote(wordEntry.getKey(), writer, 1);
+				writer.write(": ");
+				writeObjectArrays(wordEntry.getValue(), writer, 1);
 
-	            // Handle remaining entries
-	            while (iterator.hasNext()) {
-	                writer.write(",\n");
-	                wordEntry = iterator.next();
+				// Handle remaining entries
+				while (iterator.hasNext()) {
+					writer.write(",\n");
+					wordEntry = iterator.next();
 
-	                writeQuote(wordEntry.getKey(), writer, 1);
-	                writer.write(": ");
-	                writeObjectArrays(wordEntry.getValue(), writer, 1);
-	            }
+					writeQuote(wordEntry.getKey(), writer, 1);
+					writer.write(": ");
+					writeObjectArrays(wordEntry.getValue(), writer, 1);
+				}
 
-	            writer.write("\n");
-	        }
+				writer.write("\n");
+			}
 
-	        writer.write("}");
-	    } catch (IOException e) {
-	        throw new IOException("Failed to write index to: " + outputPath, e);
-	    }
+			writer.write("}");
+		} catch (IOException e) {
+			throw new IOException("Failed to write index to: " + outputPath, e);
+		}
 	}
 
 }

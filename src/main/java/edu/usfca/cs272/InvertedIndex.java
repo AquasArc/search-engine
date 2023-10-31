@@ -178,52 +178,52 @@ public class InvertedIndex {
 		return Collections.emptySet();
 	}
 
-    /**
-     * Gets the number of unique words in the index.
-     * 
-     * @return The number of unique words in the index.
-     */
+	/**
+	 * Gets the number of unique words in the index.
+	 * 
+	 * @return The number of unique words in the index.
+	 */
 	public int numWords() {
 		return invertedIndex.size();
 	}
 
 	/**
-     * Gets the number of locations for a specific word in the index.
-     * 
-     * @param word The word to query.
-     * @return The number of locations for the given word. Returns 0 if the word does not exist.
-     */
+	 * Gets the number of locations for a specific word in the index.
+	 * 
+	 * @param word The word to query.
+	 * @return The number of locations for the given word. Returns 0 if the word does not exist.
+	 */
 	public int numLocations(String word) {
 		return hasWord(word) ? invertedIndex.get(word).size() : 0;
 	}
 
-    /**
-     * Gets the number of positions for a specific word at a specific location in the index.
-     * 
-     * @param word The word to query.
-     * @param location The location to query.
-     * @return The number of positions for the word at the location. Returns 0 if the word or location does not exist.
-     */
+	/**
+	 * Gets the number of positions for a specific word at a specific location in the index.
+	 * 
+	 * @param word The word to query.
+	 * @param location The location to query.
+	 * @return The number of positions for the word at the location. Returns 0 if the word or location does not exist.
+	 */
 	public int numPositions(String word, String location) {
 		return hasLocation(word, location) ? invertedIndex.get(word).get(location).size() : 0;
 	}
 
-    /**
-     * Gets the total number of words in a specific location.
-     * 
-     * @param location The location to query.
-     * @return The total number of words at the location. Returns 0 if the location does not exist.
-     */
+	/**
+	 * Gets the total number of words in a specific location.
+	 * 
+	 * @param location The location to query.
+	 * @return The total number of words at the location. Returns 0 if the location does not exist.
+	 */
 	public long numWordsInLocation(String location) {
 		return wordCountMap.getOrDefault(location, 0L);
 	}
 
-    /**
-     * Retrieves all the locations and their positions for a given word.
-     * 
-     * @param word The word to query.
-     * @return An unmodifiable map containing the locations and positions for the word. Returns an empty map if the word does not exist.
-     */
+	/**
+	 * Retrieves all the locations and their positions for a given word.
+	 * 
+	 * @param word The word to query.
+	 * @return An unmodifiable map containing the locations and positions for the word. Returns an empty map if the word does not exist.
+	 */
 	public Map<String, Set<Integer>> getLocationsByWord(String word) {
 		if (hasWord(word)) {
 			return Collections.unmodifiableMap(invertedIndex.get(word));

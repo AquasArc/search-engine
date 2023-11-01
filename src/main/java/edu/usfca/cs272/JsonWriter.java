@@ -389,15 +389,10 @@ public class JsonWriter {
 	}
 	
 	/**
-	 * 
-	 * Apply what you are learning in the class to your code and practice making these
-	 * design choices based on the examples given to you!
-	 */
-	/**
 	 * Writes the given inverted index to a file in JSON format.
-	 *
+	 * 
 	 * @param index The inverted index map to write.
-	 * @param writer that contains the buffered reader
+	 * @param writer The Writer object used for writing the JSON to the file.
 	 * @param outputPath The path where the JSON should be saved.
 	 * @throws IOException If there's an issue writing the file.
 	 */

@@ -397,6 +397,7 @@ public class JsonWriter {
 	 * Writes the given inverted index to a file in JSON format.
 	 *
 	 * @param index The inverted index map to write.
+	 * @param writer that contains the buffered reader
 	 * @param outputPath The path where the JSON should be saved.
 	 * @throws IOException If there's an issue writing the file.
 	 */

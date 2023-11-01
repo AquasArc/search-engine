@@ -392,35 +392,34 @@ public class JsonWriter {
 	 * Writes the given inverted index to a file in JSON format.
 	 * 
 	 * @param index The inverted index map to write.
-	 * @param writer The Writer object used for writing the JSON to the file.
+	 * @param theWriter The Writer object used for writing the JSON to the file.
 	 * @param outputPath The path where the JSON should be saved.
 	 * @throws IOException If there's an issue writing the file.
 	 */
-	public static void writeIndexToFile(Map<String, ? extends Map<String, ? extends Set<? extends Number>>> index,Writer writer,Path outputPath) throws IOException {
-		writer.write("{\n");
+	public static void writeIndexToFile(Map<String, ? extends Map<String, ? extends Set<? extends Number>>> index,Writer theWriter,Path outputPath) throws IOException {
+		theWriter.write("{\n");
 
 		if (!index.isEmpty()) {
 			var iterator = index.entrySet().iterator();
 
 			// Handle the first entry
 			var wordEntry = iterator.next();
-			writeQuote(wordEntry.getKey(), writer, 1);
-			writer.write(": ");
-			writeObjectArrays(wordEntry.getValue(), writer, 1);
+			writeQuote(wordEntry.getKey(), theWriter, 1);
+			theWriter.write(": ");
+			writeObjectArrays(wordEntry.getValue(), theWriter, 1);
 
 			// Handle remaining entries
 			while (iterator.hasNext()) {
-				writer.write(",\n");
+				theWriter.write(",\n");
 				wordEntry = iterator.next();
 
-				writeQuote(wordEntry.getKey(), writer, 1);
-				writer.write(": ");
-				writeObjectArrays(wordEntry.getValue(), writer, 1);
+				writeQuote(wordEntry.getKey(), theWriter, 1);
+				theWriter.write(": ");
+				writeObjectArrays(wordEntry.getValue(), theWriter, 1);
 			}
 
-			writer.write("\n");
+			theWriter.write("\n");
 		}
-
-		writer.write("}");
+		theWriter.write("}");
 	}
 }

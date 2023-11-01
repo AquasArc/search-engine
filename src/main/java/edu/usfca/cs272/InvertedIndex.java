@@ -1,5 +1,7 @@
 package edu.usfca.cs272;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collections;
@@ -49,7 +51,11 @@ public class InvertedIndex {
 	 * @throws IOException If an error occurs during file writing.
 	 */
 	public void processIndex(Path indexPath) throws IOException {
-		JsonWriter.writeIndexToFile(invertedIndex, indexPath);
+		try( BufferedWriter writer = new BufferedWriter(new FileWriter(indexPath.toFile()))) {
+			JsonWriter.writeIndexToFile(invertedIndex, writer ,indexPath);
+		} catch (IOException e) {
+			throw new IOException("Failed to write index to " + indexPath, e);
+		}
 	}
 
 	/** A toString method prints inverted index contents

@@ -3,7 +3,6 @@ package edu.usfca.cs272;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -12,8 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Map;
-import java.util.TreeMap;
-import java.util.TreeSet;
+import java.util.Set;
 /**
  * Outputs several simple data structures in "pretty" JSON format where newlines
  * are used to separate elements and nested elements are indented using spaces.
@@ -402,35 +400,31 @@ public class JsonWriter {
 	 * @param outputPath The path where the JSON should be saved.
 	 * @throws IOException If there's an issue writing the file.
 	 */
-	public static void writeIndexToFile(TreeMap<String, TreeMap<String, TreeSet<Integer>>> index, Path outputPath) throws IOException {
-		try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputPath.toFile()))) {
-			writer.write("{\n");
+	public static void writeIndexToFile(Map<String, ? extends Map<String, ? extends Set<? extends Number>>> index,Writer writer,Path outputPath) throws IOException {
+		writer.write("{\n");
 
-			if (!index.isEmpty()) {
-				var iterator = index.entrySet().iterator();
+		if (!index.isEmpty()) {
+			var iterator = index.entrySet().iterator();
 
-				// Handle the first entry
-				var wordEntry = iterator.next();
+			// Handle the first entry
+			var wordEntry = iterator.next();
+			writeQuote(wordEntry.getKey(), writer, 1);
+			writer.write(": ");
+			writeObjectArrays(wordEntry.getValue(), writer, 1);
+
+			// Handle remaining entries
+			while (iterator.hasNext()) {
+				writer.write(",\n");
+				wordEntry = iterator.next();
+
 				writeQuote(wordEntry.getKey(), writer, 1);
 				writer.write(": ");
 				writeObjectArrays(wordEntry.getValue(), writer, 1);
-
-				// Handle remaining entries
-				while (iterator.hasNext()) {
-					writer.write(",\n");
-					wordEntry = iterator.next();
-
-					writeQuote(wordEntry.getKey(), writer, 1);
-					writer.write(": ");
-					writeObjectArrays(wordEntry.getValue(), writer, 1);
-				}
-
-				writer.write("\n");
 			}
 
-			writer.write("}");
-		} catch (IOException e) {
-			throw new IOException("Failed to write index to: " + outputPath, e);
+			writer.write("\n");
 		}
+
+		writer.write("}");
 	}
 }

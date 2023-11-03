@@ -3,7 +3,9 @@ package edu.usfca.cs272;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -51,10 +53,8 @@ public class InvertedIndex {
 	 * @throws IOException If an error occurs during file writing.
 	 */
 	public void processIndex(Path indexPath) throws IOException {
-		try( BufferedWriter writer = new BufferedWriter(new FileWriter(indexPath.toFile()))) { // TODO Make this modern
-			JsonWriter.writeIndexToFile(invertedIndex, writer ,indexPath); // TODO Formatting
-		} catch (IOException e) { // TODO Delete catch
-			throw new IOException("Failed to write index to " + indexPath, e);
+		try(BufferedWriter writer = Files.newBufferedWriter(indexPath)) {
+			JsonWriter.writeIndexToFile(invertedIndex, writer, 1, indexPath);
 		}
 	}
 
@@ -62,7 +62,7 @@ public class InvertedIndex {
 	 * 
 	 *@returns to string value of the inverted index 
 	 */
-	// TODO @Override
+	@Override
 	public String toString() {
 		return invertedIndex.toString();
 	}
@@ -157,11 +157,9 @@ public class InvertedIndex {
 	 * @return An unmodifiable map containing the locations and positions of the given word.
 	 */
 	public Set<String> getLocations(String word) {
-		//if (invertedIndex.containsKey(word)) { TODO Clean up your code
 		if (hasWord(word)) {
 			return Collections.unmodifiableSet(invertedIndex.get(word).keySet());
 		}
-		//}
 		return Collections.emptySet();
 	}
 
@@ -218,18 +216,5 @@ public class InvertedIndex {
 	 */
 	public long numWordsInLocation(String location) {
 		return wordCountMap.getOrDefault(location, 0L);
-	}
-
-	/**
-	 * Retrieves all the locations and their positions for a given word.
-	 * 
-	 * @param word The word to query.
-	 * @return An unmodifiable map containing the locations and positions for the word. Returns an empty map if the word does not exist.
-	 */
-	public Map<String, Set<Integer>> getLocationsByWord(String word) { // TODO This is still breaking encapsulation, remove
-		if (hasWord(word)) {
-			return Collections.unmodifiableMap(invertedIndex.get(word));
-		}
-		return Collections.emptyMap();
 	}
 }

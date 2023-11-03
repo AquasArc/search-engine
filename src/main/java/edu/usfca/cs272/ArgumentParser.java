@@ -93,8 +93,6 @@ public class ArgumentParser {
 		}
 	}
 
-
-
 	/**
 	 * Returns the number of unique flags.
 	 *
@@ -171,22 +169,11 @@ public class ArgumentParser {
 	 * @see Path#of(String, String...)
 	 */
 	public Path getPath(String flag, Path backup) {
-		/* TODO 
 		try {
 			return Path.of(getString(flag));
 		} catch (InvalidPathException | NullPointerException e) {
 			return backup;
 		}
-		*/
-		
-		if (hasValue(flag)) {
-			try {
-				return Path.of(getString(flag));
-			} catch (InvalidPathException e) { // TODO Never have an empty catch block
-				// Log the exception if needed
-			}
-		}
-		return backup;
 	}
 
 	/**
@@ -218,15 +205,12 @@ public class ArgumentParser {
 	 *
 	 * @see Integer#parseInt(String)
 	 */
-	public int getInteger(String flag, int backup) { // TODO Same change here
-		if (hasValue(flag)) {
-			try {
-				return Integer.parseInt(getString(flag));
-			} catch (NumberFormatException e) {
-				// Log the exception if needed
-			}
-		}
-		return backup;
+	public int getInteger(String flag, int backup) {
+		try {
+			return Integer.parseInt(getString(flag));
+		} catch (NumberFormatException | NullPointerException e) {
+	        return backup;
+	    }
 	}
 
 	/**

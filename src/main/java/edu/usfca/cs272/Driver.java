@@ -50,7 +50,5 @@ public class Driver {
 				System.out.println("Error processing index: " + e.getMessage());
 			}
 		}
-		
-		System.out.println(index); //Test toString method TODO Remove
 	}
 }

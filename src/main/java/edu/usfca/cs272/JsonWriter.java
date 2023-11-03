@@ -237,9 +237,9 @@ public class JsonWriter {
 	 */
 	//Requested change: use var, use if-while approach
 	public static void writeObjectArrays(Map<String, ? extends Collection<? extends Number>> elements, Writer writer, int indent) throws IOException {
-		writer.write("{\n");
+		writer.write("{\n"); // TODO Make sure you decide how you want the \n output and then do it consistently
 
-		if (!elements.isEmpty()) {
+		if (!elements.isEmpty()) { // TODO iterator.hasNext
 			var iterator = elements.entrySet().iterator();
 
 			// handle first entry
@@ -327,7 +327,7 @@ public class JsonWriter {
 	public static void writeArrayObjects(Collection<? extends Map<String, ? extends Number>> elements, Writer writer, int indent) throws IOException {
 		writer.write("[");
 
-		if (!elements.isEmpty()) {
+		if (!elements.isEmpty()) { // TODO Make everything consistent
 			writer.write("\n");
 
 			var iterator = elements.iterator();
@@ -388,6 +388,8 @@ public class JsonWriter {
 		}
 	}
 	
+	// TODO Formatting
+	// TODO Upcast Set to Collection
 	/**
 	 * Writes the given inverted index to a file in JSON format.
 	 * 
@@ -399,12 +401,12 @@ public class JsonWriter {
 	public static void writeIndexToFile(Map<String, ? extends Map<String, ? extends Set<? extends Number>>> index, Writer writer,Path outputPath) throws IOException {
 		writer.write("{\n");
 
-		if (!index.isEmpty()) {
+		if (!index.isEmpty()) { // TODO Make consistent
 			var iterator = index.entrySet().iterator();
 
 			// Handle the first entry
 			var wordEntry = iterator.next();
-			writeQuote(wordEntry.getKey(), writer, 1);
+			writeQuote(wordEntry.getKey(), writer, 1); // TODO Hard coded indent level
 			writer.write(": ");
 			writeObjectArrays(wordEntry.getValue(), writer, 1);
 

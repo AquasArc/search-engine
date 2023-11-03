@@ -51,9 +51,7 @@ public class InvertedIndex {
 	 * @throws IOException If an error occurs during file writing.
 	 */
 	public void processIndex(Path indexPath) throws IOException {
-		try(BufferedWriter writer = Files.newBufferedWriter(indexPath)) {
-			JsonWriter.writeIndexToFile(invertedIndex, writer, 1, indexPath);
-		}
+		JsonWriter.writeIndexToFile(invertedIndex,indexPath);
 	}
 
 	/** A toString method prints inverted index contents

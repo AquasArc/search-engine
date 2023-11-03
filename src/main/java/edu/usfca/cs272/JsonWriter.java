@@ -377,25 +377,58 @@ public class JsonWriter {
 		}
 	}
 
-	public static void writeIndexToFile(Map<String, ? extends Map<String, ? extends Collection<? extends Number>>> index, Writer writer, int indent, Path outputPath) throws IOException {
+	
+	/**
+	 * Writes the index as a pretty JSON object with nested arrays to file.
+	 *
+	 * @param index the index to write
+	 * @param path the file path to use
+	 * @param indent the initial indentation level
+	 * @throws IOException if an IO error occurs
+	 */
+	public static void writeIndexToFile(Map<String, ? extends Map<String, ? extends Collection<? extends Number>>> index, Path path) throws IOException {
+	    try (BufferedWriter writer = Files.newBufferedWriter(path, UTF_8)) {
+	        writeIndexToFile(index, writer, 0);
+	    }
+	}
+
+	/**
+	 * Returns the index as a pretty JSON object with nested arrays.
+	 *
+	 * @param index the index to use
+	 * @param indent the initial indentation level
+	 * @return a {@link String} containing the index in pretty JSON format
+	 */
+	public static String writeIndexToFile(Map<String, ? extends Map<String, ? extends Collection<? extends Number>>> elements) {
+	    try {
+	        StringWriter writer = new StringWriter();
+	        writeIndexToFile(elements, writer, 0);
+	        return writer.toString();
+	    } catch (IOException e) {
+	        return null;
+	    }
+	}
+	
+	
+	public static void writeIndexToFile(Map<String, ? extends Map<String, ? extends Collection<? extends Number>>> index, Writer writer, int indent) throws IOException {
 		writer.write("{\n");
 
 		var iterator = index.entrySet().iterator();
 		if (iterator.hasNext()) {
 			// Handle the first entry
 			var wordEntry = iterator.next();
-			writeQuote(wordEntry.getKey(), writer, indent);
+			writeQuote(wordEntry.getKey(), writer, indent + 1);
 			writer.write(": ");
-			writeObjectArrays(wordEntry.getValue(), writer, indent);
+			writeObjectArrays(wordEntry.getValue(), writer, indent + 1);
 
 			// Handle remaining entries
 			while (iterator.hasNext()) {
 				writer.write(",\n");
 				wordEntry = iterator.next();
 
-				writeQuote(wordEntry.getKey(), writer, indent);
+				writeQuote(wordEntry.getKey(), writer, indent + 1);
 				writer.write(": ");
-				writeObjectArrays(wordEntry.getValue(), writer, indent);
+				writeObjectArrays(wordEntry.getValue(), writer, indent + 1);
 			}
 
 			writer.write("\n");

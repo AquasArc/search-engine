@@ -152,30 +152,30 @@ public class JsonWriter {
 	 * @see #writeIndent(String, Writer, int)
 	 */
 	public static void writeObject(Map<String, ? extends Number> elements, Writer writer, int indent) throws IOException {
-	     writer.write("{\n");
-	     var iterator = elements.entrySet().iterator();
+		writer.write("{\n");
+		var iterator = elements.entrySet().iterator();
 
-	     if (iterator.hasNext()) {
-	       var entry = iterator.next();
-	       writeIndent(writer, indent + 1);
-	       writeQuote(entry.getKey(), writer, 0);
-	       writer.write(": ");
-	       writer.write(entry.getValue().toString());
+		if (iterator.hasNext()) {
+			var entry = iterator.next();
+			writeIndent(writer, indent + 1);
+			writeQuote(entry.getKey(), writer, 0);
+			writer.write(": ");
+			writer.write(entry.getValue().toString());
 
-	       while (iterator.hasNext()) {
-	         writer.write(",\n");
-	         entry = iterator.next();
-	         writeIndent(writer, indent + 1);
-	         writeQuote(entry.getKey(), writer, 0);
-	         writer.write(": ");
-	         writer.write(entry.getValue().toString());
-	       }
-	       writer.write("\n");
-	     }
+			while (iterator.hasNext()) {
+				writer.write(",\n");
+				entry = iterator.next();
+				writeIndent(writer, indent + 1);
+				writeQuote(entry.getKey(), writer, 0);
+				writer.write(": ");
+				writer.write(entry.getValue().toString());
+			}
+			writer.write("\n");
+		}
 
-	     writeIndent(writer, indent);
-	     writer.write("}");
-	   }
+		writeIndent(writer, indent);
+		writer.write("}");
+	}
 
 	/**
 	 * Writes the elements as a pretty JSON object to file.
@@ -232,35 +232,35 @@ public class JsonWriter {
 	 * @see #writeArray(Collection)
 	 */
 	public static void writeObjectArrays(Map<String, ? extends Collection<? extends Number>> elements, Writer writer, int indent) throws IOException {
-	    writer.write("{\n"); 
+		writer.write("{\n"); 
 
-	    var iterator = elements.entrySet().iterator();
-	    if (iterator.hasNext()) {
-	      // handle first entry
-	      var entry = iterator.next();
-	      
-	      writeIndent(writer, indent + 1);
-	      writeQuote(entry.getKey(), writer, 0);
-	      writer.write(": ");
-	      writeArray(entry.getValue(), writer, indent + 1);
+		var iterator = elements.entrySet().iterator();
+		if (iterator.hasNext()) {
+			// handle first entry
+			var entry = iterator.next();
 
-	      // handle remaining entries
-	      while (iterator.hasNext()) {
-	        writer.write(",\n");
-	        entry = iterator.next();
+			writeIndent(writer, indent + 1);
+			writeQuote(entry.getKey(), writer, 0);
+			writer.write(": ");
+			writeArray(entry.getValue(), writer, indent + 1);
 
-	        writeIndent(writer, indent + 1);
-	        writeQuote(entry.getKey(), writer, 0);
-	        writer.write(": ");
-	        writeArray(entry.getValue(), writer, indent + 1);
-	      }
+			// handle remaining entries
+			while (iterator.hasNext()) {
+				writer.write(",\n");
+				entry = iterator.next();
 
-	      writer.write("\n");
-	    }
+				writeIndent(writer, indent + 1);
+				writeQuote(entry.getKey(), writer, 0);
+				writer.write(": ");
+				writeArray(entry.getValue(), writer, indent + 1);
+			}
 
-	    writeIndent(writer, indent);
-	    writer.write("}");
-	  }
+			writer.write("\n");
+		}
+
+		writeIndent(writer, indent);
+		writer.write("}");
+	}
 
 	/**
 	 * Writes the elements as a pretty JSON object with nested arrays to file.
@@ -317,28 +317,28 @@ public class JsonWriter {
 	 * @see #writeObject(Map)
 	 */
 	public static void writeArrayObjects(Collection<? extends Map<String, ? extends Number>> elements, Writer writer, int indent) throws IOException {
-	    writer.write("[\n");
-	    var iterator = elements.iterator();
+		writer.write("[\n");
+		var iterator = elements.iterator();
 
-	    if (iterator.hasNext()) {
-	      var currentMap = iterator.next();
+		if (iterator.hasNext()) {
+			var currentMap = iterator.next();
 
-	      writeIndent(writer, indent + 1);
-	      writeObject(currentMap, writer, indent + 1);
+			writeIndent(writer, indent + 1);
+			writeObject(currentMap, writer, indent + 1);
 
-	      while (iterator.hasNext()) {
-	        writer.write(",\n");
-	        currentMap = iterator.next();
+			while (iterator.hasNext()) {
+				writer.write(",\n");
+				currentMap = iterator.next();
 
-	        writeIndent(writer, indent + 1);
-	        writeObject(currentMap, writer, indent + 1);
-	      }
-	      writer.write("\n");
-	    }
-	    
-	    writeIndent(writer, indent);
-	    writer.write("]");
-	  }
+				writeIndent(writer, indent + 1);
+				writeObject(currentMap, writer, indent + 1);
+			}
+			writer.write("\n");
+		}
+
+		writeIndent(writer, indent);
+		writer.write("]");
+	}
 
 	/**
 	 * Writes the elements as a pretty JSON array with nested objects to file.
@@ -376,30 +376,30 @@ public class JsonWriter {
 			return null;
 		}
 	}
-	
+
 	public static void writeIndexToFile(Map<String, ? extends Map<String, ? extends Collection<? extends Number>>> index, Writer writer, int indent, Path outputPath) throws IOException {
-	    writer.write("{\n");
+		writer.write("{\n");
 
-	    var iterator = index.entrySet().iterator();
-	    if (iterator.hasNext()) {
-	        // Handle the first entry
-	        var wordEntry = iterator.next();
-	        writeQuote(wordEntry.getKey(), writer, indent);
-	        writer.write(": ");
-	        writeObjectArrays(wordEntry.getValue(), writer, indent);
+		var iterator = index.entrySet().iterator();
+		if (iterator.hasNext()) {
+			// Handle the first entry
+			var wordEntry = iterator.next();
+			writeQuote(wordEntry.getKey(), writer, indent);
+			writer.write(": ");
+			writeObjectArrays(wordEntry.getValue(), writer, indent);
 
-	        // Handle remaining entries
-	        while (iterator.hasNext()) {
-	            writer.write(",\n");
-	            wordEntry = iterator.next();
+			// Handle remaining entries
+			while (iterator.hasNext()) {
+				writer.write(",\n");
+				wordEntry = iterator.next();
 
-	            writeQuote(wordEntry.getKey(), writer, indent);
-	            writer.write(": ");
-	            writeObjectArrays(wordEntry.getValue(), writer, indent);
-	        }
+				writeQuote(wordEntry.getKey(), writer, indent);
+				writer.write(": ");
+				writeObjectArrays(wordEntry.getValue(), writer, indent);
+			}
 
-	        writer.write("\n");
-	    }
-	    writer.write("}");
+			writer.write("\n");
+		}
+		writer.write("}");
 	}
 }

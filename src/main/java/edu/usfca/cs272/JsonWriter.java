@@ -413,7 +413,7 @@ public class JsonWriter {
 	 * @param index is the data structure that is being written in jsonformat
 	 * @param writer writer to write the data into a file
 	 * @param indent indent count for spacing
-	 * @throws IOException
+	 * @throws IOException throws an IOException
 	 */
 	public static void writeIndexToFile(Map<String, ? extends Map<String, ? extends Collection<? extends Number>>> index, Writer writer, int indent) throws IOException {
 		writer.write("{\n");

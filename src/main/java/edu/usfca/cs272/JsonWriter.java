@@ -379,11 +379,10 @@ public class JsonWriter {
 
 	
 	/**
-	 * Writes the index as a pretty JSON object with nested arrays to file.
+	 * Writes the index as a pretty JSON format.
 	 *
 	 * @param index the index to write
 	 * @param path the file path to use
-	 * @param indent the initial indentation level
 	 * @throws IOException if an IO error occurs
 	 */
 	public static void writeIndexToFile(Map<String, ? extends Map<String, ? extends Collection<? extends Number>>> index, Path path) throws IOException {
@@ -393,10 +392,9 @@ public class JsonWriter {
 	}
 
 	/**
-	 * Returns the index as a pretty JSON object with nested arrays.
+	 * Returns the index as a pretty JSON format.
 	 *
-	 * @param index the index to use
-	 * @param indent the initial indentation level
+	 * @param elements, essentially the inverted index to use
 	 * @return a {@link String} containing the index in pretty JSON format
 	 */
 	public static String writeIndexToFile(Map<String, ? extends Map<String, ? extends Collection<? extends Number>>> elements) {
@@ -410,6 +408,13 @@ public class JsonWriter {
 	}
 	
 	
+	/**This method is to write the inverted index data into files in a pretty json format
+	 * 
+	 * @param index is the data structure that is being written in jsonformat
+	 * @param writer writer to write the data into a file
+	 * @param indent indent count for spacing
+	 * @throws IOException
+	 */
 	public static void writeIndexToFile(Map<String, ? extends Map<String, ? extends Collection<? extends Number>>> index, Writer writer, int indent) throws IOException {
 		writer.write("{\n");
 

@@ -51,9 +51,9 @@ public class InvertedIndex {
 	 * @throws IOException If an error occurs during file writing.
 	 */
 	public void processIndex(Path indexPath) throws IOException {
-		try( BufferedWriter writer = new BufferedWriter(new FileWriter(indexPath.toFile()))) {
-			JsonWriter.writeIndexToFile(invertedIndex, writer ,indexPath);
-		} catch (IOException e) {
+		try( BufferedWriter writer = new BufferedWriter(new FileWriter(indexPath.toFile()))) { // TODO Make this modern
+			JsonWriter.writeIndexToFile(invertedIndex, writer ,indexPath); // TODO Formatting
+		} catch (IOException e) { // TODO Delete catch
 			throw new IOException("Failed to write index to " + indexPath, e);
 		}
 	}
@@ -62,6 +62,7 @@ public class InvertedIndex {
 	 * 
 	 *@returns to string value of the inverted index 
 	 */
+	// TODO @Override
 	public String toString() {
 		return invertedIndex.toString();
 	}
@@ -156,7 +157,7 @@ public class InvertedIndex {
 	 * @return An unmodifiable map containing the locations and positions of the given word.
 	 */
 	public Set<String> getLocations(String word) {
-		//if (invertedIndex.containsKey(word)) {
+		//if (invertedIndex.containsKey(word)) { TODO Clean up your code
 		if (hasWord(word)) {
 			return Collections.unmodifiableSet(invertedIndex.get(word).keySet());
 		}
@@ -225,7 +226,7 @@ public class InvertedIndex {
 	 * @param word The word to query.
 	 * @return An unmodifiable map containing the locations and positions for the word. Returns an empty map if the word does not exist.
 	 */
-	public Map<String, Set<Integer>> getLocationsByWord(String word) {
+	public Map<String, Set<Integer>> getLocationsByWord(String word) { // TODO This is still breaking encapsulation, remove
 		if (hasWord(word)) {
 			return Collections.unmodifiableMap(invertedIndex.get(word));
 		}

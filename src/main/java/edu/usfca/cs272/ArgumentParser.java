@@ -171,10 +171,18 @@ public class ArgumentParser {
 	 * @see Path#of(String, String...)
 	 */
 	public Path getPath(String flag, Path backup) {
+		/* TODO 
+		try {
+			return Path.of(getString(flag));
+		} catch (InvalidPathException | NullPointerException e) {
+			return backup;
+		}
+		*/
+		
 		if (hasValue(flag)) {
 			try {
 				return Path.of(getString(flag));
-			} catch (InvalidPathException e) {
+			} catch (InvalidPathException e) { // TODO Never have an empty catch block
 				// Log the exception if needed
 			}
 		}
@@ -210,7 +218,7 @@ public class ArgumentParser {
 	 *
 	 * @see Integer#parseInt(String)
 	 */
-	public int getInteger(String flag, int backup) {
+	public int getInteger(String flag, int backup) { // TODO Same change here
 		if (hasValue(flag)) {
 			try {
 				return Integer.parseInt(getString(flag));

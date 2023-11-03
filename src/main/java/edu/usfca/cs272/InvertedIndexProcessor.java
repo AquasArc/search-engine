@@ -38,7 +38,7 @@ public class InvertedIndexProcessor {
 				for (String word : words) {
 					String stemmedWord = stemmer.stem(word).toString();
 					position++;
-					index.add(stemmedWord,filePathStr, position);
+					index.add(stemmedWord, filePathStr, position);
 				}
 			}
 		}

@@ -58,7 +58,7 @@ public class QueryProcessor {
 		if (queryPath == null || !Files.exists(queryPath) || !Files.isRegularFile(queryPath)
 				|| Files.isDirectory(queryPath)) {
 			System.out.println("Error: Missing value for -query flag");
-			System.exit(0);
+			return null;
 		}
 		List<String> queries = readQueries(queryPath);
 

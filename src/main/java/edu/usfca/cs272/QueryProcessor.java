@@ -9,6 +9,14 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
+/**Handles query functionality. Both partial/exact
+ * 
+ * 
+ * @author Anton Lim
+ * @author CS 272 Software Development (University of San Francisco)
+ * @version Fall 2023
+ */
+
 public class QueryProcessor {
 
 	/** The InvertedIndex class... */
@@ -32,7 +40,7 @@ public class QueryProcessor {
 	 * is being used to search with. Either exact or partial
 	 * 
 	 * @param queryPath The given argument that is path to file
-	 * @return List<String> that holds all the clean/parsed queries
+	 * @return List of strings that holds all the clean/parsed queries
 	 * @throws IOException throws exception if issues occur
 	 */
 	public List<String> readQueries(Path queryPath) throws IOException {
@@ -52,7 +60,7 @@ public class QueryProcessor {
 	 * @param isPartial The boolean value to determine if we do partial search over
 	 *                  exact
 	 * @return resultsMap Returns the results map with the populated information
-	 * @throws IOException
+	 * @throws IOException throws io exception if issues hit
 	 */
 	public Map<String, List<FileResult>> processQuery(Path queryPath, boolean isPartial) throws IOException {
 		if (queryPath == null || !Files.exists(queryPath) || !Files.isRegularFile(queryPath)

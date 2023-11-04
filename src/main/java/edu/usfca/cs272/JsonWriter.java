@@ -441,6 +441,13 @@ public class JsonWriter {
 		writer.write("}");
 	}
 
+	
+	/**Writes the results of exact or partial search into a pretty json format into a file
+	 * 
+	 * @param results the data structure containing the data being written
+	 * @param outputPath the output path which is where the data will be written to
+	 * @throws IOException throws io if issues occur
+	 */
 	public static void writeResultsToFile(Map<String, List<FileResult>> results, Path outputPath) throws IOException {
 		try (BufferedWriter writer = Files.newBufferedWriter(outputPath, UTF_8)) {
 			writer.write("{\n");

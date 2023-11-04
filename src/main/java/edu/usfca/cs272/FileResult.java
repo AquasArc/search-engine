@@ -16,99 +16,112 @@ import java.util.Map;
  */
 public class FileResult implements Comparable<FileResult> {
 
-  private final String location;
-  private int count = 0;
-  private double score = 0.0;
-  private final long totalWords;
+	/** contains the information for location*/
+	private final String location;
 
-  /**
-   * Returns the count.
-   *
-   * @return the count value.
-   */
-  public int getCount() {
-    return this.count;
-  }
+	/** contains the information for count */
+	private int count = 0;
 
-  /**
-   * Returns the score.
-   *
-   * @return the score value.
-   */
-  public double getScore() {
-    return this.score;
-  }
+	/** contains the information for score*/
+	private double score = 0.0;
 
-  /**
-   * Returns the where string.
-   *
-   * @return the where location.
-   */
-  public String getWhere() {
-    return this.location;
-  }
+	/** contains the information for totalwords*/
+	private final long totalWords;
 
-  /**
-   * Initializes a new FileResult with the given location and total word count.
-   * 
-   * @param location    The location (path) of the file.
-   * @param totalWords  The total number of words in the file.
-   */
-  public FileResult(String location, long totalWords) {
-    this.location = location;
-    this.totalWords = totalWords;
-  }
+	/**
+	 * Returns the count.
+	 *
+	 * @return the count value.
+	 */
+	public int getCount() {
+		return this.count;
+	}
 
-  /**
-   * Increments the word count by a given value and updates the score.
-   * 
-   * @param value The value to increment the word count by.
-   */
-  public void incrementCount(int value) {
-    this.count += value;
-    updateScore();
-  }
+	/**
+	 * Returns the score.
+	 *
+	 * @return the score value.
+	 */
+	public double getScore() {
+		return this.score;
+	}
 
-  /**
-   * Updates the score based on the current word count and total words.
-   */
-  private void updateScore() {
-    if (totalWords != 0) {
-      this.score = (double) count / totalWords;
-    }
-  }
+	/**
+	 * Returns the where string.
+	 *
+	 * @return the where location.
+	 */
+	public String getWhere() {
+		return this.location;
+	}
 
-  /**
-   * Converts the properties of this object to a map.
-   * 
-   * @return A map representation of this object.
-   */
-  public Map<String, Object> asMap() {
-    Map<String, Object> map = new HashMap<>();
-    map.put("where", location);
-    map.put("count", count);
-    map.put("score", String.format("%.8f", score));  // to ensure 8 decimal places
-    return map;
-  }
+	/**
+	 * Initializes a new FileResult with the given location and total word count.
+	 * 
+	 * @param location    The location (path) of the file.
+	 * @param totalWords  The total number of words in the file.
+	 */
+	public FileResult(String location, long totalWords) {
+		this.location = location;
+		this.totalWords = totalWords;
+	}
+
+	/**
+	 * Increments the word count by a given value and updates the score.
+	 * 
+	 * @param value The value to increment the word count by.
+	 */
+	public void incrementCount(int value) {
+		this.count += value;
+		updateScore();
+	}
+
+	/**
+	 * Updates the score based on the current word count and total words.
+	 */
+	private void updateScore() {
+		if (totalWords != 0) {
+			this.score = (double) count / totalWords;
+		}
+	}
+
+	/**
+	 * Converts the properties of this object to a map.
+	 * 
+	 * @return A map representation of this object.
+	 */
+	public Map<String, Object> asMap() {
+		Map<String, Object> map = new HashMap<>();
+		map.put("where", location);
+		map.put("count", count);
+		map.put("score", String.format("%.8f", score));  // to ensure 8 decimal places
+		return map;
+	}
 
 
-  @Override
-  public int compareTo(FileResult other) {
-    int scoreCompare = Double.compare(other.score, this.score);
-    if (scoreCompare != 0) {
-      return scoreCompare;
-    }
+	/** Compares the score + the count
+	 * 
+	 */
+	@Override
+	public int compareTo(FileResult other) {
+		int scoreCompare = Double.compare(other.score, this.score);
+		if (scoreCompare != 0) {
+			return scoreCompare;
+		}
 
-    int countCompare = Integer.compare(other.count, this.count);
-    if (countCompare != 0) {
-      return countCompare;
-    }
+		int countCompare = Integer.compare(other.count, this.count);
+		if (countCompare != 0) {
+			return countCompare;
+		}
 
-    return this.location.compareToIgnoreCase(other.location);
-  }
+		return this.location.compareToIgnoreCase(other.location);
+	}
 
-  @Override
-  public String toString() {
-    return "Location: " + location + " | Count: " + count + " | Score: " + score;
-  }
+	/**To string method to test if variables have the proper values
+	 * 
+	 */
+	@Override
+	public String toString() {
+		return "Location: " + location + " | Count: " + count + " | Score: " + score;
+	}
 }

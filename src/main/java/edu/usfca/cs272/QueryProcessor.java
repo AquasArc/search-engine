@@ -14,11 +14,12 @@ public class QueryProcessor {
 	/** The InvertedIndex class... */
 	private final InvertedIndex index;
 
-	/** The data structure for results from query searches*/
+	/** The data structure for results from query searches */
 	private final TreeMap<String, List<FileResult>> resultsMap = new TreeMap<String, List<FileResult>>();
 	// { Queries : [Count: _ , Score: _ , where: _ ]}
 
-	/** Initialize
+	/**
+	 * Initialize
 	 * 
 	 * @param index to use invertedindex methods
 	 */
@@ -54,27 +55,29 @@ public class QueryProcessor {
 	 * @throws IOException
 	 */
 	public Map<String, List<FileResult>> processQuery(Path queryPath, boolean isPartial) throws IOException {
-		if (queryPath == null || !Files.exists(queryPath) || !Files.isRegularFile(queryPath)) {
+		if (queryPath == null || !Files.exists(queryPath) || !Files.isRegularFile(queryPath)
+				|| Files.isDirectory(queryPath)) {
 			System.out.println("Error: Missing value for -query flag");
-		}
+		} else {
+			List<String> queries = readQueries(queryPath);
 
-		List<String> queries = readQueries(queryPath);
+			for (String query : queries) {
+				if (!query.isEmpty()) {
+					TreeSet<String> cleanedUniqueQueries = new TreeSet<>(FileStemmer.uniqueStems(query));
+					List<FileResult> sortedResults;
 
-		for (String query : queries) {
-			if (!query.isEmpty()) {
-				TreeSet<String> cleanedUniqueQueries = new TreeSet<>(FileStemmer.uniqueStems(query));
-				List<FileResult> sortedResults;
+					TreeMap<String, FileResult> tempMap = new TreeMap<String, FileResult>();
 
-				TreeMap<String, FileResult> tempMap = new TreeMap<String, FileResult>();
+					sortedResults = isPartial ? searchPartial(cleanedUniqueQueries, tempMap)
+							: searchExact(cleanedUniqueQueries, tempMap);
 
-				sortedResults = isPartial ? searchPartial(cleanedUniqueQueries, tempMap)
-						: searchExact(cleanedUniqueQueries, tempMap);
-
-				resultsMap.put(String.join(" ", cleanedUniqueQueries), sortedResults);
+					resultsMap.put(String.join(" ", cleanedUniqueQueries), sortedResults);
+				}
 			}
+			resultsMap.remove("");
+			return resultsMap;
 		}
-		resultsMap.remove("");
-		return resultsMap;
+		throw new IllegalArgumentException();
 	}
 
 	/**
@@ -82,7 +85,7 @@ public class QueryProcessor {
 	 * list of FileResult objects.
 	 *
 	 * @param cleanedUniqueQueries the cleaned and unique queries
-	 * @param inputMap the map to store the search results
+	 * @param inputMap             the map to store the search results
 	 * @return a sorted list of FileResult objects
 	 */
 	public List<FileResult> searchExact(TreeSet<String> cleanedUniqueQueries, TreeMap<String, FileResult> inputMap) {

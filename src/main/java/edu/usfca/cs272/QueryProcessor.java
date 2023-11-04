@@ -54,7 +54,9 @@ public class QueryProcessor {
 	 * @throws IOException
 	 */
 	public Map<String, List<FileResult>> processQuery(Path queryPath, boolean isPartial) throws IOException {
-		if (queryPath == null || Files.isDirectory(queryPath)) throw new IllegalArgumentException();
+		if (queryPath == null || !Files.exists(queryPath) || !Files.isRegularFile(queryPath)) {
+			System.out.println("Error: Missing value for -query flag");
+		}
 
 		List<String> queries = readQueries(queryPath);
 

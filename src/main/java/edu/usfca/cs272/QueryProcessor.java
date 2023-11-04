@@ -58,26 +58,25 @@ public class QueryProcessor {
 		if (queryPath == null || !Files.exists(queryPath) || !Files.isRegularFile(queryPath)
 				|| Files.isDirectory(queryPath)) {
 			System.out.println("Error: Missing value for -query flag");
-		} else {
-			List<String> queries = readQueries(queryPath);
-
-			for (String query : queries) {
-				if (!query.isEmpty()) {
-					TreeSet<String> cleanedUniqueQueries = new TreeSet<>(FileStemmer.uniqueStems(query));
-					List<FileResult> sortedResults;
-
-					TreeMap<String, FileResult> tempMap = new TreeMap<String, FileResult>();
-
-					sortedResults = isPartial ? searchPartial(cleanedUniqueQueries, tempMap)
-							: searchExact(cleanedUniqueQueries, tempMap);
-
-					resultsMap.put(String.join(" ", cleanedUniqueQueries), sortedResults);
-				}
-			}
-			resultsMap.remove("");
-			return resultsMap;
+			System.exit(0);
 		}
-		throw new IllegalArgumentException();
+		List<String> queries = readQueries(queryPath);
+
+		for (String query : queries) {
+			if (!query.isEmpty()) {
+				TreeSet<String> cleanedUniqueQueries = new TreeSet<>(FileStemmer.uniqueStems(query));
+				List<FileResult> sortedResults;
+
+				TreeMap<String, FileResult> tempMap = new TreeMap<String, FileResult>();
+
+				sortedResults = isPartial ? searchPartial(cleanedUniqueQueries, tempMap)
+						: searchExact(cleanedUniqueQueries, tempMap);
+
+				resultsMap.put(String.join(" ", cleanedUniqueQueries), sortedResults);
+			}
+		}
+		resultsMap.remove("");
+		return resultsMap;
 	}
 
 	/**

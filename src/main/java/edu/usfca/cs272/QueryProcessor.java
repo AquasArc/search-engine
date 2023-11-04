@@ -54,6 +54,8 @@ public class QueryProcessor {
 	 * @throws IOException
 	 */
 	public Map<String, List<FileResult>> processQuery(Path queryPath, boolean isPartial) throws IOException {
+		if (queryPath == null) throw new IllegalArgumentException();
+		
 		List<String> queries = readQueries(queryPath);
 
 		for (String query : queries) {

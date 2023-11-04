@@ -10,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 
@@ -407,7 +408,6 @@ public class JsonWriter {
 	    }
 	}
 	
-	
 	/**This method is to write the inverted index data into files in a pretty json format
 	 * 
 	 * @param index is the data structure that is being written in jsonformat
@@ -440,4 +440,52 @@ public class JsonWriter {
 		}
 		writer.write("}");
 	}
+
+	public static void writeResultsToFile(Map<String, List<FileResult>> results, Path outputPath) throws IOException {
+		try (BufferedWriter writer = Files.newBufferedWriter(outputPath, UTF_8)) {
+			writer.write("{\n");
+			int outerCount = 0;
+
+			for (Map.Entry<String, List<FileResult>> entry : results.entrySet()) {
+				writeQuote(entry.getKey(), writer, 1);
+				writer.write(": [\n");
+
+				int innerCount = 0;
+				for (FileResult fileResult : entry.getValue()) {
+					writeIndent(writer, 2);
+					writer.write("{\n");
+
+					writeQuote("count", writer, 3);
+					writer.write(": " + fileResult.getCount() + ",\n");
+
+					writeQuote("score", writer, 3);
+					writer.write(": " + String.format("%.8f", fileResult.getScore()) + ",\n");
+
+					writeQuote("where", writer, 3);
+					writer.write(": \"" + fileResult.getWhere() + "\"\n");
+
+					writeIndent(writer, 2);
+					writer.write("}");
+
+					if (innerCount < entry.getValue().size() - 1) {
+						writer.write(",");
+					}
+					writer.write("\n");
+					innerCount++;
+				}
+
+				writeIndent(writer, 1);
+				writer.write("]");
+
+				if (outerCount < results.size() - 1) {
+					writer.write(",");
+				}
+				writer.write("\n");
+				outerCount++;
+			}
+
+			writer.write("}");
+		}
+	}
+
 }

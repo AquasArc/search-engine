@@ -209,8 +209,8 @@ public class ArgumentParser {
 		try {
 			return Integer.parseInt(getString(flag));
 		} catch (NumberFormatException | NullPointerException e) {
-	        return backup;
-	    }
+			return backup;
+		}
 	}
 
 	/**

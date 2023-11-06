@@ -9,14 +9,17 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
-/**Handles query functionality. Both partial/exact
- * 
+/*
+ * TODO Initialize class members in the class and instance members in the constructor
+ */
+
+/**
+ * Handles query functionality. Both partial/exact
  * 
  * @author Anton Lim
  * @author CS 272 Software Development (University of San Francisco)
  * @version Fall 2023
  */
-
 public class QueryProcessor {
 
 	/** The InvertedIndex class... */
@@ -35,6 +38,7 @@ public class QueryProcessor {
 		this.index = index;
 	}
 
+	// TODO FileStemmer listUniqueStems? or uniqueStems?
 	/**
 	 * ReadQueries is mainly for cleaning the files that contains the queries that
 	 * is being used to search with. Either exact or partial
@@ -43,7 +47,7 @@ public class QueryProcessor {
 	 * @return List of strings that holds all the clean/parsed queries
 	 * @throws IOException throws exception if issues occur
 	 */
-	public List<String> readQueries(Path queryPath) throws IOException {
+	public List<String> readQueries(Path queryPath) throws IOException { // TODO Remove
 		return Files.lines(queryPath).map(FileStemmer::clean).filter(line -> !line.matches(".*\\d+.*"))
 				.collect(Collectors.toList());
 	}
@@ -63,19 +67,21 @@ public class QueryProcessor {
 	 * @throws IOException throws io exception if issues hit
 	 */
 	public Map<String, List<FileResult>> processQuery(Path queryPath, boolean isPartial) throws IOException {
+		// TODO Is this an appropriate place for outputting console output?
 		if (queryPath == null || !Files.exists(queryPath) || !Files.isRegularFile(queryPath)
 				|| Files.isDirectory(queryPath)) {
 			System.out.println("Error: Missing value for -query flag");
 			return null;
 		}
+		
 		List<String> queries = readQueries(queryPath);
 
 		for (String query : queries) {
 			if (!query.isEmpty()) {
-				TreeSet<String> cleanedUniqueQueries = new TreeSet<>(FileStemmer.uniqueStems(query));
+				TreeSet<String> cleanedUniqueQueries = new TreeSet<>(FileStemmer.uniqueStems(query)); // TODO What is going on here? Shouldn't need the copy?
 				List<FileResult> sortedResults;
 
-				TreeMap<String, FileResult> tempMap = new TreeMap<String, FileResult>();
+				TreeMap<String, FileResult> tempMap = new TreeMap<String, FileResult>(); // TODO Make this where it is needed (inside the search methods)
 
 				sortedResults = isPartial ? searchPartial(cleanedUniqueQueries, tempMap)
 						: searchExact(cleanedUniqueQueries, tempMap);
@@ -86,6 +92,22 @@ public class QueryProcessor {
 		resultsMap.remove("");
 		return resultsMap;
 	}
+	
+	/*
+	 * TODO Think about: 
+	 * 
+	 * Why does processQuery belong here and not in the inverted index?
+	 * - The stemming logic
+	 * 
+	 * Why does searchExact belong in the inverted index and not here?
+	 * - This is based on how the data is stored
+	 */
+	
+	/*
+	 * TODO Why are you using 2 data structures for search?
+	 * 
+	 * TreeMap and a List that both store the same FileResult objects
+	 */
 
 	/**
 	 * Performs an exact search for cleaned and unique queries and returns a sorted
@@ -95,10 +117,13 @@ public class QueryProcessor {
 	 * @param inputMap             the map to store the search results
 	 * @return a sorted list of FileResult objects
 	 */
-	public List<FileResult> searchExact(TreeSet<String> cleanedUniqueQueries, TreeMap<String, FileResult> inputMap) {
+	public List<FileResult> searchExact(TreeSet<String> cleanedUniqueQueries, TreeMap<String, FileResult> inputMap) { // TODO Can remove map from parameters
+		// TODO TreeMap<String, FileResult> tempMap = new TreeMap<String, FileResult>();
+		
 		for (String word : cleanedUniqueQueries) {
 			for (String location : index.getLocations(word)) {
 				long totalWords = index.numWordsInLocation(location);
+				// TODO Functional will slow you down
 				inputMap.computeIfAbsent(location, k -> new FileResult(k, totalWords))
 						.incrementCount(index.getPositions(word, location).size());
 			}

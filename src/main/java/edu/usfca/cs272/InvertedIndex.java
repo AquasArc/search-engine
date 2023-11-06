@@ -1,8 +1,6 @@
 package edu.usfca.cs272;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
@@ -72,7 +70,6 @@ public class InvertedIndex {
 	public void writeCountsMap(Path countsPath) throws IOException {
 		JsonWriter.writeObject(wordCountMap,countsPath);
 	}
-
 
 	/**
 	 * Adds a word, its location and position to the indexMap and wordCountMap.

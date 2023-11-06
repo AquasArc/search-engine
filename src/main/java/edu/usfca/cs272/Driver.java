@@ -3,7 +3,7 @@ package edu.usfca.cs272;
 import java.io.IOException;
 import java.nio.file.Path;
 
-
+// TODO Make sure to move project 2 and the code under review back into the main branch
 
 /**
  * Class responsible for running this project based on the provided command-line
@@ -22,8 +22,10 @@ public class Driver {
 	 */
 	public static void main(String[] args){
 		ArgumentParser parser = new ArgumentParser(args);
-
 		InvertedIndex index = new InvertedIndex();
+		QueryProcessor processor = new QueryProcessor(index);
+
+		boolean isPartial = parser.hasFlag("-partial");
 
 		if (parser.hasFlag("-text")) {
 			Path inputPath = parser.getPath("-text");
@@ -48,6 +50,22 @@ public class Driver {
 				index.processIndex(parser.getPath("-index", Path.of("index.json")));
 			} catch (IOException e) {
 				System.out.println("Error processing index: " + e.getMessage());
+			}
+		}
+
+		if (parser.hasFlag("-query")) {
+			try {
+				processor.processQuery(parser.getPath("-query"), isPartial); 
+			} catch (IOException e) {
+				System.out.println("Error processing query: " + e.getMessage());
+			}
+		}
+
+		if (parser.hasFlag("-results")) {
+			try {
+				processor.writeResults(parser.getPath("-results", Path.of("results.json")));
+			} catch (IOException e) {
+				System.out.println("Error processing results: " + e.getMessage());
 			}
 		}
 	}

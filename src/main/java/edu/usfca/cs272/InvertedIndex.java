@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 
 /**
@@ -210,4 +211,6 @@ public class InvertedIndex {
 	public long numWordsInLocation(String location) {
 		return wordCountMap.getOrDefault(location, 0L);
 	}
+	/** =============================Project 2 Functionality============================= */
+	
 }

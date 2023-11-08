@@ -9,9 +9,6 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
-/*
- * TODO Initialize class members in the class and instance members in the constructor
- */
 
 /**
  * Handles query functionality. Both partial/exact
@@ -26,7 +23,7 @@ public class QueryProcessor {
 	private final InvertedIndex index;
 
 	/** The data structure for results from query searches */
-	private final TreeMap<String, List<FileResult>> resultsMap = new TreeMap<String, List<FileResult>>();
+	private final TreeMap<String, List<FileResult>> resultsMap;
 	// { Queries : [Count: _ , Score: _ , where: _ ]}
 
 	/**
@@ -36,20 +33,7 @@ public class QueryProcessor {
 	 */
 	public QueryProcessor(InvertedIndex index) {
 		this.index = index;
-	}
-
-	// TODO FileStemmer listUniqueStems? or uniqueStems?
-	/**
-	 * ReadQueries is mainly for cleaning the files that contains the queries that
-	 * is being used to search with. Either exact or partial
-	 * 
-	 * @param queryPath The given argument that is path to file
-	 * @return List of strings that holds all the clean/parsed queries
-	 * @throws IOException throws exception if issues occur
-	 */
-	public List<String> readQueries(Path queryPath) throws IOException { // TODO Remove
-		return Files.lines(queryPath).map(FileStemmer::clean).filter(line -> !line.matches(".*\\d+.*"))
-				.collect(Collectors.toList());
+		this.resultsMap = new TreeMap<String, List<FileResult>>();
 	}
 
 	/**
@@ -67,46 +51,56 @@ public class QueryProcessor {
 	 * @throws IOException throws io exception if issues hit
 	 */
 	public Map<String, List<FileResult>> processQuery(Path queryPath, boolean isPartial) throws IOException {
-		// TODO Is this an appropriate place for outputting console output?
-		if (queryPath == null || !Files.exists(queryPath) || !Files.isRegularFile(queryPath)
-				|| Files.isDirectory(queryPath)) {
-			System.out.println("Error: Missing value for -query flag");
-			return null;
-		}
-		
-		List<String> queries = readQueries(queryPath);
+		// Should i instead utilize BufferedReader???
+		List<String> lines = Files.readAllLines(queryPath); // Might be better for large files...
 
-		for (String query : queries) {
-			if (!query.isEmpty()) {
-				TreeSet<String> cleanedUniqueQueries = new TreeSet<>(FileStemmer.uniqueStems(query)); // TODO What is going on here? Shouldn't need the copy?
+		for (String line : lines) {
+				TreeSet<String> cleanedUniqueQueries = FileStemmer.uniqueStems(line);
 				List<FileResult> sortedResults;
 
-				TreeMap<String, FileResult> tempMap = new TreeMap<String, FileResult>(); // TODO Make this where it is needed (inside the search methods)
-
-				sortedResults = isPartial ? searchPartial(cleanedUniqueQueries, tempMap)
-						: searchExact(cleanedUniqueQueries, tempMap);
+				sortedResults = isPartial ? searchPartial(cleanedUniqueQueries)
+						: searchExact(cleanedUniqueQueries);
 
 				resultsMap.put(String.join(" ", cleanedUniqueQueries), sortedResults);
-			}
 		}
 		resultsMap.remove("");
 		return resultsMap;
 	}
 	
 	/*
-	 * TODO Think about: 
+	 * Think about: 
 	 * 
 	 * Why does processQuery belong here and not in the inverted index?
 	 * - The stemming logic
-	 * 
+	 * - We want to keep the inverted index general. 
+	 * - The inverted index will still work even if we don't stem words
+	 * - Its just an extra step of pre-processing that we are doing
+	 * - So we want to keep the data structure nice and general
+	 * - Inverted Index data structure can store stem words, non-stem words, even
+	 * 	 phrases like n-grams
+	 * - We want the data structure as general as possible
+	 * - This is specific how we are doing the processing. Like how we want to do
+	 *   stemming first.
+	 * - Which will help us improve our search results later.
+	 * - We keep processing step/cleaning step outside of the data structure, 
+	 *   so that the data structure cares only about the storing logic...
+	 *   
 	 * Why does searchExact belong in the inverted index and not here?
 	 * - This is based on how the data is stored
+	 * - While processQuery stays inside the QueryProcessor because its main
+	 *   functionality is just to stem, parse, clean, etc
+	 * - searchExact and searchPartial needs to stay inside the inverted index because
+	 *   their functionality more leans to how information is stored...
 	 */
 	
 	/*
-	 * TODO Why are you using 2 data structures for search?
+	 * Why are you using 2 data structures for search?
 	 * 
 	 * TreeMap and a List that both store the same FileResult objects
+	 * 
+	 * This was terrible coding on my part, and too wasteful/redundant. My 
+	 * Original thought was having a TreeMap that would store the FileResults objects
+	 * 
 	 */
 
 	/**
@@ -117,8 +111,8 @@ public class QueryProcessor {
 	 * @param inputMap             the map to store the search results
 	 * @return a sorted list of FileResult objects
 	 */
-	public List<FileResult> searchExact(TreeSet<String> cleanedUniqueQueries, TreeMap<String, FileResult> inputMap) { // TODO Can remove map from parameters
-		// TODO TreeMap<String, FileResult> tempMap = new TreeMap<String, FileResult>();
+	public List<FileResult> searchExact(TreeSet<String> cleanedUniqueQueries) {
+		TreeMap<String, FileResult> inputMap = new TreeMap<String, FileResult>();
 		
 		for (String word : cleanedUniqueQueries) {
 			for (String location : index.getLocations(word)) {
@@ -139,8 +133,9 @@ public class QueryProcessor {
 	 * @param inputMap             the map to store the search results
 	 * @return a sorted list of FileResult objects
 	 */
-	public List<FileResult> searchPartial(TreeSet<String> cleanedUniqueQueries, TreeMap<String, FileResult> inputMap) {
-
+	public List<FileResult> searchPartial(TreeSet<String> cleanedUniqueQueries) {
+		TreeMap<String, FileResult> inputMap = new TreeMap<String, FileResult>();
+		
 		for (String word : cleanedUniqueQueries) {
 			// Word within invertedIndex
 			// Checking to see if the query word starts with the inverted index word.

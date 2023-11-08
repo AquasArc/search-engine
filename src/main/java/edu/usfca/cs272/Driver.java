@@ -1,9 +1,9 @@
 package edu.usfca.cs272;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
-// TODO Make sure to move project 2 and the code under review back into the main branch
 
 /**
  * Class responsible for running this project based on the provided command-line
@@ -54,6 +54,12 @@ public class Driver {
 		}
 
 		if (parser.hasFlag("-query")) {
+			Path queryPath = parser.getPath("-query");
+			
+			if (queryPath == null || !Files.exists(queryPath) || !Files.isRegularFile(queryPath)) {
+				System.out.println("Error: Missing value for -query flag");
+			}
+			
 			try {
 				processor.processQuery(parser.getPath("-query"), isPartial); 
 			} catch (IOException e) {

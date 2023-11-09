@@ -217,7 +217,6 @@ public class InvertedIndex {
 	 * list of FileResult objects.
 	 *
 	 * @param cleanedUniqueQueries the cleaned and unique queries
-	 * @param inputMap             the map to store the search results
 	 * @return a sorted list of FileResult objects
 	 */
 	public List<FileResult> searchExact(TreeSet<String> cleanedUniqueQueries) {
@@ -241,7 +240,6 @@ public class InvertedIndex {
 	 * list of FileResult objects.
 	 *
 	 * @param cleanedUniqueQueries the cleaned and unique queries
-	 * @param inputMap             the map to store the search results
 	 * @return a sorted list of FileResult objects
 	 */
 	public List<FileResult> searchPartial(TreeSet<String> cleanedUniqueQueries) {

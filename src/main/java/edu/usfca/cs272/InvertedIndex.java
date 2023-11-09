@@ -245,24 +245,23 @@ public class InvertedIndex {
 	 * @return a sorted list of FileResult objects
 	 */
 	public List<FileResult> searchPartial(TreeSet<String> cleanedUniqueQueries) {
-		TreeMap<String, FileResult> inputMap = new TreeMap<String, FileResult>();
-		
-		for (String word : cleanedUniqueQueries) {
-			for (String w : getWords()) {
-				if (w.startsWith(word)) {
-					for (String location : getLocations(w)) {
-						long totalWords = numWordsInLocation(location);
+	    TreeMap<String, FileResult> inputMap = new TreeMap<>();
 
-			            if (!inputMap.containsKey(location)) {
-			                inputMap.put(location, new FileResult(location, totalWords));
-			            }
-			            inputMap.get(location).incrementCount(getPositions(word, location).size());
-					}
-				}
-			}
-		}
+	    for (String word : cleanedUniqueQueries) {
+	        for (String w : getWords()) {
+	            if (w.startsWith(word)) {
+	                for (String location : getLocations(w)) {
+	                    long totalWords = numWordsInLocation(location);
 
-		// Convert the map values to a sorted list
-		return inputMap.values().stream().sorted().collect(Collectors.toList());
+	                    if (!inputMap.containsKey(location)) {
+	                        inputMap.put(location, new FileResult(location, totalWords));
+	                    }
+	                    inputMap.get(location).incrementCount(getPositions(w, location).size());
+	                }
+	            }
+	        }
+	    }
+	    return inputMap.values().stream().sorted().collect(Collectors.toList());
 	}
+
 }

@@ -101,6 +101,18 @@ public class QueryProcessor {
 	 * 
 	 * This was terrible coding on my part, and too wasteful/redundant. My 
 	 * Original thought was having a TreeMap that would store the FileResults objects
+	 * While removing duplicates and placing them in alphabetical order
+	 * And same for the key sets as well
+	 * 
+	 * Then id use the values for the List to write the results. I thought it would be
+	 * more straightforward/easier to do
+	 * 
+	 * But how id improve upon this:
+	 * 1. Id focus on storing all the information in a TreeMap
+	 * -  This will help remove duplicates and keep it all in order
+	 * 2. Change FileResults with how I increment/update my objects
+	 * -  Using a TreeMap and then converting its values to a List and 
+	 *    then sorting the list adds unnecessary overhead.
 	 * 
 	 */
 

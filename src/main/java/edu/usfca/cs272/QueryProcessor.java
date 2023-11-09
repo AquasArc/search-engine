@@ -1,8 +1,10 @@
 package edu.usfca.cs272;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -51,18 +53,17 @@ public class QueryProcessor {
 	 * @throws IOException throws io exception if issues hit
 	 */
 	public Map<String, List<FileResult>> processQuery(Path queryPath, boolean isPartial) throws IOException {
-		// Should i instead utilize BufferedReader???
-		List<String> lines = Files.readAllLines(queryPath); // Might be better for large files...
-
-		for (String line : lines) {
-				TreeSet<String> cleanedUniqueQueries = FileStemmer.uniqueStems(line);
-				List<FileResult> sortedResults;
-
-				sortedResults = isPartial ? searchPartial(cleanedUniqueQueries)
-						: searchExact(cleanedUniqueQueries);
-
-				resultsMap.put(String.join(" ", cleanedUniqueQueries), sortedResults);
-		}
+		try (BufferedReader reader = Files.newBufferedReader(queryPath)) {
+	        String line;
+	        while ((line = reader.readLine()) != null) {
+	            TreeSet<String> cleanedUniqueQueries = FileStemmer.uniqueStems(line);
+	            if (!cleanedUniqueQueries.isEmpty()) {
+	                List<FileResult> sortedResults = isPartial ? index.searchPartial(cleanedUniqueQueries)
+	                                                           : index.searchExact(cleanedUniqueQueries);
+	                resultsMap.put(String.join(" ", cleanedUniqueQueries), sortedResults);
+	            }
+	        }
+	    }
 		resultsMap.remove("");
 		return resultsMap;
 	}
@@ -103,56 +104,6 @@ public class QueryProcessor {
 	 * 
 	 */
 
-	/**
-	 * Performs an exact search for cleaned and unique queries and returns a sorted
-	 * list of FileResult objects.
-	 *
-	 * @param cleanedUniqueQueries the cleaned and unique queries
-	 * @param inputMap             the map to store the search results
-	 * @return a sorted list of FileResult objects
-	 */
-	public List<FileResult> searchExact(TreeSet<String> cleanedUniqueQueries) {
-		TreeMap<String, FileResult> inputMap = new TreeMap<String, FileResult>();
-		
-		for (String word : cleanedUniqueQueries) {
-			for (String location : index.getLocations(word)) {
-				long totalWords = index.numWordsInLocation(location);
-				// TODO Functional will slow you down
-				inputMap.computeIfAbsent(location, k -> new FileResult(k, totalWords))
-						.incrementCount(index.getPositions(word, location).size());
-			}
-		}
-		return inputMap.values().stream().sorted().collect(Collectors.toList());
-	}
-
-	/**
-	 * Performs a partial search for cleaned and unique queries and returns a sorted
-	 * list of FileResult objects.
-	 *
-	 * @param cleanedUniqueQueries the cleaned and unique queries
-	 * @param inputMap             the map to store the search results
-	 * @return a sorted list of FileResult objects
-	 */
-	public List<FileResult> searchPartial(TreeSet<String> cleanedUniqueQueries) {
-		TreeMap<String, FileResult> inputMap = new TreeMap<String, FileResult>();
-		
-		for (String word : cleanedUniqueQueries) {
-			// Word within invertedIndex
-			// Checking to see if the query word starts with the inverted index word.
-			for (String w : index.getWords()) {
-				if (w.startsWith(word)) {
-					for (String location : index.getLocations(w)) {
-						long totalWords = index.numWordsInLocation(location);
-						inputMap.computeIfAbsent(location, k -> new FileResult(k, totalWords))
-								.incrementCount(index.getPositions(w, location).size());
-					}
-				}
-			}
-		}
-
-		// Convert the map values to a sorted list
-		return inputMap.values().stream().sorted().collect(Collectors.toList());
-	}
 
 	/**
 	 * Writes the results map to the specified output file in JSON format.

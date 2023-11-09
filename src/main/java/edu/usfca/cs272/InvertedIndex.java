@@ -212,5 +212,57 @@ public class InvertedIndex {
 		return wordCountMap.getOrDefault(location, 0L);
 	}
 	/** =============================Project 2 Functionality============================= */
-	
+	/**
+	 * Performs an exact search for cleaned and unique queries and returns a sorted
+	 * list of FileResult objects.
+	 *
+	 * @param cleanedUniqueQueries the cleaned and unique queries
+	 * @param inputMap             the map to store the search results
+	 * @return a sorted list of FileResult objects
+	 */
+	public List<FileResult> searchExact(TreeSet<String> cleanedUniqueQueries) {
+	    TreeMap<String, FileResult> inputMap = new TreeMap<>();
+
+	    for (String word : cleanedUniqueQueries) {
+	        for (String location : getLocations(word)) {
+	            long totalWords = numWordsInLocation(location);
+
+	            if (!inputMap.containsKey(location)) {
+	                inputMap.put(location, new FileResult(location, totalWords));
+	            }
+	            inputMap.get(location).incrementCount(getPositions(word, location).size());
+	        }
+	    }
+	    return inputMap.values().stream().sorted().collect(Collectors.toList());
+	}
+
+	/**
+	 * Performs a partial search for cleaned and unique queries and returns a sorted
+	 * list of FileResult objects.
+	 *
+	 * @param cleanedUniqueQueries the cleaned and unique queries
+	 * @param inputMap             the map to store the search results
+	 * @return a sorted list of FileResult objects
+	 */
+	public List<FileResult> searchPartial(TreeSet<String> cleanedUniqueQueries) {
+		TreeMap<String, FileResult> inputMap = new TreeMap<String, FileResult>();
+		
+		for (String word : cleanedUniqueQueries) {
+			for (String w : getWords()) {
+				if (w.startsWith(word)) {
+					for (String location : getLocations(w)) {
+						long totalWords = numWordsInLocation(location);
+
+			            if (!inputMap.containsKey(location)) {
+			                inputMap.put(location, new FileResult(location, totalWords));
+			            }
+			            inputMap.get(location).incrementCount(getPositions(word, location).size());
+					}
+				}
+			}
+		}
+
+		// Convert the map values to a sorted list
+		return inputMap.values().stream().sorted().collect(Collectors.toList());
+	}
 }

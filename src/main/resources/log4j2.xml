@@ -9,13 +9,13 @@
 
 		<File name="Debug" fileName="debug.log" append="false" immediateFlush="true">
 			<PatternLayout
-				pattern="[%03sequenceNumber %level{lowerCase=true}] %file:%line %thread: %m %throwable%n">
+				pattern="[%02sequenceNumber %level{lowerCase=true}] %file:%line %thread: %m %throwable%n">
 			</PatternLayout>
 		</File>
 	</Appenders>
 
 	<Loggers>
-		<Root level="ALL">
+		<Root level="OFF">
 			<AppenderRef ref="Console" level="INFO" />
 			<AppenderRef ref="Debug" level="ALL" />
 		</Root>

@@ -1,19 +1,8 @@
 package edu.usfca.cs272;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
-/*
- * TODO 
-Description	Resource	Path	Location	Type
-Javadoc: Invalid param tag name	JsonWriter.java	/SearchEngine/src/main/java/edu/usfca/cs272	line 398	Java Problem
-Javadoc: Missing tag for parameter elements	JsonWriter.java	/SearchEngine/src/main/java/edu/usfca/cs272	line 401	Java Problem
-The import java.nio.file.Files is never used	Driver.java	/SearchEngine/src/main/java/edu/usfca/cs272	line 4	Java Problem
-The import java.util.ArrayList is never used	QueryProcessor.java	/SearchEngine/src/main/java/edu/usfca/cs272	line 7	Java Problem
-The import java.util.stream.Collectors is never used	QueryProcessor.java	/SearchEngine/src/main/java/edu/usfca/cs272	line 12	Java Problem
-
- */
 
 /**
  * Class responsible for running this project based on the provided command-line

@@ -4,12 +4,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.stream.Collectors;
 
 
 /**
@@ -31,7 +29,7 @@ public class QueryProcessor {
 	/**
 	 * Initialize
 	 * 
-	 * @param index to use invertedindex methods
+	 * @param index to use inverted index methods
 	 */
 	public QueryProcessor(InvertedIndex index) {
 		this.index = index;
@@ -113,6 +111,8 @@ public class QueryProcessor {
 	 * 2. Change FileResults with how I increment/update my objects
 	 * -  Using a TreeMap and then converting its values to a List and 
 	 *    then sorting the list adds unnecessary overhead.
+	 * 
+	 * 
 	 * 
 	 */
 

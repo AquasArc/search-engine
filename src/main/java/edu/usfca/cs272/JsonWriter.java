@@ -312,6 +312,8 @@ public class JsonWriter {
 	 *   initial indentation level
 	 * @throws IOException if an IO error occurs
 	 *
+	 *
+	 *
 	 * @see Writer#write(String)
 	 * @see #writeIndent(Writer, int)
 	 * @see #writeIndent(String, Writer, int)
@@ -378,13 +380,12 @@ public class JsonWriter {
 		}
 	}
 
-	
-	/**
-	 * Writes the index as a pretty JSON format.
-	 *
-	 * @param index the index to write
-	 * @param path the file path to use
-	 * @throws IOException if an IO error occurs
+
+	/**Writes the index as a pretty json format
+	 * 
+	 * @param index the index data structure that contains the data that will be written
+	 * @param path The output that will be writing to
+	 * @throws IOException throws an error if problems occur
 	 */
 	public static void writeIndexToFile(Map<String, ? extends Map<String, ? extends Collection<? extends Number>>> index, Path path) throws IOException {
 	    try (BufferedWriter writer = Files.newBufferedWriter(path, UTF_8)) {
@@ -392,11 +393,10 @@ public class JsonWriter {
 	    }
 	}
 
-	/**
-	 * Returns the index as a pretty JSON format.
-	 *
-	 * @param elements, essentially the inverted index to use
-	 * @return a {@link String} containing the index in pretty JSON format
+	/**Writes the index a a pretty json format, takes in just the data structure
+	 * 
+	 * @param elements is the data structure being passed
+	 * @return writer.toString(); after calling writeIndexTofile
 	 */
 	public static String writeIndexToFile(Map<String, ? extends Map<String, ? extends Collection<? extends Number>>> elements) {
 	    try {

@@ -31,7 +31,7 @@ public class QueryProcessor {
 	 * 
 	 * @param index to use inverted index methods
 	 */
-	public QueryProcessor(InvertedIndex index) {
+	public QueryProcessor(InvertedIndex index) { // TODO Also pass isPartial here and make a final member
 		this.index = index;
 		this.resultsMap = new TreeMap<String, List<FileResult>>();
 	}
@@ -50,6 +50,7 @@ public class QueryProcessor {
 	 * @return resultsMap Returns the results map with the populated information
 	 * @throws IOException throws io exception if issues hit
 	 */
+	// TODO Why not this: public Map<String, List<FileResult>> processQuery(Path queryPath, boolean isPartial, InvertedIndex index) throws IOException {
 	public Map<String, List<FileResult>> processQuery(Path queryPath, boolean isPartial) throws IOException {
 		try (BufferedReader reader = Files.newBufferedReader(queryPath)) {
 	        String line;

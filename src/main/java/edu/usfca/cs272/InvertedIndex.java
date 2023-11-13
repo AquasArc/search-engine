@@ -2,14 +2,13 @@ package edu.usfca.cs272;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.stream.Collectors;
-
 
 /**
  * Represents an inverted index where words map to their occurrences within files.
@@ -220,19 +219,22 @@ public class InvertedIndex {
 	 * @return a sorted list of FileResult objects
 	 */
 	public List<FileResult> searchExact(TreeSet<String> cleanedUniqueQueries) {
-	    TreeMap<String, FileResult> inputMap = new TreeMap<>();
-
-	    for (String word : cleanedUniqueQueries) {
-	        for (String location : getLocations(word)) {
-	            long totalWords = numWordsInLocation(location);
-
-	            if (!inputMap.containsKey(location)) {
-	                inputMap.put(location, new FileResult(location, totalWords));
-	            }
-	            inputMap.get(location).incrementCount(getPositions(word, location).size());
-	        }
-	    }
-	    return inputMap.values().stream().sorted().collect(Collectors.toList());
+		TreeMap<String, FileResult> temporaryMap = new TreeMap<>();
+		
+		for (String word : cleanedUniqueQueries) {
+			for (String location : getLocations(word)) {
+				FileResult fr = temporaryMap.get(location);
+				if(fr == null) {
+					fr = new FileResult(location, numWordsInLocation(location));
+					temporaryMap.put(location, fr);
+				}
+				fr.incrementCount(numPositions(word, location));
+			}
+		}
+		
+		List<FileResult> resultList = new ArrayList<>(temporaryMap.values());
+		Collections.sort(resultList);
+		return resultList;
 	}
 
 	/**
@@ -243,23 +245,25 @@ public class InvertedIndex {
 	 * @return a sorted list of FileResult objects
 	 */
 	public List<FileResult> searchPartial(TreeSet<String> cleanedUniqueQueries) {
-	    TreeMap<String, FileResult> inputMap = new TreeMap<>();
+		TreeMap<String, FileResult> temporaryMap = new TreeMap<>();
 
-	    for (String word : cleanedUniqueQueries) {
-	        for (String w : getWords()) {
-	            if (w.startsWith(word)) {
-	                for (String location : getLocations(w)) {
-	                    long totalWords = numWordsInLocation(location);
-
-	                    if (!inputMap.containsKey(location)) {
-	                        inputMap.put(location, new FileResult(location, totalWords));
-	                    }
-	                    inputMap.get(location).incrementCount(getPositions(w, location).size());
-	                }
-	            }
-	        }
-	    }
-	    return inputMap.values().stream().sorted().collect(Collectors.toList());
+		for (String word : cleanedUniqueQueries) {
+			for (String w : getWords()) {
+				if (w.startsWith(word)) {
+					for (String location : getLocations(w)) {
+						FileResult fr = temporaryMap.get(location);
+						if(fr == null) {
+							fr = new FileResult(location, numWordsInLocation(location));
+							temporaryMap.put(location, fr);
+						}
+						fr.incrementCount(numPositions(w, location));
+					}
+				}
+			}
+		}
+		
+		List<FileResult> resultList = new ArrayList<>(temporaryMap.values());
+		Collections.sort(resultList);
+		return resultList;
 	}
-
 }

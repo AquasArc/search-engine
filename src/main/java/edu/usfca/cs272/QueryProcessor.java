@@ -34,6 +34,7 @@ public class QueryProcessor {
 	 * Initialize
 	 * 
 	 * @param index to use inverted index methods
+	 * @param isPartial to determine either partial/exact search
 	 */
 	public QueryProcessor(InvertedIndex index, Boolean isPartial) {
 		this.index = index;

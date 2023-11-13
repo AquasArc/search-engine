@@ -265,6 +265,7 @@ public class InvertedIndex {
 	            			FileResult fr2 = new FileResult(location, numWordsInLocation(location));
 	            			fr2.incrementCount(numPositions(w, location));
 	            			resultList.add(fr2);
+	            			
 	            		}
 	            	}
 	            }

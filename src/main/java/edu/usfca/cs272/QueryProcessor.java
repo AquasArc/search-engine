@@ -21,6 +21,9 @@ public class QueryProcessor {
 
 	/** The InvertedIndex class... */
 	private final InvertedIndex index;
+	
+	/** To determine partial/exact search */
+	private final boolean isPartial;
 
 	/** The data structure for results from query searches */
 	private final TreeMap<String, List<FileResult>> resultsMap;
@@ -31,8 +34,9 @@ public class QueryProcessor {
 	 * 
 	 * @param index to use inverted index methods
 	 */
-	public QueryProcessor(InvertedIndex index) { // TODO Also pass isPartial here and make a final member
+	public QueryProcessor(InvertedIndex index, Boolean isPartial) {
 		this.index = index;
+		this.isPartial = isPartial;
 		this.resultsMap = new TreeMap<String, List<FileResult>>();
 	}
 
@@ -50,22 +54,24 @@ public class QueryProcessor {
 	 * @return resultsMap Returns the results map with the populated information
 	 * @throws IOException throws io exception if issues hit
 	 */
-	// TODO Why not this: public Map<String, List<FileResult>> processQuery(Path queryPath, boolean isPartial, InvertedIndex index) throws IOException {
-	public Map<String, List<FileResult>> processQuery(Path queryPath, boolean isPartial) throws IOException {
+	public Map<String, List<FileResult>> processQuery(Path queryPath) throws IOException {
 		try (BufferedReader reader = Files.newBufferedReader(queryPath)) {
-	        String line;
+			 String line;
 	        while ((line = reader.readLine()) != null) {
 	            TreeSet<String> cleanedUniqueQueries = FileStemmer.uniqueStems(line);
 	            if (!cleanedUniqueQueries.isEmpty()) {
-	                List<FileResult> sortedResults = isPartial ? index.searchPartial(cleanedUniqueQueries)
+	            	List<FileResult> sortedResults = isPartial ? index.searchPartial(cleanedUniqueQueries)
 	                                                           : index.searchExact(cleanedUniqueQueries);
 	                resultsMap.put(String.join(" ", cleanedUniqueQueries), sortedResults);
 	            }
 	        }
 	    }
-		resultsMap.remove("");
 		return resultsMap;
 	}
+	// Why not this: public Map<String, List<FileResult>> processQuery(Path queryPath, boolean isPartial, InvertedIndex index) throws IOException {
+	// Because we want the data structure to hold data from search from either partial or exact
+	// We don't want the data structure to contain mixed data from both
+	// Because its possible to get different values for a specific query
 	
 	/*
 	 * Think about: 
@@ -107,11 +113,8 @@ public class QueryProcessor {
 	 * more straightforward/easier to do
 	 * 
 	 * But how id improve upon this:
-	 * 1. Id focus on storing all the information in a TreeMap
-	 * -  This will help remove duplicates and keep it all in order
-	 * 2. Change FileResults with how I increment/update my objects
-	 * -  Using a TreeMap and then converting its values to a List and 
-	 *    then sorting the list adds unnecessary overhead.
+	 * Change the return type of search (partial and exact) to a list<FileResults>
+	 * -  This will remove the unnecessary usage of a Tree<String> that holds location during search
 	 * 
 	 * 
 	 * 

@@ -22,9 +22,10 @@ public class Driver {
 	public static void main(String[] args){
 		ArgumentParser parser = new ArgumentParser(args);
 		InvertedIndex index = new InvertedIndex();
-		QueryProcessor processor = new QueryProcessor(index);
-
+		
 		boolean isPartial = parser.hasFlag("-partial");
+		QueryProcessor processor = new QueryProcessor(index,isPartial);
+
 
 		if (parser.hasFlag("-text")) {
 			Path inputPath = parser.getPath("-text");
@@ -54,7 +55,7 @@ public class Driver {
 
 		if (parser.hasFlag("-query")) {
 			try {
-				processor.processQuery(parser.getPath("-query"), isPartial); 
+				processor.processQuery(parser.getPath("-query")); 
 			} catch (IOException | NullPointerException e) {
 				System.out.println("Error processing query: " + e.getMessage());
 			}

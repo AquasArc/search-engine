@@ -50,8 +50,6 @@ public class QueryProcessor {
 	 * 
 	 * 
 	 * @param queryPath The given path that holds the address to file
-	 * @param isPartial The boolean value to determine if we do partial search over
-	 *                  exact
 	 * @return resultsMap Returns the results map with the populated information
 	 * @throws IOException throws io exception if issues hit
 	 */

@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -55,13 +56,15 @@ public class QueryProcessor {
 	 * @throws IOException throws io exception if issues hit
 	 */
 	public Map<String, List<FileResult>> processQuery(Path queryPath) throws IOException {
+		ArrayList<String> searchedQueries = new ArrayList<>();
 		try (BufferedReader reader = Files.newBufferedReader(queryPath)) {
 			 String line;
 	        while ((line = reader.readLine()) != null) {
 	            TreeSet<String> cleanedUniqueQueries = FileStemmer.uniqueStems(line);
-	            if (!cleanedUniqueQueries.isEmpty()) {
+	            if (!cleanedUniqueQueries.isEmpty() && !searchedQueries.contains(String.join(" ", cleanedUniqueQueries))) {
 	            	List<FileResult> sortedResults = isPartial ? index.searchPartial(cleanedUniqueQueries)
 	                                                           : index.searchExact(cleanedUniqueQueries);
+	            	searchedQueries.add(String.join(" ", cleanedUniqueQueries));
 	                resultsMap.put(String.join(" ", cleanedUniqueQueries), sortedResults);
 	            }
 	        }

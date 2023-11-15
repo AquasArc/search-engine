@@ -35,7 +35,7 @@ public class QueryProcessor {
 	 * @param index to use inverted index methods
 	 * @param isPartial to determine either partial/exact search
 	 */
-	public QueryProcessor(InvertedIndex index, Boolean isPartial) {
+	public QueryProcessor(InvertedIndex index, Boolean isPartial) { // TODO boolean
 		this.index = index;
 		this.isPartial = isPartial;
 		this.resultsMap = new TreeMap<String, List<FileResult>>();
@@ -48,8 +48,6 @@ public class QueryProcessor {
 	 * not partial boolean flag is given Depending on whether or not partial is
 	 * given, we split to either search exact or partial
 	 * 
-	 * 
-	 * 
 	 * @param queryPath The given path that holds the address to file
 	 * @return resultsMap Returns the results map with the populated information
 	 * @throws IOException throws io exception if issues hit
@@ -59,8 +57,9 @@ public class QueryProcessor {
 			String line;
 
 			while ((line = reader.readLine()) != null) {
-				TreeSet<String> cleanedUniqueQueries = FileStemmer.uniqueStems(line);
+				TreeSet<String> cleanedUniqueQueries = FileStemmer.uniqueStems(line); // TODO Reuse a stemmer
 
+				// TODO Don't call join multiple times
 				if (!cleanedUniqueQueries.isEmpty() && !resultsMap.containsKey(String.join(" ", cleanedUniqueQueries))) {
 					List<FileResult> sortedResults = isPartial ? index.searchPartial(cleanedUniqueQueries)
 							: index.searchExact(cleanedUniqueQueries);
@@ -71,6 +70,15 @@ public class QueryProcessor {
 		}
 		return resultsMap;
 	}
+	
+	// TODO Clean up comments eventually
+	
+	/*
+	 * TODO processQuery is breaking encapsulation (need to fix this)
+	 * 
+	 * missing generally useful methods in this class
+	 */
+	
 	// Why not this: public Map<String, List<FileResult>> processQuery(Path queryPath, boolean isPartial, InvertedIndex index) throws IOException {
 	// Because we want the data structure to hold data from search from either partial or exact
 	// We don't want the data structure to contain mixed data from both

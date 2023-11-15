@@ -220,20 +220,25 @@ public class InvertedIndex {
 	 * @return a sorted list of FileResult objects
 	 */
 	public List<FileResult> searchExact(TreeSet<String> cleanedUniqueQueries) {
-		HashMap<String, FileResult> temporaryMap = new HashMap<>();
-
+		HashMap<String, FileResult> temporaryMap = new HashMap<>(); // TODO Rename to lookupMap
+		// TODO List<FileResult> resultList = new ArrayList<>();
+		
 		for (String word : cleanedUniqueQueries) {
+			/*
+			 * TODO Can make it faster by accessing invertedIndex directly!
+			 */
 			for (String location : getLocations(word)) {
-				FileResult fr = temporaryMap.get(location);
+				FileResult fr = temporaryMap.get(location); // TODO Better name
 				if(fr == null) {
 					fr = new FileResult(location, numWordsInLocation(location));
 					temporaryMap.put(location, fr);
+					// TODO resultList.add(fr)
 				}
 				fr.incrementCount(numPositions(word, location));
 			}
 		}
 
-		List<FileResult> resultList = new ArrayList<>(temporaryMap.values());
+		List<FileResult> resultList = new ArrayList<>(temporaryMap.values()); // TODO Remove
 		Collections.sort(resultList);
 		return resultList;
 	}
@@ -249,7 +254,7 @@ public class InvertedIndex {
 		HashMap<String, FileResult> temporaryMap = new HashMap<>();
 
 		for (String word : cleanedUniqueQueries) {
-			for (String w : getWords()) {
+			for (String w : getWords()) { // TODO Also a linear search, keep it as is
 				if (w.startsWith(word)) {
 					for (String location : getLocations(w)) {
 						FileResult fr = temporaryMap.get(location);

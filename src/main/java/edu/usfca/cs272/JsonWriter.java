@@ -442,6 +442,12 @@ public class JsonWriter {
 
 
 
+	/**Writes the resultsMap data structure into a json format
+	 * 
+	 * @param results the data structure containing the data
+	 * @param path is the output path that is being written to
+	 * @throws IOException if any issues arises
+	 */
 	public static void writeResultsToFile(Map<String, ? extends Collection<? extends FileResult>> results, Path path) throws IOException {
 		try (BufferedWriter writer = Files.newBufferedWriter(path, UTF_8)) {
 			writeResultsToFile(results, writer, 0);
@@ -449,6 +455,11 @@ public class JsonWriter {
 	}
 
 
+	/**Writes the resultsMap data structure into a json format
+	 * 
+	 * @param results the data structure containing the data
+	 * @return writer.toString() or null depending on if errors occur
+	 */
 	public static String writeResultToFile(Map<String, ? extends Collection<? extends FileResult>> results) {
 		try {
 			StringWriter writer = new StringWriter();
@@ -459,6 +470,13 @@ public class JsonWriter {
 		}
 	}
 
+	/**The main method that is being used to write the resultsMap into a pretty json structure
+	 * 
+	 * @param results the data structure containing the data
+	 * @param writer the writer to use 
+	 * @param indent indenting the values
+	 * @throws IOException if any errors occur
+	 */
 	public static void writeResultsToFile(Map<String, ? extends Collection<? extends FileResult>> results, Writer writer, int indent) throws IOException {
 		writer.write("{\n");
 
@@ -478,6 +496,13 @@ public class JsonWriter {
 		writeIndent("}", writer, indent);
 	}
 
+	/**A helper method 
+	 * 
+	 * @param entry the data structure being passed in to be written in json format
+	 * @param writer to write the values
+	 * @param indent to write the indents
+	 * @throws IOException if any errors occur
+	 */
 	private static void writeResultEntry(Map.Entry<String, ? extends Collection<? extends FileResult>> entry, Writer writer, int indent) throws IOException {
 		writeQuote(entry.getKey(), writer, indent);
 		writer.write(": [\n");
@@ -500,6 +525,13 @@ public class JsonWriter {
 		}
 	}
 
+	/**A helper method responsible for writing the file result meta data
+	 * 
+	 * @param fileResult the file result object 
+	 * @param writer to write data
+	 * @param indent for indenting the values
+	 * @throws IOException if any errors occur
+	 */
 	private static void writeFileResult(FileResult fileResult, Writer writer, int indent) throws IOException {
 		writeIndent("{\n", writer, indent);
 		writeIndent("\"count\": " + fileResult.getCount() + ",\n", writer, indent + 1);

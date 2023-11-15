@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -219,8 +220,8 @@ public class InvertedIndex {
 	 * @return a sorted list of FileResult objects
 	 */
 	public List<FileResult> searchExact(TreeSet<String> cleanedUniqueQueries) {
-		TreeMap<String, FileResult> temporaryMap = new TreeMap<>();
-		
+		HashMap<String, FileResult> temporaryMap = new HashMap<>();
+
 		for (String word : cleanedUniqueQueries) {
 			for (String location : getLocations(word)) {
 				FileResult fr = temporaryMap.get(location);
@@ -231,44 +232,11 @@ public class InvertedIndex {
 				fr.incrementCount(numPositions(word, location));
 			}
 		}
-		
+
 		List<FileResult> resultList = new ArrayList<>(temporaryMap.values());
 		Collections.sort(resultList);
 		return resultList;
 	}
-	
-	//My attempt prior to this. I tried to avoid using a Tree which stores the location associated with fr object
-	//One issue i have with this attempt is the workaround with checking if the file result already exists and has been made
-	//Im essentially trying to avoid making a new file result object for these reasons:
-	// 1. If one of the words in the query was found in the same location as any of the other words in the same query
-	// 2. Creating an unnecessary new file result object, when i can just increment an existing fr
-
-//	public List<FileResult> searchExact(TreeSet<String> cleanedUniqueQueries) {
-//	    List<FileResult> resultList = new ArrayList<>(); //What I am are going to use to hold the results per search of query
-//
-//	    for (String word : cleanedUniqueQueries) { // Element set up : [Lori] or [four, six]...
-//	        for (String location : getLocations(word)) { //Loop through each word in a given element
-//	            boolean isLocationFound = false;  // To make sure I'm not adding a new file result when it already exists
-//
-//	            for (FileResult fileResult : resultList) { 
-//	                if (location.equals(fileResult.getWhere())) {
-//	                    fileResult.incrementCount(numPositions(word, location));
-//	                    isLocationFound = true;
-//	                }
-//	            }
-//
-//	            if (!isLocationFound) {
-//	                FileResult newFileResult = new FileResult(location, numWordsInLocation(location));
-//	                newFileResult.incrementCount(numPositions(word, location));
-//	                resultList.add(newFileResult);
-//	            }
-//	        }
-//	    }
-//
-//	    Collections.sort(resultList);
-//	    return resultList;
-//	}
-
 
 	/**
 	 * Performs a partial search for cleaned and unique queries and returns a sorted
@@ -278,7 +246,7 @@ public class InvertedIndex {
 	 * @return a sorted list of FileResult objects
 	 */
 	public List<FileResult> searchPartial(TreeSet<String> cleanedUniqueQueries) {
-		TreeMap<String, FileResult> temporaryMap = new TreeMap<>();
+		HashMap<String, FileResult> temporaryMap = new HashMap<>();
 
 		for (String word : cleanedUniqueQueries) {
 			for (String w : getWords()) {
@@ -294,9 +262,9 @@ public class InvertedIndex {
 				}
 			}
 		}
-		
+
 		List<FileResult> resultList = new ArrayList<>(temporaryMap.values());
 		Collections.sort(resultList);
 		return resultList;
-	}
+	}	
 }

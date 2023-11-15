@@ -21,7 +21,7 @@ public class QueryProcessor {
 
 	/** The InvertedIndex class... */
 	private final InvertedIndex index;
-	
+
 	/** To determine partial/exact search */
 	private final boolean isPartial;
 
@@ -56,26 +56,26 @@ public class QueryProcessor {
 	 */
 	public Map<String, List<FileResult>> processQuery(Path queryPath) throws IOException {
 		try (BufferedReader reader = Files.newBufferedReader(queryPath)) {
-			 String line;
-			 
-	        while ((line = reader.readLine()) != null) {
-	            TreeSet<String> cleanedUniqueQueries = FileStemmer.uniqueStems(line);
-	            
-	            if (!cleanedUniqueQueries.isEmpty() && !resultsMap.containsKey(String.join(" ", cleanedUniqueQueries))) {
-	            	List<FileResult> sortedResults = isPartial ? index.searchPartial(cleanedUniqueQueries)
-	                                                           : index.searchExact(cleanedUniqueQueries);
-	            	
-	                resultsMap.put(String.join(" ", cleanedUniqueQueries), sortedResults);
-	            }
-	        }
-	    }
+			String line;
+
+			while ((line = reader.readLine()) != null) {
+				TreeSet<String> cleanedUniqueQueries = FileStemmer.uniqueStems(line);
+
+				if (!cleanedUniqueQueries.isEmpty() && !resultsMap.containsKey(String.join(" ", cleanedUniqueQueries))) {
+					List<FileResult> sortedResults = isPartial ? index.searchPartial(cleanedUniqueQueries)
+							: index.searchExact(cleanedUniqueQueries);
+
+					resultsMap.put(String.join(" ", cleanedUniqueQueries), sortedResults);
+				}
+			}
+		}
 		return resultsMap;
 	}
 	// Why not this: public Map<String, List<FileResult>> processQuery(Path queryPath, boolean isPartial, InvertedIndex index) throws IOException {
 	// Because we want the data structure to hold data from search from either partial or exact
 	// We don't want the data structure to contain mixed data from both
 	// Because its possible to get different values for a specific query
-	
+
 	/*
 	 * Think about: 
 	 * 
@@ -101,7 +101,7 @@ public class QueryProcessor {
 	 * - searchExact and searchPartial needs to stay inside the inverted index because
 	 *   their functionality more leans to how information is stored...
 	 */
-	
+
 	/*
 	 * Why are you using 2 data structures for search?
 	 * 
@@ -131,6 +131,7 @@ public class QueryProcessor {
 	 * @throws IOException if an I/O error occurs
 	 */
 	public void writeResults(Path outputPath) throws IOException {
+		System.out.println("Results Map: " + resultsMap);
 		JsonWriter.writeResultsToFile(resultsMap, outputPath);
 	}
 }

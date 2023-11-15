@@ -10,7 +10,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 
@@ -388,9 +387,9 @@ public class JsonWriter {
 	 * @throws IOException throws an error if problems occur
 	 */
 	public static void writeIndexToFile(Map<String, ? extends Map<String, ? extends Collection<? extends Number>>> index, Path path) throws IOException {
-	    try (BufferedWriter writer = Files.newBufferedWriter(path, UTF_8)) {
-	        writeIndexToFile(index, writer, 0);
-	    }
+		try (BufferedWriter writer = Files.newBufferedWriter(path, UTF_8)) {
+			writeIndexToFile(index, writer, 0);
+		}
 	}
 
 	/**Writes the index a a pretty json format, takes in just the data structure
@@ -399,15 +398,15 @@ public class JsonWriter {
 	 * @return writer.toString(); after calling writeIndexTofile
 	 */
 	public static String writeIndexToFile(Map<String, ? extends Map<String, ? extends Collection<? extends Number>>> elements) {
-	    try {
-	        StringWriter writer = new StringWriter();
-	        writeIndexToFile(elements, writer, 0);
-	        return writer.toString();
-	    } catch (IOException e) {
-	        return null;
-	    }
+		try {
+			StringWriter writer = new StringWriter();
+			writeIndexToFile(elements, writer, 0);
+			return writer.toString();
+		} catch (IOException e) {
+			return null;
+		}
 	}
-	
+
 	/**This method is to write the inverted index data into files in a pretty json format
 	 * 
 	 * @param index is the data structure that is being written in jsonformat
@@ -441,58 +440,71 @@ public class JsonWriter {
 		writer.write("}");
 	}
 
-	
-	/**Writes the results of exact or partial search into a pretty json format into a file
-	 * 
-	 * @param results the data structure containing the data being written
-	 * @param outputPath the output path which is where the data will be written to
-	 * @throws IOException throws io if issues occur
-	 */
-	public static void writeResultsToFile(Map<String, List<FileResult>> results, Path outputPath) throws IOException {
-		try (BufferedWriter writer = Files.newBufferedWriter(outputPath, UTF_8)) {
-			writer.write("{\n");
-			int outerCount = 0;
 
-			for (Map.Entry<String, List<FileResult>> entry : results.entrySet()) {
-				writeQuote(entry.getKey(), writer, 1);
-				writer.write(": [\n");
 
-				int innerCount = 0;
-				for (FileResult fileResult : entry.getValue()) {
-					writeIndent(writer, 2);
-					writer.write("{\n");
-
-					writeQuote("count", writer, 3);
-					writer.write(": " + fileResult.getCount() + ",\n");
-
-					writeQuote("score", writer, 3);
-					writer.write(": " + String.format("%.8f", fileResult.getScore()) + ",\n");
-
-					writeQuote("where", writer, 3);
-					writer.write(": \"" + fileResult.getWhere() + "\"\n");
-
-					writeIndent(writer, 2);
-					writer.write("}");
-
-					if (innerCount < entry.getValue().size() - 1) {
-						writer.write(",");
-					}
-					writer.write("\n");
-					innerCount++;
-				}
-
-				writeIndent(writer, 1);
-				writer.write("]");
-
-				if (outerCount < results.size() - 1) {
-					writer.write(",");
-				}
-				writer.write("\n");
-				outerCount++;
-			}
-
-			writer.write("}");
+	public static void writeResultsToFile(Map<String, ? extends Collection<? extends FileResult>> results, Path path) throws IOException {
+		try (BufferedWriter writer = Files.newBufferedWriter(path, UTF_8)) {
+			writeResultsToFile(results, writer, 0);
 		}
 	}
 
+
+	public static String writeResultToFile(Map<String, ? extends Collection<? extends FileResult>> results) {
+		try {
+			StringWriter writer = new StringWriter();
+			writeResultsToFile(results, writer, 0);
+			return writer.toString();
+		} catch (IOException e) {
+			return null;
+		}
+	}
+
+	public static void writeResultsToFile(Map<String, ? extends Collection<? extends FileResult>> results, Writer writer, int indent) throws IOException {
+		writer.write("{\n");
+
+		var iterator = results.entrySet().iterator();
+		if (iterator.hasNext()) {
+			Map.Entry<String, ? extends Collection<? extends FileResult>> entry = iterator.next();
+			writeResultEntry(entry, writer, indent + 1);
+
+			while (iterator.hasNext()) {
+				writer.write(",\n");
+				entry = iterator.next();
+				writeResultEntry(entry, writer, indent + 1);
+			}
+
+			writer.write("\n");
+		}
+		writeIndent("}", writer, indent);
+	}
+
+	private static void writeResultEntry(Map.Entry<String, ? extends Collection<? extends FileResult>> entry, Writer writer, int indent) throws IOException {
+		writeQuote(entry.getKey(), writer, indent);
+		writer.write(": [\n");
+
+		var fileResultsIterator = entry.getValue().iterator();
+		if (fileResultsIterator.hasNext()) {
+			FileResult fileResult = fileResultsIterator.next();
+			writeFileResult(fileResult, writer, indent + 1);
+
+			while (fileResultsIterator.hasNext()) {
+				writer.write(",\n");
+				fileResult = fileResultsIterator.next();
+				writeFileResult(fileResult, writer, indent + 1);
+			}
+
+			writer.write("\n");
+			writeIndent("]", writer, indent);
+		} else {
+			writeIndent("]", writer, indent);
+		}
+	}
+
+	private static void writeFileResult(FileResult fileResult, Writer writer, int indent) throws IOException {
+		writeIndent("{\n", writer, indent);
+		writeIndent("\"count\": " + fileResult.getCount() + ",\n", writer, indent + 1);
+		writeIndent("\"score\": " + String.format("%.8f", fileResult.getScore()) + ",\n", writer, indent + 1);
+		writeIndent("\"where\": \"" + fileResult.getWhere() + "\"\n", writer, indent + 1);
+		writeIndent("}", writer, indent);
+	}
 }

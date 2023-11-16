@@ -10,8 +10,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.stream.Collectors;
-
 
 /**
  * Represents an inverted index where words map to their occurrences within files.
@@ -222,22 +220,25 @@ public class InvertedIndex {
 	 * @return a sorted list of FileResult objects
 	 */
 	public List<FileResult> searchExact(TreeSet<String> cleanedUniqueQueries) {
-	    Map<String, FileResult> resultMap = new HashMap<>(); // Use a map to track results by location
+		HashMap<String, FileResult> lookupMap = new HashMap<>(); // TODO Rename to lookupMap
+		List<FileResult> resultList = new ArrayList<>(); // TODO List<FileResult> resultList = new ArrayList<>();
 
-	    for (String word : cleanedUniqueQueries) { // Loop through each unique query word
-	        for (String location : getLocations(word)) { // Loop through each location the word appears in
-	            FileResult fileResult = resultMap.get(location);
-	            if (fileResult == null) {
-	                // If not present, create a new FileResult and put it in the map
-	                fileResult = new FileResult(location, numWordsInLocation(location));
-	                resultMap.put(location, fileResult);
-	            }
-	            fileResult.incrementCount(numPositions(word, location));
-	        }
-	    }
-	    List<FileResult> resultList = new ArrayList<>(resultMap.values());
-	    Collections.sort(resultList);
-	    return resultList;
+		for (String word : cleanedUniqueQueries) {
+			if (invertedIndex.get(word) != null) {
+				for (String location : invertedIndex.get(word).keySet()) {
+					System.out.println("This is the location for word " + word + ": " + invertedIndex.get(word).keySet());
+					FileResult fr = lookupMap.get(location);
+					if(fr == null) {
+						fr = new FileResult(location, numWordsInLocation(location));
+						lookupMap.put(location, fr);
+						resultList.add(fr);
+					}
+					fr.incrementCount(numPositions(word, location));
+				}
+			}
+		}
+		Collections.sort(resultList);
+		return resultList;
 	}
 
 	/**
@@ -248,32 +249,25 @@ public class InvertedIndex {
 	 * @return a sorted list of FileResult objects
 	 */
 	public List<FileResult> searchPartial(TreeSet<String> cleanedUniqueQueries) {
-		List<FileResult> resultList = new ArrayList<>(); // [hello, word] or [cardin] or [capybara, hidden]
-		Boolean containsExistingLocation;
-		for (String word : cleanedUniqueQueries) { //no dups
-	        for (String w : getWords()) {
-	            if (w.startsWith(word)) {
-	            	for (String location : getLocations(w)) { // no dups
-	            		containsExistingLocation = false;
-	            		for (FileResult fr : resultList) {
-	            			if (location.equals(fr.getWhere())) {
-	            				containsExistingLocation = true;
-	            				fr.incrementCount(numPositions(w, location));
-	            			}
-	            		}
-	            		if (containsExistingLocation == false) {
-	            			FileResult fr2 = new FileResult(location, numWordsInLocation(location));
-	            			fr2.incrementCount(numPositions(w, location));
-	            			resultList.add(fr2);
-	            			
-	            		}
-	            	}
-	            }
+		HashMap<String, FileResult> lookupMap = new HashMap<>();
+		List<FileResult> resultList = new ArrayList<>();
+
+		for (String word : cleanedUniqueQueries) {
+			for (String w : getWords()) {
+				if (w.startsWith(word)) {
+					for (String location : getLocations(w)) {
+						FileResult fr = lookupMap.get(location);
+						if(fr == null) {
+							fr = new FileResult(location, numWordsInLocation(location));
+							lookupMap.put(location, fr);
+							resultList.add(fr);
+						}
+						fr.incrementCount(numPositions(w, location));
+					}
+				}
 			}
 		}
-		
 		Collections.sort(resultList);
 		return resultList;
-	}
-
+	}	
 }

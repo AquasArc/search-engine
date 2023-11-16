@@ -122,6 +122,6 @@ public class FileResult implements Comparable<FileResult> {
 	 */
 	@Override
 	public String toString() {
-		return "\nCount: " + count + ",\nScore: " + score + "\nLocation: " + location;
+		return "\nCount: " + count + ",\nScore: " + score + "\nLocation: " + location + "\n";
 	}
 }

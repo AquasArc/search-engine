@@ -26,7 +26,6 @@ public class Driver {
 		boolean isPartial = parser.hasFlag("-partial");
 		QueryProcessor processor = new QueryProcessor(index,isPartial);
 
-
 		if (parser.hasFlag("-text")) {
 			Path inputPath = parser.getPath("-text");
 			try {

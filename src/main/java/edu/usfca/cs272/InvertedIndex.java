@@ -211,7 +211,9 @@ public class InvertedIndex {
 	public long numWordsInLocation(String location) {
 		return wordCountMap.getOrDefault(location, 0L);
 	}
+	
 	/** =============================Project 2 Functionality============================= */
+	
 	/**
 	 * Performs an exact search for cleaned and unique queries and returns a sorted
 	 * list of FileResult objects.
@@ -220,20 +222,19 @@ public class InvertedIndex {
 	 * @return a sorted list of FileResult objects
 	 */
 	public List<FileResult> searchExact(TreeSet<String> cleanedUniqueQueries) {
-		HashMap<String, FileResult> lookupMap = new HashMap<>(); // TODO Rename to lookupMap
-		List<FileResult> resultList = new ArrayList<>(); // TODO List<FileResult> resultList = new ArrayList<>();
+		HashMap<String, FileResult> lookupMap = new HashMap<>();
+		List<FileResult> resultList = new ArrayList<>();
 
 		for (String word : cleanedUniqueQueries) {
 			if (invertedIndex.get(word) != null) {
 				for (String location : invertedIndex.get(word).keySet()) {
-					System.out.println("This is the location for word " + word + ": " + invertedIndex.get(word).keySet());
 					FileResult fr = lookupMap.get(location);
 					if(fr == null) {
-						fr = new FileResult(location, numWordsInLocation(location));
+						fr = new FileResult(location, wordCountMap.getOrDefault(location, 0L));
 						lookupMap.put(location, fr);
 						resultList.add(fr);
 					}
-					fr.incrementCount(numPositions(word, location));
+					fr.incrementCount(invertedIndex.get(word).get(location).size());
 				}
 			}
 		}
@@ -258,11 +259,11 @@ public class InvertedIndex {
 					for (String location : getLocations(w)) {
 						FileResult fr = lookupMap.get(location);
 						if(fr == null) {
-							fr = new FileResult(location, numWordsInLocation(location));
+							fr = new FileResult(location, wordCountMap.getOrDefault(location, 0L));
 							lookupMap.put(location, fr);
 							resultList.add(fr);
 						}
-						fr.incrementCount(numPositions(w, location));
+						fr.incrementCount(invertedIndex.get(word).get(location).size());
 					}
 				}
 			}

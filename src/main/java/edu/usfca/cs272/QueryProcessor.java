@@ -6,7 +6,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -39,11 +41,67 @@ public class QueryProcessor {
 	 * @param index to use inverted index methods
 	 * @param isPartial to determine either partial/exact search
 	 */
-	public QueryProcessor(InvertedIndex index, Boolean isPartial) { // TODO boolean
+	public QueryProcessor(InvertedIndex index, boolean isPartial) {
 		this.index = index;
 		this.isPartial = isPartial;
 		this.resultsMap = new TreeMap<String, List<FileResult>>();
 	}
+	
+	/** A toString method prints inverted index contents
+	 * 
+	 *@returns to string value of the inverted index 
+	 */
+	@Override
+	public String toString() {
+		return resultsMap.toString();
+	}
+	
+	/**Returns true or false depending on if the query exists in the results map
+	 * 
+	 * @param query string input of a query
+	 * @return true or false using containsKey...
+	 */
+	public boolean hasQuery(String query) {
+	    return resultsMap.containsKey(query);
+	}
+	
+	/**
+	 * Checks if a specific query has any associated FileResult objects.
+	 *
+	 * @param query The query to check.
+	 * @return True if the query has one or more FileResult objects, false otherwise.
+	 */
+	public boolean hasFileResults(String query) {
+	    return resultsMap.containsKey(query) && !resultsMap.get(query).isEmpty();
+	}
+	
+	/**Calculates the number of FileResults for a given query
+	 * 
+	 * @param query a string containing a line of queries
+	 * @return number of file results for a query, otherwise, 0 if none..
+	 */
+	public int numResultsForQuery(String query) {
+	    return resultsMap.containsKey(query) ? resultsMap.get(query).size() : 0;
+	}
+
+	/**Returns an integer number of total queries that was processed
+	 * 
+	 * @return the size of the resultsMap
+	 */
+	public int numQueriesProcessed() {
+	    return resultsMap.size();
+	}
+	
+	/**
+	 * Retrieves an unmodifiable set of all the queries processed.
+	 *
+	 * @return An unmodifiable set of query strings.
+	 */
+	public Set<String> getQueries() {
+	    return Collections.unmodifiableSet(resultsMap.keySet());
+	}
+
+
 
 	/**
 	 * ProcessQuery is the start of the search exact/partial functionality. It first
@@ -64,6 +122,7 @@ public class QueryProcessor {
 
 			while ((line = reader.readLine()) != null) {
 				TreeSet<String> cleanedUniqueQueries = FileStemmer.uniqueStems(line, stemmer);
+				
 
 				String query = String.join(" ", cleanedUniqueQueries);
 				

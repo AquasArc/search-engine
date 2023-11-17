@@ -3,6 +3,8 @@ package edu.usfca.cs272;
 import java.util.HashMap;
 import java.util.Map;
 
+// TODO Move this into inverted index inner class
+
 /**
  * Represents results of a file search, including the location of the file,
  * word count, score based on search criteria, and the total number of words
@@ -11,8 +13,6 @@ import java.util.Map;
  * @author Anton Lim
  * @author CS 272 Software Development (University of San Francisco)
  * @version Fall 2023
- * 
- *
  */
 public class FileResult implements Comparable<FileResult> {
 
@@ -26,7 +26,7 @@ public class FileResult implements Comparable<FileResult> {
 	private double score = 0.0;
 
 	/** contains the information for totalwords*/
-	private final long totalWords;
+	private final long totalWords; // TODO Remove, access the word count data structure when needed
 
 	/**
 	 * Returns the count.
@@ -71,7 +71,7 @@ public class FileResult implements Comparable<FileResult> {
 	 * 
 	 * @param value The value to increment the word count by.
 	 */
-	public void incrementCount(int value) {
+	public void incrementCount(int value) { // TODO private
 		this.count += value;
 		updateScore();
 	}

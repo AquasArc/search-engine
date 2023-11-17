@@ -49,7 +49,7 @@ public class InvertedIndex {
 	 * @param indexPath The path where the index should be written in JSON format
 	 * @throws IOException If an error occurs during file writing.
 	 */
-	public void processIndex(Path indexPath) throws IOException {
+	public void processIndex(Path indexPath) throws IOException { // TODO writeIndex
 		JsonWriter.writeIndexToFile(invertedIndex,indexPath);
 	}
 
@@ -68,7 +68,7 @@ public class InvertedIndex {
 	 * @param countsPath The path to write the word counts.
 	 * @throws IOException If writing fails.
 	 */
-	public void writeCountsMap(Path countsPath) throws IOException {
+	public void writeCountsMap(Path countsPath) throws IOException { // TODO writeCounts
 		JsonWriter.writeObject(wordCountMap,countsPath);
 	}
 
@@ -85,6 +85,15 @@ public class InvertedIndex {
 		invertedIndex.get(word).putIfAbsent(location, new TreeSet<>());
 		invertedIndex.get(word).get(location).add(position);
 
+		// TODO Only put the count if something new was added
+		
+		/*
+		 * TODO 
+		 * boolean modified = invertedIndex.get(word).get(location).add(position);
+		 * 
+		 * if (modified) then put
+		 */
+		
 		//Adds to wordCountMap...
 		wordCountMap.put(location, wordCountMap.getOrDefault(location, 0L) + 1);
 	}
@@ -226,15 +235,23 @@ public class InvertedIndex {
 		List<FileResult> resultList = new ArrayList<>();
 
 		for (String word : cleanedUniqueQueries) {
+			// TODO Use entrySet and save the gets...
+			/*
+			 * var innerMap = invertedIndex.get(word);
+			 * 
+			 * if (innerMap != null) ...
+			 */
+			
 			if (invertedIndex.get(word) != null) {
-				for (String location : invertedIndex.get(word).keySet()) {
+				// TODO Move the duplicate code private search helper method
+				for (String location : invertedIndex.get(word).keySet()) { // TODO innerMap.entrySet
 					FileResult fr = lookupMap.get(location);
 					if(fr == null) {
 						fr = new FileResult(location, wordCountMap.getOrDefault(location, 0L));
 						lookupMap.put(location, fr);
 						resultList.add(fr);
 					}
-					fr.incrementCount(invertedIndex.get(word).get(location).size());
+					fr.incrementCount(invertedIndex.get(word).get(location).size()); // TODO Don't re-get the same data
 				}
 			}
 		}
@@ -251,10 +268,10 @@ public class InvertedIndex {
 	 */
 	public List<FileResult> searchPartial(TreeSet<String> cleanedUniqueQueries) {
 		HashMap<String, FileResult> lookupMap = new HashMap<>();
-		List<FileResult> resultList = new ArrayList<>(lookupMap.values());
+		List<FileResult> resultList = new ArrayList<>(lookupMap.values()); // TODO remove lookupMap.values()
 
 		for (String word : cleanedUniqueQueries) {
-			for (String w : invertedIndex.keySet()) {
+			for (String w : invertedIndex.keySet()) { // TODO entrySet, tailMap, and break 
 				if (w.startsWith(word)) {
 					for (String location : getLocations(w)) {
 						FileResult fr = lookupMap.get(location);

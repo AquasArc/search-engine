@@ -111,7 +111,6 @@ public class QueryProcessor {
 	 * given, we split to either search exact or partial
 	 * 
 	 * @param queryPath The given path that holds the address to file
-	 * @return resultsMap Returns the results map with the populated information
 	 * @throws IOException throws io exception if issues hit
 	 */
 	public void processQuery(Path queryPath) throws IOException {

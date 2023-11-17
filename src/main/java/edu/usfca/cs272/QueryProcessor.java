@@ -62,6 +62,7 @@ public class QueryProcessor {
 	 * @return true or false using containsKey...
 	 */
 	public boolean hasQuery(String query) {
+	// TODO Need to stem and join before accessing the query in the map
 	    return resultsMap.containsKey(query);
 	}
 	
@@ -72,6 +73,7 @@ public class QueryProcessor {
 	 * @return True if the query has one or more FileResult objects, false otherwise.
 	 */
 	public boolean hasFileResults(String query) {
+	// TODO Need to stem and join before accessing the query in the map
 	    return resultsMap.containsKey(query) && !resultsMap.get(query).isEmpty();
 	}
 	
@@ -81,6 +83,7 @@ public class QueryProcessor {
 	 * @return number of file results for a query, otherwise, 0 if none..
 	 */
 	public int numResultsForQuery(String query) {
+		// TODO Need to stem and join before accessing the query in the map
 	    return resultsMap.containsKey(query) ? resultsMap.get(query).size() : 0;
 	}
 
@@ -100,8 +103,8 @@ public class QueryProcessor {
 	public Set<String> getQueries() {
 	    return Collections.unmodifiableSet(resultsMap.keySet());
 	}
-
-
+	
+	// TODO Need a safe way of getting results without breaking encapsulation
 
 	/**
 	 * ProcessQuery is the start of the search exact/partial functionality. It first
@@ -114,12 +117,13 @@ public class QueryProcessor {
 	 * @throws IOException throws io exception if issues hit
 	 */
 	public void processQuery(Path queryPath) throws IOException {
-		Stemmer stemmer = new SnowballStemmer(ENGLISH);
+		Stemmer stemmer = new SnowballStemmer(ENGLISH); // TODO Make a member of the class so you can reuse more
 		
 		try (BufferedReader reader = Files.newBufferedReader(queryPath)) {
 			String line;
 
 			while ((line = reader.readLine()) != null) {
+				// TODO Move the logic here into processQuery(String line)
 				TreeSet<String> cleanedUniqueQueries = FileStemmer.uniqueStems(line, stemmer);
 				
 
@@ -134,7 +138,12 @@ public class QueryProcessor {
 			}
 		}
 	}
-
+	
+	/* TODO 
+	public void processQuery(String line) {
+		
+	}
+	*/
 
 	/**
 	 * Writes the results map to the specified output file in JSON format.

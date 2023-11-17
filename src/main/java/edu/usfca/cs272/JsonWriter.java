@@ -448,7 +448,7 @@ public class JsonWriter {
 	 * @param path is the output path that is being written to
 	 * @throws IOException if any issues arises
 	 */
-	public static void writeResultsToFile(Map<String, ? extends Collection<? extends FileResult>> results, Path path) throws IOException {
+	public static void writeResultsToFile(Map<String, ? extends Collection<? extends InvertedIndex.FileResult>> results, Path path) throws IOException {
 		try (BufferedWriter writer = Files.newBufferedWriter(path, UTF_8)) {
 			writeResultsToFile(results, writer, 0);
 		}
@@ -460,7 +460,7 @@ public class JsonWriter {
 	 * @param results the data structure containing the data
 	 * @return writer.toString() or null depending on if errors occur
 	 */
-	public static String writeResultToFile(Map<String, ? extends Collection<? extends FileResult>> results) {
+	public static String writeResultToFile(Map<String, ? extends Collection<? extends InvertedIndex.FileResult>> results) {
 		try {
 			StringWriter writer = new StringWriter();
 			writeResultsToFile(results, writer, 0);
@@ -477,12 +477,12 @@ public class JsonWriter {
 	 * @param indent indenting the values
 	 * @throws IOException if any errors occur
 	 */
-	public static void writeResultsToFile(Map<String, ? extends Collection<? extends FileResult>> results, Writer writer, int indent) throws IOException {
+	public static void writeResultsToFile(Map<String, ? extends Collection<? extends InvertedIndex.FileResult>> results, Writer writer, int indent) throws IOException {
 		writer.write("{\n");
 
 		var iterator = results.entrySet().iterator();
 		if (iterator.hasNext()) {
-			Map.Entry<String, ? extends Collection<? extends FileResult>> entry = iterator.next();
+			Map.Entry<String, ? extends Collection<? extends InvertedIndex.FileResult>> entry = iterator.next();
 			writeResultEntry(entry, writer, indent + 1);
 
 			while (iterator.hasNext()) {
@@ -503,13 +503,13 @@ public class JsonWriter {
 	 * @param indent to write the indents
 	 * @throws IOException if any errors occur
 	 */
-	private static void writeResultEntry(Map.Entry<String, ? extends Collection<? extends FileResult>> entry, Writer writer, int indent) throws IOException {
+	private static void writeResultEntry(Map.Entry<String, ? extends Collection<? extends InvertedIndex.FileResult>> entry, Writer writer, int indent) throws IOException {
 		writeQuote(entry.getKey(), writer, indent);
 		writer.write(": [\n");
 
 		var fileResultsIterator = entry.getValue().iterator();
 		if (fileResultsIterator.hasNext()) {
-			FileResult fileResult = fileResultsIterator.next();
+			InvertedIndex.FileResult fileResult = fileResultsIterator.next();
 			writeFileResult(fileResult, writer, indent + 1);
 
 			while (fileResultsIterator.hasNext()) {
@@ -530,7 +530,7 @@ public class JsonWriter {
 	 * @param indent for indenting the values
 	 * @throws IOException if any errors occur
 	 */
-	private static void writeFileResult(FileResult fileResult, Writer writer, int indent) throws IOException {
+	private static void writeFileResult(InvertedIndex.FileResult fileResult, Writer writer, int indent) throws IOException {
 		writeIndent("{\n", writer, indent);
 		writeIndent("\"count\": " + fileResult.getCount() + ",\n", writer, indent + 1);
 		writeIndent("\"score\": " + String.format("%.8f", fileResult.getScore()) + ",\n", writer, indent + 1);

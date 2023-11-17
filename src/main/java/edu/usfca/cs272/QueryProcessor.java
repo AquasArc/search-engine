@@ -35,7 +35,7 @@ public class QueryProcessor {
 	private final Stemmer stemmer;
 
 	/** The data structure for results from query searches */
-	private final TreeMap<String, List<FileResult>> resultsMap;
+	private final TreeMap<String, List<InvertedIndex.FileResult>> resultsMap;
 	// { Queries : [Count: _ , Score: _ , where: _ ]}
 
 	/**
@@ -48,7 +48,7 @@ public class QueryProcessor {
 		this.index = index;
 		this.isPartial = isPartial;
 		this.stemmer = new SnowballStemmer(ENGLISH);
-		this.resultsMap = new TreeMap<String, List<FileResult>>();
+		this.resultsMap = new TreeMap<String, List<InvertedIndex.FileResult>>();
 	}
 	
 	/** A toString method prints inverted index contents
@@ -66,8 +66,9 @@ public class QueryProcessor {
 	 * @return true or false using containsKey...
 	 */
 	public boolean hasQuery(String query) {
-	// TODO Need to stem and join before accessing the query in the map
-	    return resultsMap.containsKey(query);
+		TreeSet<String> stemmedQueries = FileStemmer.uniqueStems(query, stemmer);
+	    String processedQuery = String.join(" ", stemmedQueries);
+	    return resultsMap.containsKey(processedQuery);
 	}
 	
 	/**
@@ -115,7 +116,7 @@ public class QueryProcessor {
 	 * @return either a empty list if the query does not exist, or a unmodifiableList 
 	 *  of the metadata associated to the processed query
 	 */
-	public List<FileResult> getResultsForQuery(String query) {
+	public List<InvertedIndex.FileResult> getResultsForQuery(String query) {
 	    TreeSet<String> stemmedQueries = FileStemmer.uniqueStems(query, stemmer);
 	    String processedQuery = String.join(" ", stemmedQueries);
 
@@ -154,18 +155,16 @@ public class QueryProcessor {
 	 */
 	public void processQuery(String line) {
 		TreeSet<String> cleanedUniqueQueries = FileStemmer.uniqueStems(line, stemmer);
-		
 
 		String query = String.join(" ", cleanedUniqueQueries);
 		
 		if (!cleanedUniqueQueries.isEmpty() && !resultsMap.containsKey(query)) {
-			List<FileResult> sortedResults = isPartial ? index.searchPartial(cleanedUniqueQueries)
+			List<InvertedIndex.FileResult> sortedResults = isPartial ? index.searchPartial(cleanedUniqueQueries)
 					: index.searchExact(cleanedUniqueQueries);
 
 			resultsMap.put(query, sortedResults);
 		}
 	}
-
 
 	/**
 	 * Writes the results map to the specified output file in JSON format.

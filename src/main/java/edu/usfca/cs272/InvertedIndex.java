@@ -80,15 +80,15 @@ public class InvertedIndex {
 	 * @param position The position of the word.
 	 */
 	public void add(String word, String location, int position) {
-	    // Adds to invertedIndex
-	    invertedIndex.putIfAbsent(word, new TreeMap<>());
-	    invertedIndex.get(word).putIfAbsent(location, new TreeSet<>());
-	    boolean modified = invertedIndex.get(word).get(location).add(position);
+		// Adds to invertedIndex
+		invertedIndex.putIfAbsent(word, new TreeMap<>());
+		invertedIndex.get(word).putIfAbsent(location, new TreeSet<>());
+		boolean modified = invertedIndex.get(word).get(location).add(position);
 
-	    // Only updates the word count if something new was added
-	    if (modified) {
-	        wordCountMap.put(location, wordCountMap.getOrDefault(location, 0L) + 1);
-	    }
+		// Only updates the word count if something new was added
+		if (modified) {
+			wordCountMap.put(location, wordCountMap.getOrDefault(location, 0L) + 1);
+		}
 	}
 
 
@@ -217,6 +217,23 @@ public class InvertedIndex {
 
 	/** =============================Project 2 Functionality============================= */
 
+	/**A Private helper method for search. 
+	 * 
+	 * @param location The string location of where the word being searched is found
+	 * @param count The integer count of how many times that word has appeared in said location
+	 * @param lookupMap The lookup map to keep track of fr objects that has already been made
+	 * @param resultList populate the List of FileResult objects that will be returned at the end of the process
+	 */
+	private void processFileResult(String location, int count, HashMap<String, FileResult> lookupMap, List<FileResult> resultList) {
+		FileResult fr = lookupMap.get(location);
+		if (fr == null) {
+			fr = new FileResult(location);
+			lookupMap.put(location, fr);
+			resultList.add(fr);
+		}
+		fr.incrementCount(count);
+	}
+
 	/**
 	 * Performs an exact search for cleaned and unique queries and returns a sorted
 	 * list of FileResult objects.
@@ -227,25 +244,11 @@ public class InvertedIndex {
 	public List<FileResult> searchExact(TreeSet<String> cleanedUniqueQueries) {
 		HashMap<String, FileResult> lookupMap = new HashMap<>();
 		List<FileResult> resultList = new ArrayList<>();
-
 		for (String word : cleanedUniqueQueries) {
-			// TODO Use entrySet and save the gets...
-			/*
-			 * var innerMap = invertedIndex.get(word);
-			 * 
-			 * if (innerMap != null) ...
-			 */
-
-			if (invertedIndex.get(word) != null) {
-				// TODO Move the duplicate code private search helper method
-				for (String location : invertedIndex.get(word).keySet()) { // TODO innerMap.entrySet
-					FileResult fr = lookupMap.get(location);
-					if(fr == null) {
-						fr = new FileResult(location, wordCountMap.getOrDefault(location, 0L));
-						lookupMap.put(location, fr);
-						resultList.add(fr);
-					}
-					fr.incrementCount(invertedIndex.get(word).get(location).size()); // TODO Don't re-get the same data
+			var innerMap = invertedIndex.get(word);
+			if (innerMap != null) {
+				for (var entry : innerMap.entrySet()) {
+					processFileResult(entry.getKey(), entry.getValue().size(), lookupMap, resultList);
 				}
 			}
 		}
@@ -264,22 +267,114 @@ public class InvertedIndex {
 		HashMap<String, FileResult> lookupMap = new HashMap<>();
 		List<FileResult> resultList = new ArrayList<>();
 
-		for (String word : cleanedUniqueQueries) {
-			for (String w : invertedIndex.keySet()) { // TODO entrySet, tailMap, and break 
-				if (w.startsWith(word)) {
-					for (String location : getLocations(w)) {
-						FileResult fr = lookupMap.get(location);
-						if(fr == null) {
-							fr = new FileResult(location, wordCountMap.getOrDefault(location, 0L));
-							lookupMap.put(location, fr);
-							resultList.add(fr);
-						}
-						fr.incrementCount(numPositions(w, location));
-					}
+		for (String queryWord : cleanedUniqueQueries) {
+			for (var entry : invertedIndex.tailMap(queryWord).entrySet()) {
+				String word = entry.getKey();
+				var wordVal = entry.getValue();
+
+				if (!word.startsWith(queryWord)) {
+					break;
+				}
+				for (String location : wordVal.keySet()) {
+					processFileResult(location, wordVal.get(location).size(), lookupMap, resultList);
 				}
 			}
 		}
 		Collections.sort(resultList);
 		return resultList;
+	}
+
+
+	/**
+	 * Represents results of a file search, including the location of the file,
+	 * word count, score based on search criteria, and the total number of words
+	 * in the file.
+	 * 
+	 * @author Anton Lim
+	 * @author CS 272 Software Development (University of San Francisco)
+	 * @version Fall 2023
+	 */
+	public class FileResult implements Comparable<FileResult> {
+
+		private final String location;
+		private int count = 0;
+		private double score = 0.0;
+
+		public FileResult(String location) {
+			this.location = location;
+		}
+		
+		public int getCount() {
+			return this.count;
+		}
+
+		/**
+		 * Returns the score.
+		 *
+		 * @return the score value.
+		 */
+		public double getScore() {
+			return this.score;
+		}
+
+		/**
+		 * Returns the where string.
+		 *
+		 * @return the where location.
+		 */
+		public String getWhere() {
+			return this.location;
+		}
+
+		private void incrementCount(int value) {
+			this.count += value;
+			updateScore();
+		}
+
+		private void updateScore() {
+			long totalWords = wordCountMap.getOrDefault(location, 0L);
+			if (totalWords != 0) {
+				this.score = (double) count / totalWords;
+			}
+		}
+
+		/**
+		 * Converts the properties of this object to a map.
+		 * 
+		 * @return A map representation of this object.
+		 */
+		public Map<String, Object> asMap() {
+			Map<String, Object> map = new HashMap<>();
+			map.put("where", location);
+			map.put("count", count);
+			map.put("score", String.format("%.8f", score));  // to ensure 8 decimal places
+			return map;
+		}
+
+
+		/** Compares the score + the count
+		 * 
+		 */
+		public int compareTo(FileResult other) {
+			int scoreCompare = Double.compare(other.score, this.score);
+			if (scoreCompare != 0) {
+				return scoreCompare;
+			}
+
+			int countCompare = Integer.compare(other.count, this.count);
+			if (countCompare != 0) {
+				return countCompare;
+			}
+
+			return this.location.compareToIgnoreCase(other.location);
+		}
+
+		/**To string method to test if variables have the proper values
+		 * 
+		 */
+		@Override
+		public String toString() {
+			return "\nCount: " + count + ",\nScore: " + score + "\nLocation: " + location + "\n";
+		}
 	}
 }

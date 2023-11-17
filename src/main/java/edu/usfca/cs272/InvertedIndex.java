@@ -303,7 +303,7 @@ public class InvertedIndex {
 		public FileResult(String location) {
 			this.location = location;
 		}
-		
+
 		public int getCount() {
 			return this.count;
 		}

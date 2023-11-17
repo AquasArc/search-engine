@@ -30,7 +30,7 @@ public class QueryProcessor {
 
 	/** To determine partial/exact search */
 	private final boolean isPartial;
-	
+
 	/** Made stemmer a member of the class for reusability */
 	private final Stemmer stemmer;
 
@@ -50,7 +50,7 @@ public class QueryProcessor {
 		this.stemmer = new SnowballStemmer(ENGLISH);
 		this.resultsMap = new TreeMap<String, List<InvertedIndex.FileResult>>();
 	}
-	
+
 	/** A toString method prints inverted index contents
 	 * 
 	 *@returns to string value of the inverted index 
@@ -59,7 +59,7 @@ public class QueryProcessor {
 	public String toString() {
 		return resultsMap.toString();
 	}
-	
+
 	/**Returns true or false depending on if the query exists in the results map
 	 * 
 	 * @param query string input of a query
@@ -67,10 +67,10 @@ public class QueryProcessor {
 	 */
 	public boolean hasQuery(String query) {
 		TreeSet<String> stemmedQueries = FileStemmer.uniqueStems(query, stemmer);
-	    String processedQuery = String.join(" ", stemmedQueries);
-	    return resultsMap.containsKey(processedQuery);
+		String processedQuery = String.join(" ", stemmedQueries);
+		return resultsMap.containsKey(processedQuery);
 	}
-	
+
 	/**
 	 * Checks if a specific query has any associated FileResult objects.
 	 *
@@ -78,11 +78,11 @@ public class QueryProcessor {
 	 * @return True if the query has one or more FileResult objects, false otherwise.
 	 */
 	public boolean hasFileResults(String query) {
-	    TreeSet<String> stemmedQueries = FileStemmer.uniqueStems(query, stemmer);
-	    String processedQuery = String.join(" ", stemmedQueries);
-	    return resultsMap.containsKey(processedQuery) && !resultsMap.get(processedQuery).isEmpty();
+		TreeSet<String> stemmedQueries = FileStemmer.uniqueStems(query, stemmer);
+		String processedQuery = String.join(" ", stemmedQueries);
+		return resultsMap.containsKey(processedQuery) && !resultsMap.get(processedQuery).isEmpty();
 	}
-	
+
 	/**Calculates the number of FileResults for a given query
 	 * 
 	 * @param query a string containing a line of queries
@@ -90,8 +90,8 @@ public class QueryProcessor {
 	 */
 	public int numResultsForQuery(String query) {
 		TreeSet<String> stemmedQueries = FileStemmer.uniqueStems(query, stemmer);
-	    String processedQuery = String.join(" ", stemmedQueries);
-	    return resultsMap.containsKey(processedQuery) ? resultsMap.get(processedQuery).size() : 0;
+		String processedQuery = String.join(" ", stemmedQueries);
+		return resultsMap.containsKey(processedQuery) ? resultsMap.get(processedQuery).size() : 0;
 	}
 
 	/**Returns an integer number of total queries that was processed
@@ -99,17 +99,17 @@ public class QueryProcessor {
 	 * @return the size of the resultsMap
 	 */
 	public int numQueriesProcessed() {
-	    return resultsMap.size();
+		return resultsMap.size();
 	}
-	
+
 	/**Retrieves an unmodifiable set of all the queries processed.
 	 *
 	 * @return An unmodifiable set of query strings.
 	 */
 	public Set<String> getQueries() {
-	    return Collections.unmodifiableSet(resultsMap.keySet());
+		return Collections.unmodifiableSet(resultsMap.keySet());
 	}
-	
+
 	/**Retrieves the List of meta data associated to a query that has been processed
 	 * 
 	 * @param query input to search from the results map
@@ -117,14 +117,14 @@ public class QueryProcessor {
 	 *  of the metadata associated to the processed query
 	 */
 	public List<InvertedIndex.FileResult> getResultsForQuery(String query) {
-	    TreeSet<String> stemmedQueries = FileStemmer.uniqueStems(query, stemmer);
-	    String processedQuery = String.join(" ", stemmedQueries);
+		TreeSet<String> stemmedQueries = FileStemmer.uniqueStems(query, stemmer);
+		String processedQuery = String.join(" ", stemmedQueries);
 
-	    if (resultsMap.containsKey(processedQuery)) {
-	        return Collections.unmodifiableList(resultsMap.get(processedQuery));
-	    } else {
-	        return Collections.emptyList();
-	    }
+		if (resultsMap.containsKey(processedQuery)) {
+			return Collections.unmodifiableList(resultsMap.get(processedQuery));
+		} else {
+			return Collections.emptyList();
+		}
 	}
 
 
@@ -147,7 +147,7 @@ public class QueryProcessor {
 			}
 		}
 	}
-	
+
 
 	/**The query processing logic. This processes one query. Essentially one line.
 	 * 
@@ -157,7 +157,7 @@ public class QueryProcessor {
 		TreeSet<String> cleanedUniqueQueries = FileStemmer.uniqueStems(line, stemmer);
 
 		String query = String.join(" ", cleanedUniqueQueries);
-		
+
 		if (!cleanedUniqueQueries.isEmpty() && !resultsMap.containsKey(query)) {
 			List<InvertedIndex.FileResult> sortedResults = isPartial ? index.searchPartial(cleanedUniqueQueries)
 					: index.searchExact(cleanedUniqueQueries);

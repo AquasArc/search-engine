@@ -120,11 +120,10 @@ public class QueryProcessor {
 		TreeSet<String> stemmedQueries = FileStemmer.uniqueStems(query, stemmer);
 		String processedQuery = String.join(" ", stemmedQueries);
 
-		if (resultsMap.containsKey(processedQuery)) {
+		if (hasQuery(processedQuery)) {
 			return Collections.unmodifiableList(resultsMap.get(processedQuery));
-		} else {
-			return Collections.emptyList();
-		}
+		} 
+		return Collections.emptyList();
 	}
 
 
@@ -164,6 +163,8 @@ public class QueryProcessor {
 
 			resultsMap.put(query, sortedResults);
 		}
+		
+		System.out.println("This is the results for " + query + ": " + getResultsForQuery(query));
 	}
 
 	/**

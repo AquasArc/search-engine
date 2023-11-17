@@ -211,9 +211,9 @@ public class InvertedIndex {
 	public long numWordsInLocation(String location) {
 		return wordCountMap.getOrDefault(location, 0L);
 	}
-	
+
 	/** =============================Project 2 Functionality============================= */
-	
+
 	/**
 	 * Performs an exact search for cleaned and unique queries and returns a sorted
 	 * list of FileResult objects.
@@ -251,10 +251,10 @@ public class InvertedIndex {
 	 */
 	public List<FileResult> searchPartial(TreeSet<String> cleanedUniqueQueries) {
 		HashMap<String, FileResult> lookupMap = new HashMap<>();
-		List<FileResult> resultList = new ArrayList<>();
+		List<FileResult> resultList = new ArrayList<>(lookupMap.values());
 
 		for (String word : cleanedUniqueQueries) {
-			for (String w : getWords()) {
+			for (String w : invertedIndex.keySet()) {
 				if (w.startsWith(word)) {
 					for (String location : getLocations(w)) {
 						FileResult fr = lookupMap.get(location);
@@ -263,12 +263,12 @@ public class InvertedIndex {
 							lookupMap.put(location, fr);
 							resultList.add(fr);
 						}
-						fr.incrementCount(invertedIndex.get(word).get(location).size());
+						fr.incrementCount(numPositions(w, location));
 					}
 				}
 			}
 		}
 		Collections.sort(resultList);
 		return resultList;
-	}	
+	}
 }

@@ -49,7 +49,7 @@ public class InvertedIndex {
 	 * @param indexPath The path where the index should be written in JSON format
 	 * @throws IOException If an error occurs during file writing.
 	 */
-	public void processIndex(Path indexPath) throws IOException { // TODO writeIndex
+	public void writeIndex(Path indexPath) throws IOException {
 		JsonWriter.writeIndexToFile(invertedIndex,indexPath);
 	}
 
@@ -68,7 +68,7 @@ public class InvertedIndex {
 	 * @param countsPath The path to write the word counts.
 	 * @throws IOException If writing fails.
 	 */
-	public void writeCountsMap(Path countsPath) throws IOException { // TODO writeCounts
+	public void writeCounts(Path countsPath) throws IOException {
 		JsonWriter.writeObject(wordCountMap,countsPath);
 	}
 
@@ -80,23 +80,17 @@ public class InvertedIndex {
 	 * @param position The position of the word.
 	 */
 	public void add(String word, String location, int position) {
-		//Adds to indexMap
-		invertedIndex.putIfAbsent(word, new TreeMap<>());
-		invertedIndex.get(word).putIfAbsent(location, new TreeSet<>());
-		invertedIndex.get(word).get(location).add(position);
+	    // Adds to invertedIndex
+	    invertedIndex.putIfAbsent(word, new TreeMap<>());
+	    invertedIndex.get(word).putIfAbsent(location, new TreeSet<>());
+	    boolean modified = invertedIndex.get(word).get(location).add(position);
 
-		// TODO Only put the count if something new was added
-		
-		/*
-		 * TODO 
-		 * boolean modified = invertedIndex.get(word).get(location).add(position);
-		 * 
-		 * if (modified) then put
-		 */
-		
-		//Adds to wordCountMap...
-		wordCountMap.put(location, wordCountMap.getOrDefault(location, 0L) + 1);
+	    // Only updates the word count if something new was added
+	    if (modified) {
+	        wordCountMap.put(location, wordCountMap.getOrDefault(location, 0L) + 1);
+	    }
 	}
+
 
 	/**
 	 * Adds multiple words, their location and positions
@@ -241,7 +235,7 @@ public class InvertedIndex {
 			 * 
 			 * if (innerMap != null) ...
 			 */
-			
+
 			if (invertedIndex.get(word) != null) {
 				// TODO Move the duplicate code private search helper method
 				for (String location : invertedIndex.get(word).keySet()) { // TODO innerMap.entrySet
@@ -268,7 +262,7 @@ public class InvertedIndex {
 	 */
 	public List<FileResult> searchPartial(TreeSet<String> cleanedUniqueQueries) {
 		HashMap<String, FileResult> lookupMap = new HashMap<>();
-		List<FileResult> resultList = new ArrayList<>(lookupMap.values()); // TODO remove lookupMap.values()
+		List<FileResult> resultList = new ArrayList<>();
 
 		for (String word : cleanedUniqueQueries) {
 			for (String w : invertedIndex.keySet()) { // TODO entrySet, tailMap, and break 

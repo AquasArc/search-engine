@@ -30,6 +30,9 @@ public class QueryProcessor {
 
 	/** To determine partial/exact search */
 	private final boolean isPartial;
+	
+	/** Made stemmer a member of the class for reusability */
+	private final Stemmer stemmer;
 
 	/** The data structure for results from query searches */
 	private final TreeMap<String, List<FileResult>> resultsMap;
@@ -44,6 +47,7 @@ public class QueryProcessor {
 	public QueryProcessor(InvertedIndex index, boolean isPartial) {
 		this.index = index;
 		this.isPartial = isPartial;
+		this.stemmer = new SnowballStemmer(ENGLISH);
 		this.resultsMap = new TreeMap<String, List<FileResult>>();
 	}
 	
@@ -73,8 +77,9 @@ public class QueryProcessor {
 	 * @return True if the query has one or more FileResult objects, false otherwise.
 	 */
 	public boolean hasFileResults(String query) {
-	// TODO Need to stem and join before accessing the query in the map
-	    return resultsMap.containsKey(query) && !resultsMap.get(query).isEmpty();
+	    TreeSet<String> stemmedQueries = FileStemmer.uniqueStems(query, stemmer);
+	    String processedQuery = String.join(" ", stemmedQueries);
+	    return resultsMap.containsKey(processedQuery) && !resultsMap.get(processedQuery).isEmpty();
 	}
 	
 	/**Calculates the number of FileResults for a given query
@@ -83,8 +88,9 @@ public class QueryProcessor {
 	 * @return number of file results for a query, otherwise, 0 if none..
 	 */
 	public int numResultsForQuery(String query) {
-		// TODO Need to stem and join before accessing the query in the map
-	    return resultsMap.containsKey(query) ? resultsMap.get(query).size() : 0;
+		TreeSet<String> stemmedQueries = FileStemmer.uniqueStems(query, stemmer);
+	    String processedQuery = String.join(" ", stemmedQueries);
+	    return resultsMap.containsKey(processedQuery) ? resultsMap.get(processedQuery).size() : 0;
 	}
 
 	/**Returns an integer number of total queries that was processed
@@ -95,8 +101,7 @@ public class QueryProcessor {
 	    return resultsMap.size();
 	}
 	
-	/**
-	 * Retrieves an unmodifiable set of all the queries processed.
+	/**Retrieves an unmodifiable set of all the queries processed.
 	 *
 	 * @return An unmodifiable set of query strings.
 	 */
@@ -104,7 +109,23 @@ public class QueryProcessor {
 	    return Collections.unmodifiableSet(resultsMap.keySet());
 	}
 	
-	// TODO Need a safe way of getting results without breaking encapsulation
+	/**Retrieves the List of meta data associated to a query that has been processed
+	 * 
+	 * @param query input to search from the results map
+	 * @return either a empty list if the query does not exist, or a unmodifiableList 
+	 *  of the metadata associated to the processed query
+	 */
+	public List<FileResult> getResultsForQuery(String query) {
+	    TreeSet<String> stemmedQueries = FileStemmer.uniqueStems(query, stemmer);
+	    String processedQuery = String.join(" ", stemmedQueries);
+
+	    if (resultsMap.containsKey(processedQuery)) {
+	        return Collections.unmodifiableList(resultsMap.get(processedQuery));
+	    } else {
+	        return Collections.emptyList();
+	    }
+	}
+
 
 	/**
 	 * ProcessQuery is the start of the search exact/partial functionality. It first
@@ -116,34 +137,35 @@ public class QueryProcessor {
 	 * @param queryPath The given path that holds the address to file
 	 * @throws IOException throws io exception if issues hit
 	 */
-	public void processQuery(Path queryPath) throws IOException {
-		Stemmer stemmer = new SnowballStemmer(ENGLISH); // TODO Make a member of the class so you can reuse more
-		
+	public void processQuery(Path queryPath) throws IOException {	
 		try (BufferedReader reader = Files.newBufferedReader(queryPath)) {
 			String line;
 
 			while ((line = reader.readLine()) != null) {
-				// TODO Move the logic here into processQuery(String line)
-				TreeSet<String> cleanedUniqueQueries = FileStemmer.uniqueStems(line, stemmer);
-				
-
-				String query = String.join(" ", cleanedUniqueQueries);
-				
-				if (!cleanedUniqueQueries.isEmpty() && !resultsMap.containsKey(query)) {
-					List<FileResult> sortedResults = isPartial ? index.searchPartial(cleanedUniqueQueries)
-							: index.searchExact(cleanedUniqueQueries);
-
-					resultsMap.put(query, sortedResults);
-				}
+				processQuery(line);
 			}
 		}
 	}
 	
-	/* TODO 
+
+	/**The query processing logic. This processes one query. Essentially one line.
+	 * 
+	 * @param takes in one line of query and adds the result of searching said line into the results map
+	 */
 	public void processQuery(String line) {
+		TreeSet<String> cleanedUniqueQueries = FileStemmer.uniqueStems(line, stemmer);
 		
+
+		String query = String.join(" ", cleanedUniqueQueries);
+		
+		if (!cleanedUniqueQueries.isEmpty() && !resultsMap.containsKey(query)) {
+			List<FileResult> sortedResults = isPartial ? index.searchPartial(cleanedUniqueQueries)
+					: index.searchExact(cleanedUniqueQueries);
+
+			resultsMap.put(query, sortedResults);
+		}
 	}
-	*/
+
 
 	/**
 	 * Writes the results map to the specified output file in JSON format.

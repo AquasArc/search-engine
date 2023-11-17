@@ -39,7 +39,7 @@ public class Driver {
 
 		if (parser.hasFlag("-counts")) {
 			try {
-				index.writeCountsMap(parser.getPath("-counts", Path.of("counts.json")));
+				index.writeCounts(parser.getPath("-counts", Path.of("counts.json")));
 			} catch (IOException e) {
 				System.out.println("Error processing counts: " + e.getMessage());
 			}
@@ -47,7 +47,7 @@ public class Driver {
 
 		if (parser.hasFlag("-index")) {
 			try {
-				index.processIndex(parser.getPath("-index", Path.of("index.json")));
+				index.writeIndex(parser.getPath("-index", Path.of("index.json")));
 			} catch (IOException e) {
 				System.out.println("Error processing index: " + e.getMessage());
 			}

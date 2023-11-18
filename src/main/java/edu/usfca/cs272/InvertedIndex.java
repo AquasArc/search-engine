@@ -220,10 +220,9 @@ public class InvertedIndex {
 
 	/**A Private helper method for search. 
 	 * 
-	 * @param location The string location of where the word being searched is found
-	 * @param count The integer count of how many times that word has appeared in said location
 	 * @param lookupMap The lookup map to keep track of fr objects that has already been made
 	 * @param resultList populate the List of FileResult objects that will be returned at the end of the process
+	 * @param set the Entry set that is being used in both exact/partial search
 	 */
 	private void processFileResult(HashMap<String, FileResult> lookupMap, List<FileResult> resultList, Set<Entry<String, TreeSet<Integer>>> set) {
 		for (var entry : set) {

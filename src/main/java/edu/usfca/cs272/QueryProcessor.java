@@ -150,7 +150,7 @@ public class QueryProcessor {
 
 	/**The query processing logic. This processes one query. Essentially one line.
 	 * 
-	 * @param takes in one line of query and adds the result of searching said line into the results map
+	 * @param line takes in one line of query and adds the result of searching said line into the results map
 	 */
 	public void processQuery(String line) {
 		TreeSet<String> cleanedUniqueQueries = FileStemmer.uniqueStems(line, stemmer);

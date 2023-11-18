@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -224,14 +225,18 @@ public class InvertedIndex {
 	 * @param lookupMap The lookup map to keep track of fr objects that has already been made
 	 * @param resultList populate the List of FileResult objects that will be returned at the end of the process
 	 */
-	private void processFileResult(String location, int count, HashMap<String, FileResult> lookupMap, List<FileResult> resultList) {
-		FileResult fr = lookupMap.get(location);
-		if (fr == null) {
-			fr = new FileResult(location);
-			lookupMap.put(location, fr);
-			resultList.add(fr);
+	private void processFileResult(HashMap<String, FileResult> lookupMap, List<FileResult> resultList, Set<Entry<String, TreeSet<Integer>>> set) {
+		for (var entry : set) {
+			String location = entry.getKey();
+			int count = entry.getValue().size();
+			FileResult fr = lookupMap.get(location);
+			if (fr == null) {
+				fr = new FileResult(location);
+				lookupMap.put(location, fr);
+				resultList.add(fr);
+			}
+			fr.incrementCount(count);
 		}
-		fr.incrementCount(count);
 	}
 
 	/**
@@ -244,14 +249,15 @@ public class InvertedIndex {
 	public List<FileResult> searchExact(TreeSet<String> cleanedUniqueQueries) {
 		HashMap<String, FileResult> lookupMap = new HashMap<>();
 		List<FileResult> resultList = new ArrayList<>();
+
 		for (String word : cleanedUniqueQueries) {
 			var innerMap = invertedIndex.get(word);
+			
 			if (innerMap != null) {
-				for (var entry : innerMap.entrySet()) {
-					processFileResult(entry.getKey(), entry.getValue().size(), lookupMap, resultList);
-				}
+				processFileResult(lookupMap, resultList, innerMap.entrySet());
 			}
 		}
+		
 		Collections.sort(resultList);
 		return resultList;
 	}
@@ -270,16 +276,16 @@ public class InvertedIndex {
 		for (String queryWord : cleanedUniqueQueries) {
 			for (var entry : invertedIndex.tailMap(queryWord).entrySet()) {
 				String word = entry.getKey();
-				var wordVal = entry.getValue();
 
 				if (!word.startsWith(queryWord)) {
 					break;
 				}
-				for (String location : wordVal.keySet()) {
-					processFileResult(location, wordVal.get(location).size(), lookupMap, resultList);
-				}
+				
+				var wordVal = entry.getValue();
+				processFileResult(lookupMap, resultList, wordVal.entrySet());
 			}
 		}
+		
 		Collections.sort(resultList);
 		return resultList;
 	}

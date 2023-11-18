@@ -163,8 +163,6 @@ public class QueryProcessor {
 
 			resultsMap.put(query, sortedResults);
 		}
-		
-		System.out.println("This is the results for " + query + ": " + getResultsForQuery(query));
 	}
 
 	/**

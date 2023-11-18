@@ -22,11 +22,21 @@ public class Driver {
 	 */
 	public static void main(String[] args){
 		ArgumentParser parser = new ArgumentParser(args);
-		InvertedIndex index = new InvertedIndex();
+		//InvertedIndex index = new InvertedIndex();
+		ThreadSafeInvertedIndex index = new ThreadSafeInvertedIndex();
 		
 		boolean isPartial = parser.hasFlag("-partial");
-		QueryProcessor processor = new QueryProcessor(index,isPartial);
+		QueryProcessor processor = new QueryProcessor(index, isPartial);
 
+		if (parser.hasFlag("-threads")) {
+			try {
+				InvertedIndexProcessor.updateThreadCount(parser.getInteger("threads"));
+			} catch (IOException | NullPointerException e) {
+				System.out.println("Error Detected:");
+				System.out.println("Error processing text: " + e.getMessage());
+			}
+		}
+		
 		if (parser.hasFlag("-text")) {
 			Path inputPath = parser.getPath("-text");
 			try {

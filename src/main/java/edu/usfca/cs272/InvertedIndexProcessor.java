@@ -18,6 +18,10 @@ import static opennlp.tools.stemmer.snowball.SnowballStemmer.ALGORITHM.ENGLISH;
  * @version Fall 2023
  */
 public class InvertedIndexProcessor {
+
+	public static int THREAD_COUNT = 1;
+
+
 	/**
 	 * Processes a file, stems its words, and updates the inverted index data structure.
 	 * 
@@ -25,7 +29,7 @@ public class InvertedIndexProcessor {
 	 * @param index The InvertedIndex instance used for updating word occurrences.
 	 * @throws IOException If an error occurs while reading the file.
 	 */
-	public static void processFile(Path filePath, InvertedIndex index) throws IOException {
+	public static void processFile(Path filePath, ThreadSafeInvertedIndex index) throws IOException {
 		try (BufferedReader reader = Files.newBufferedReader(filePath)) {
 			String line;
 			int position = 0;
@@ -50,18 +54,31 @@ public class InvertedIndexProcessor {
 	 * @param index The InvertedIndex instance used for updating word occurrences.
 	 * @throws IOException If an error occurs while reading files within the directory.
 	 */
-	public static void processDirectory(Path dirPath, InvertedIndex index) throws IOException { 
+	public static void processDirectory(Path dirPath, ThreadSafeInvertedIndex index) throws IOException { 
+		WorkQueue workQueue = new WorkQueue(THREAD_COUNT);
 		try (DirectoryStream<Path> stream = Files.newDirectoryStream(dirPath)) {
+			// Create the work queue
 			for (Path entry : stream) {
 				if (Files.isDirectory(entry)) {
 					processDirectory(entry, index);
 				} else if (Files.isRegularFile(entry) && isTextFile(entry)) {
-					processFile(entry, index);
+					workQueue.execute(() -> {
+						// Reminder to add a logger here...
+						synchronized(index) {
+							try {
+								processFile(entry, index);
+							} catch (IOException e) {
+								System.out.println("Error Processing File while sync");
+							}
+						}
+					});
 				}
 			}
+			workQueue.join();
+		} finally {
+			workQueue.shutdown();
 		}
 	}
-
 	/**Check to see if the file ends with a .txt or .text
 	 * 
 	 * @param filePath is the argument given
@@ -81,11 +98,25 @@ public class InvertedIndexProcessor {
 	 * @param index The InvertedIndex instance to use for processing.
 	 * @throws IOException If an error occurs during file or directory processing.
 	 */
-	public static void processText(Path inputPath, InvertedIndex index) throws IOException {
+	public static void processText(Path inputPath, ThreadSafeInvertedIndex index) throws IOException {
 		if (Files.isRegularFile(inputPath)) {
 			processFile(inputPath, index);
 		} else if (Files.isDirectory(inputPath)) {
 			processDirectory(inputPath, index);
+		}
+	}
+
+	// If the [num] argument is not provided, not a number, or less than 1, use 5 as the default number of worker threads.
+	/** Processes the threadpath and determines how many [nums] was requested. Updates the global THREAD_COUNT depending
+	 *  on result...
+	 *
+	 * @param threadPath The path to the thread [num].
+	 * @throws IOException if an error has occured
+	 */
+	public static void updateThreadCount(Object threadPath) throws IOException {
+		THREAD_COUNT = 5;
+		if (threadPath != null && ((Integer) threadPath).intValue() > 0) {
+			THREAD_COUNT = ((Integer) threadPath).intValue();
 		}
 	}
 }

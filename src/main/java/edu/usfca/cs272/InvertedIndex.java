@@ -42,6 +42,15 @@ public class InvertedIndex {
 		this.invertedIndex = new TreeMap<>();
 		this.wordCountMap = new TreeMap<>();
 	}
+	
+	/** A toString method prints inverted index contents
+	 * 
+	 *@returns to string value of the inverted index 
+	 */
+	@Override
+	public String toString() {
+		return invertedIndex.toString();
+	}
 
 
 	/**
@@ -52,15 +61,6 @@ public class InvertedIndex {
 	 */
 	public void writeIndex(Path indexPath) throws IOException {
 		JsonWriter.writeIndexToFile(invertedIndex,indexPath);
-	}
-
-	/** A toString method prints inverted index contents
-	 * 
-	 *@returns to string value of the inverted index 
-	 */
-	@Override
-	public String toString() {
-		return invertedIndex.toString();
 	}
 
 	/**

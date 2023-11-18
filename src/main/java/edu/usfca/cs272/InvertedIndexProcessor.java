@@ -19,6 +19,7 @@ import static opennlp.tools.stemmer.snowball.SnowballStemmer.ALGORITHM.ENGLISH;
  */
 public class InvertedIndexProcessor {
 
+	/** To enable single threading processing... Will only be multithreaded if thread flag is reached... */
 	public static int THREAD_COUNT = 1;
 
 

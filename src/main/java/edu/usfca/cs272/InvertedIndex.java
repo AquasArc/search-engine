@@ -280,9 +280,8 @@ public class InvertedIndex {
 				if (!word.startsWith(queryWord)) {
 					break;
 				}
-				
-				var wordVal = entry.getValue();
-				processFileResult(lookupMap, resultList, wordVal.entrySet());
+
+				processFileResult(lookupMap, resultList, entry.getValue().entrySet());
 			}
 		}
 		
@@ -302,20 +301,33 @@ public class InvertedIndex {
 	 */
 	public class FileResult implements Comparable<FileResult> {
 
+		/** A private final string value for location*/
 		private final String location;
+		
+		/** A private final integer for the amount of times a word has been found in a location */
 		private int count = 0;
+		
+		/** A private double score which is total times a word has appeared / total words in location of file*/
 		private double score = 0.0;
 
+		/**A constructor for the FileResult inner class
+		 * It takes in a location of a word...
+		 * 
+		 * @param location of a given word that is being searched...
+		 */
 		public FileResult(String location) {
 			this.location = location;
 		}
 
+		/**A get count method...
+		 * 
+		 * @return count. The total amount of times a word appears in a location...
+		 */
 		public int getCount() {
 			return this.count;
 		}
 
-		/**
-		 * Returns the score.
+		/** Returns the score.
 		 *
 		 * @return the score value.
 		 */
@@ -332,11 +344,18 @@ public class InvertedIndex {
 			return this.location;
 		}
 
+		/**Increment count is used to add onto existing count to calculate score for words...
+		 * 
+		 * @param value Is the total count of a word in a file
+		 */
 		private void incrementCount(int value) {
 			this.count += value;
 			updateScore();
 		}
 
+		/**Uses the total words of a file and grabs the count, divides the two to calculate score...
+		 * 
+		 */
 		private void updateScore() {
 			long totalWords = wordCountMap.getOrDefault(location, 0L);
 			if (totalWords != 0) {

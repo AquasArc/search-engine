@@ -127,7 +127,6 @@ public class MultiThreadInvertedIndexProcessor {
 	     * If an IOException occurs during file processing, it is caught and rethrown
 	     * as an UncheckedIOException.
 	     */
-	    @Override
 	    public void run() {
 	        try {
 	            processFile(path, index);

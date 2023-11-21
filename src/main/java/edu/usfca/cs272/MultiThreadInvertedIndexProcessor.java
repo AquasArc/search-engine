@@ -11,6 +11,11 @@ import java.nio.file.Path;
 
 import opennlp.tools.stemmer.snowball.SnowballStemmer;
 
+
+/**The multithreaded variant of the inverted index processor
+ * It makes the processFile method as a task as a whole
+ * 
+ */
 public class MultiThreadInvertedIndexProcessor {
 	/**
 	 * Processes a file, stems its words, and updates the inverted index data structure.
@@ -42,6 +47,7 @@ public class MultiThreadInvertedIndexProcessor {
 	 * 
 	 * @param dirPath The path to the directory to process
 	 * @param index The InvertedIndex instance used for updating word occurrences.
+	 * @param workQueue the Workqueue that will be used to execute said tasks
 	 * @throws IOException If an error occurs while reading files within the directory.
 	 */
 	public static void processDirectory(Path dirPath, ThreadSafeInvertedIndex index, WorkQueue workQueue) throws IOException { // adding each file as basically a task to execute
@@ -51,7 +57,7 @@ public class MultiThreadInvertedIndexProcessor {
 				if (Files.isDirectory(entry)) {
 					processDirectory(entry, index, workQueue);
 				} else if (Files.isRegularFile(entry) && isTextFile(entry)) {
-					workQueue.execute(new Task(entry, index)); //create task here
+					workQueue.execute(new Task(entry, index));
 				}
 			}
 		}
@@ -74,6 +80,7 @@ public class MultiThreadInvertedIndexProcessor {
 	 * 
 	 * @param inputPath The path to either a single file or a directory to process.
 	 * @param index The InvertedIndex instance to use for processing.
+	 * @param workQueue the Workqueue that will be used to execute said tasks
 	 * @throws IOException If an error occurs during file or directory processing.
 	 */
 	public static void processText(Path inputPath, ThreadSafeInvertedIndex index, WorkQueue workQueue) throws IOException {

@@ -22,25 +22,29 @@ public class Driver {
 	 */
 	public static void main(String[] args){
 		ArgumentParser parser = new ArgumentParser(args);
-		//InvertedIndex index = new InvertedIndex();
-		ThreadSafeInvertedIndex index = new ThreadSafeInvertedIndex();
+		InvertedIndex index = null;
+		//ThreadSafeInvertedIndex index = new ThreadSafeInvertedIndex();
+		
+		WorkQueue workQueue = null;
 		
 		boolean isPartial = parser.hasFlag("-partial");
-		QueryProcessor processor = new QueryProcessor(index, isPartial);
 
 		if (parser.hasFlag("-threads")) {
-			try {
-				InvertedIndexProcessor.updateThreadCount(parser.getInteger("threads"));
-			} catch (IOException | NullPointerException e) {
-				System.out.println("Error Detected:");
-				System.out.println("Error processing text: " + e.getMessage());
-			}
+			index = new ThreadSafeInvertedIndex();
+			workQueue = new WorkQueue(parser.getInteger("-threads", 5));
+		} else {
+			index = new InvertedIndex();
 		}
 		
+		QueryProcessor processor = new QueryProcessor(index, isPartial);
+		
 		if (parser.hasFlag("-text")) {
-			Path inputPath = parser.getPath("-text");
 			try {
-				InvertedIndexProcessor.processText(inputPath, index);
+				if (parser.hasFlag("-threads")) {
+					MultiThreadInvertedIndexProcessor.processText(parser.getPath("-text"), (ThreadSafeInvertedIndex) index, workQueue);
+				} else {
+					InvertedIndexProcessor.processText(parser.getPath("-text"), index);
+				}
 			} catch (IOException | NullPointerException e) {
 				System.out.println("Error Detected:");
 				System.out.println("Error processing text: " + e.getMessage());

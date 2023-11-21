@@ -59,7 +59,7 @@ public class InvertedIndexProcessor {
 					processDirectory(entry, index);
 				} else if (Files.isRegularFile(entry) && isTextFile(entry)) {
 					try {
-						processFile(entry, index);
+						processFile(entry, index); // TODO Remove the try/catch, let the exception get thrown
 					} catch (IOException e) {
 						System.out.println("Error Processing File while sync");
 					}

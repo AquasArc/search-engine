@@ -17,6 +17,7 @@ import opennlp.tools.stemmer.snowball.SnowballStemmer;
  * 
  */
 public class MultiThreadInvertedIndexProcessor {
+	// TODO Remove, call InvertedIndexProcessor.processFile instead
 	/**
 	 * Processes a file, stems its words, and updates the inverted index data structure.
 	 * 
@@ -61,14 +62,14 @@ public class MultiThreadInvertedIndexProcessor {
 				}
 			}
 		}
-		workQueue.finish();
+		workQueue.finish(); // TODO Over-finishing... happens every recursive call (should only happen once)
 	}
 	/**Check to see if the file ends with a .txt or .text
 	 * 
 	 * @param filePath is the argument given
 	 * @return boolean return in regards to .txt or .text
 	 */
-	public static boolean isTextFile(Path filePath) {
+	public static boolean isTextFile(Path filePath) { // TODO Duplicate
 		String fileName = filePath.toString().toLowerCase();
 		return fileName.endsWith(".txt") || fileName.endsWith(".text");
 	}
@@ -85,10 +86,11 @@ public class MultiThreadInvertedIndexProcessor {
 	 */
 	public static void processText(Path inputPath, ThreadSafeInvertedIndex index, WorkQueue workQueue) throws IOException {
 		if (Files.isRegularFile(inputPath)) {
-			processFile(inputPath, index);
+			processFile(inputPath, index); // TODO Create a task here
 		} else if (Files.isDirectory(inputPath)) {
 			processDirectory(inputPath, index, workQueue);
 		}
+		// TODO workQueue.finish();
 	}
 	
 	
@@ -129,7 +131,20 @@ public class MultiThreadInvertedIndexProcessor {
 	     */
 	    public void run() {
 	        try {
-	            processFile(path, index);
+	            processFile(path, index); // TODO Over-blocking
+	            
+	            /*
+	             * TODO
+	             * 1. Create local data structure of the same-ish type
+	             * Create a local inverted index
+	             * 
+	             * 2. Add to the local data structure inside the loop
+	             * InvertedIndexProcessor.processFile(path, localIndex)
+	             * 
+	             * 3. Safe addAll after the loop
+	             * index.addAll(localIndex); <-- method you need to create as simple as possible
+	             * 
+	             */
 	        } catch (IOException e) {
 	            throw new UncheckedIOException(e);
 	        }

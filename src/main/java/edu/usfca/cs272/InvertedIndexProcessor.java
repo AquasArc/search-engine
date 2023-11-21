@@ -18,6 +18,7 @@ import static opennlp.tools.stemmer.snowball.SnowballStemmer.ALGORITHM.ENGLISH;
  * @version Fall 2023
  */
 public class InvertedIndexProcessor {
+
 	/**
 	 * Processes a file, stems its words, and updates the inverted index data structure.
 	 * 

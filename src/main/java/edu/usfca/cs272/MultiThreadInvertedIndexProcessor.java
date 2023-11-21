@@ -84,15 +84,42 @@ public class MultiThreadInvertedIndexProcessor {
 		}
 	}
 	
+	
+	/**
+	 * Represents a task for processing a file in a separate thread.
+	 * This task is responsible for reading a file, processing its contents,
+	 * and updating the given ThreadSafeInvertedIndex with the results.
+	 */
 	public static class Task implements Runnable {
+		/**
+	     * The path to the file that this task will process.
+	     */
 	    private final Path path;
+	    
+	    /**
+	     * The ThreadSafeInvertedIndex instance where the results of file processing
+	     * will be stored.
+	     */
 	    private final ThreadSafeInvertedIndex index;
 
+	    /**
+	     * Creates a new task for processing the specified file.
+	     *
+	     * @param path  The file path to process.
+	     * @param index The ThreadSafeInvertedIndex instance to update with the results of processing the file.
+	     * 
+	     */
 	    public Task(Path path, ThreadSafeInvertedIndex index) {
 	        this.path = path;
 	        this.index = index;
 	    }
 
+	    /**
+	     * The main method that runs when this task is executed by a thread.
+	     * It calls the processFile method to handle the actual file processing.
+	     * If an IOException occurs during file processing, it is caught and rethrown
+	     * as an UncheckedIOException.
+	     */
 	    @Override
 	    public void run() {
 	        try {

@@ -25,10 +25,13 @@ public class Driver {
 		InvertedIndex index = null;
 		//ThreadSafeInvertedIndex index = new ThreadSafeInvertedIndex();
 		
+		/** Creating the workqueue and setting it to null*/
 		WorkQueue workQueue = null;
 		
+		/** Boolean flag to determine exact/partial search*/
 		boolean isPartial = parser.hasFlag("-partial");
 
+		/** Logic to determine multi-threading or not*/
 		if (parser.hasFlag("-threads")) {
 			index = new ThreadSafeInvertedIndex();
 			workQueue = new WorkQueue(parser.getInteger("-threads", 5));
@@ -36,6 +39,7 @@ public class Driver {
 			index = new InvertedIndex();
 		}
 		
+		/** QueryProcessor object for search*/
 		QueryProcessor processor = new QueryProcessor(index, isPartial);
 		
 		if (parser.hasFlag("-text")) {

@@ -24,6 +24,9 @@ public class ThreadSafeInvertedIndex extends InvertedIndex {
 		super();
 		this.lock = new MultiReaderLock();
 	}
+	
+	// TODO Not fully thread-safe yet
+	// TODO Right-click, Source, Override/implement methods
 
 	/**
 	 * Adds a word, its location and position to the indexMap and wordCountMap.
@@ -154,7 +157,7 @@ public class ThreadSafeInvertedIndex extends InvertedIndex {
 		try {
 			return super.getPositions(word, location);
 		} finally {
-			lock.readLock().lock();
+			lock.readLock().lock(); // TODO Bug!
 		}
 	}
 

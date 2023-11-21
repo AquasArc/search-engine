@@ -34,6 +34,13 @@ public class WorkQueue {
 	/** Logger used for this class. */
 	private static final Logger log = LogManager.getLogger();
 	
+	/*
+	 * TODO Think about whether it makes sense to have a separate lock object
+	 * for protecting the pending variable.
+	 * 
+	 * Init lock and pending in the constructor.
+	 */
+	
 	/** Added two new members, one for managing pending task*/
 	private final Object lock = new Object();
 	

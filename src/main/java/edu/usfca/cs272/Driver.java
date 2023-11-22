@@ -103,5 +103,9 @@ public class Driver {
 				System.out.println("Error processing results: " + e.getMessage());
 			}
 		}
+
+		if (workQueue != null) {
+			workQueue.join();
+		}
 	}
 }

@@ -213,7 +213,7 @@ public class ThreadSafeInvertedIndex extends InvertedIndex {
 	@Override
 	/** To string method... 
 	 * 
-	 * 
+	 * @return toString method
 	 */
 	public String toString() {
 		lock.readLock().lock();

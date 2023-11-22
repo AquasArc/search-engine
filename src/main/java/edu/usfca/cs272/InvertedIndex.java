@@ -108,7 +108,7 @@ public class InvertedIndex {
 	
 	/**
 	 * Adds all the entries from another inverted index into the original inverted index
-	 * Same for wordCountMap
+	 * Same for wordCount
 	 * 
 	 * @param otherIndex The other InvertedIndex to merge with this one.
 	 */

@@ -8,7 +8,7 @@ import java.nio.file.Path;
 
 
 
-/**The multithreaded variant of the inverted index processor
+/**The multi threaded variant of the inverted index processor
  * It makes the processFile method as a task as a whole
  * 
  */
@@ -23,7 +23,7 @@ public class MultiThreadInvertedIndexProcessor {
 	 * @param workQueue the Workqueue that will be used to execute said tasks
 	 * @throws IOException If an error occurs while reading files within the directory.
 	 */
-	public static void processDirectory(Path dirPath, ThreadSafeInvertedIndex index, WorkQueue workQueue) throws IOException { // adding each file as basically a task to execute
+	public static void processDirectory(Path dirPath, ThreadSafeInvertedIndex index, WorkQueue workQueue) throws IOException {
 		try (DirectoryStream<Path> stream = Files.newDirectoryStream(dirPath)) {
 			// Create the work queue
 			for (Path entry : stream) {

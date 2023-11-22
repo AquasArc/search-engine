@@ -33,7 +33,7 @@ public class WorkQueue {
 
 	/** Logger used for this class. */
 	private static final Logger log = LogManager.getLogger();
-
+	
 	/** One for tracking pending tasks(unfinished)*/
 	private int pending = 0;
 
@@ -62,7 +62,6 @@ public class WorkQueue {
 			workers[i] = new Worker();
 			workers[i].start();
 		}
-
 	}
 
 	/**
@@ -72,20 +71,20 @@ public class WorkQueue {
 	 * @param task work request (in the form of a {@link Runnable} object)
 	 */
 	public void execute(Runnable task) {
+		incrementPending();
 		synchronized (tasks) {
 			tasks.addLast(task);
-			incrementPending();
 			tasks.notifyAll();
 		}
 	}
-
+	
 	/**
 	 * To keep track of pending tasks, increment up
 	 */
 	private synchronized void incrementPending() {
 		pending++;
 	}
-
+	
 	/**
 	 * Decrement already done tasks
 	 * 
@@ -93,7 +92,7 @@ public class WorkQueue {
 	 */
 	private synchronized void decrementPending() {
 		pending--;
-		if(pending == 0) {
+		if(pending <= 0) {
 			this.notifyAll();
 		}
 	}

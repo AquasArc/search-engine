@@ -8,7 +8,15 @@ import java.util.List;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-
+/**The MultiThreadQueryProcessor
+ * Is the Multi-threaded version of the original QueryProcessor
+ * It utilizes a task class that focuses on making the logic within processQuery(line) 
+ * its main task to be processed by workqueue... 
+ * 
+ * @author Anton Lim
+ * @author CS 272 Software Development (University of San Francisco)
+ * @version Fall 2023
+ */
 public class MultiThreadQueryProcessor {
 	
 	/** The InvertedIndex class... */
@@ -20,6 +28,7 @@ public class MultiThreadQueryProcessor {
 	/** The data structure for results from query searches */
 	private final TreeMap<String, List<InvertedIndex.FileResult>> resultsMap;
 	
+	/** Constructor for handling index, isPartial, and the resultsMap */
 	public MultiThreadQueryProcessor(ThreadSafeInvertedIndex index, boolean isPartial) {
 		this.index = index;
 		this.isPartial = isPartial;
@@ -34,6 +43,7 @@ public class MultiThreadQueryProcessor {
 	 * given, we split to either search exact or partial
 	 * 
 	 * @param queryPath The given path that holds the address to file
+	 * @param workQueue The workqueue class that will be used to execute task...
 	 * @throws IOException throws io exception if issues hit
 	 */
 	public void processQuery(Path queryPath, WorkQueue workQueue) throws IOException {	
@@ -78,7 +88,7 @@ public class MultiThreadQueryProcessor {
 		 * constructor declaration
 		 * 
 		 * @param line  the line to parse from
-		 * @param exact the boolean to see if we are doing exact search or not
+		 * @param isPartial the boolean to see if we are doing exact search or not 
 		 *
 		 */
 		public Task(String line, boolean isPartial) {

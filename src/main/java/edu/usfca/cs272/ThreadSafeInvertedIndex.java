@@ -67,7 +67,7 @@ public class ThreadSafeInvertedIndex extends InvertedIndex {
 	 * Adds all the entries from another inverted index into the original inverted index
 	 * Same for wordCountMap
 	 * 
-	 * @param otherIndex The other InvertedIndex to merge with this one.
+	 * @param Index The other InvertedIndex to merge with this one.
 	 */
 	@Override
 	public void addAll(InvertedIndex index) {

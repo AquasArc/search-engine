@@ -23,7 +23,6 @@ public class Driver {
 	public static void main(String[] args){
 		ArgumentParser parser = new ArgumentParser(args);
 		InvertedIndex index = null;
-		//ThreadSafeInvertedIndex index = new ThreadSafeInvertedIndex();
 		
 		/** Creating the workqueue and setting it to null*/
 		WorkQueue workQueue = null;
@@ -82,7 +81,7 @@ public class Driver {
 
 		if (parser.hasFlag("-query")) {
 			try {
-				if (parser.hasFlag("-threads")) { // Im not sure what to do here... TODO
+				if (parser.hasFlag("-threads")) {
 					multiProcessor.processQuery(parser.getPath("-query"), workQueue);
 				} else {
 					processor.processQuery(parser.getPath("-query"));

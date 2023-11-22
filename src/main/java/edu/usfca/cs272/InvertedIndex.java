@@ -105,6 +105,26 @@ public class InvertedIndex {
 			add(word, location, position++);
 		}
 	}
+	
+	/**
+	 * Adds all the entries from another inverted index into the original inverted index
+	 * Same for wordCountMap
+	 * 
+	 * @param otherIndex The other InvertedIndex to merge with this one.
+	 */
+	public void addAll(InvertedIndex otherIndex) {
+	    for (String word : otherIndex.invertedIndex.keySet()) {
+	        invertedIndex.putIfAbsent(word, new TreeMap<>());
+	        for (String location : otherIndex.invertedIndex.get(word).keySet()) {
+	            invertedIndex.get(word).putIfAbsent(location, new TreeSet<>());
+	            invertedIndex.get(word).get(location).addAll(otherIndex.invertedIndex.get(word).get(location));
+	        }
+	    }
+
+	    for (Map.Entry<String, Long> entry : otherIndex.wordCountMap.entrySet()) {
+	        wordCountMap.put(entry.getKey(), wordCountMap.getOrDefault(entry.getKey(), 0L) + entry.getValue());
+	    }
+	}
 
 	/**
 	 * Checks if the index contains a word.

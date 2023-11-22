@@ -1,7 +1,11 @@
 package edu.usfca.cs272;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
+
 
 
 /**ThreadSafeInvertedIndex class extends the InvertedIndex class with threadsafe methods 
@@ -25,9 +29,6 @@ public class ThreadSafeInvertedIndex extends InvertedIndex {
 		this.lock = new MultiReaderLock();
 	}
 	
-	// TODO Not fully thread-safe yet
-	// TODO Right-click, Source, Override/implement methods
-
 	/**
 	 * Adds a word, its location and position to the indexMap and wordCountMap.
 	 * 
@@ -62,6 +63,23 @@ public class ThreadSafeInvertedIndex extends InvertedIndex {
 		}
 	}
 
+	/**
+	 * Adds all the entries from another inverted index into the original inverted index
+	 * Same for wordCountMap
+	 * 
+	 * @param otherIndex The other InvertedIndex to merge with this one.
+	 */
+	@Override
+	public void addAll(InvertedIndex index) {
+		lock.writeLock().lock();
+		try {
+			super.addAll(index);
+		} finally {
+			lock.writeLock().unlock();
+		}
+	}
+
+	
 	/**
 	 * Checks if the index contains a word.
 	 * 
@@ -157,7 +175,7 @@ public class ThreadSafeInvertedIndex extends InvertedIndex {
 		try {
 			return super.getPositions(word, location);
 		} finally {
-			lock.readLock().lock(); // TODO Bug!
+			lock.readLock().unlock(); 
 		}
 	}
 
@@ -187,6 +205,85 @@ public class ThreadSafeInvertedIndex extends InvertedIndex {
 		lock.readLock().lock();
 		try {
 			return super.numLocations(word);
+		} finally {
+			lock.readLock().unlock();
+		}
+	}
+
+	@Override
+	/** To string method... 
+	 * 
+	 * 
+	 */
+	public String toString() {
+		lock.readLock().lock();
+		try {
+			return super.toString();
+		} finally {
+			lock.readLock().unlock();
+		}
+	}
+
+	/**Calls super and writes the inverted index in a pretty json format using 
+	 * json writer...
+	 * 
+	 * 
+	 * @param indexPath the path that is being written to 
+	 */
+	public void writeIndex(Path indexPath) throws IOException {
+		lock.readLock().lock();
+		try {
+			super.writeIndex(indexPath);
+		} finally {
+			lock.readLock().unlock();
+		}
+	}
+
+	/**Calls super and writes the word count map in a pretty json format using 
+	 * json writer...
+	 * 
+	 * 
+	 * @param countsPath the path that is being written to 
+	 */
+	@Override
+	public void writeCounts(Path countsPath) throws IOException {
+		lock.readLock().lock();
+		try {
+			super.writeCounts(countsPath);
+		} finally {
+			lock.readLock().unlock();
+		}
+	}
+
+	/**
+	 * Performs an exact search for cleaned and unique queries and returns a sorted
+	 * list of FileResult objects.
+	 *
+	 * @param cleanedUniqueQueries the cleaned and unique queries
+	 * @return a sorted list of FileResult objects
+	 */
+	@Override
+	public List<FileResult> searchExact(TreeSet<String> cleanedUniqueQueries) {
+		lock.readLock().lock();
+		try {
+			return super.searchExact(cleanedUniqueQueries);
+		} finally {
+			lock.readLock().unlock();
+		}
+	}
+
+	/**
+	 * Performs a partial search for cleaned and unique queries and returns a sorted
+	 * list of FileResult objects.
+	 *
+	 * @param cleanedUniqueQueries the cleaned and unique queries
+	 * @return a sorted list of FileResult objects
+	 */
+	@Override
+	public List<FileResult> searchPartial(TreeSet<String> cleanedUniqueQueries) {
+		lock.readLock().lock();
+		try {
+			return super.searchPartial(cleanedUniqueQueries);
 		} finally {
 			lock.readLock().unlock();
 		}

@@ -141,8 +141,7 @@ public class ThreadSafeQueryProcessor extends QueryProcessor {
 	 * not partial boolean flag is given Depending on whether or not partial is
 	 * given, we split to either search exact or partial
 	 * 
-	 * @param queryPath The given path that holds the address to file
-	 * @throws IOException throws io exception if issues hit
+	 * @param line a singular query input...
 	 */
 	@Override
 	public void processQuery(String line) {

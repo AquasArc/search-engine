@@ -19,7 +19,11 @@ public class ThreadSafeQueryProcessor extends QueryProcessor {
 	private final MultiReaderLock lock;
 
 
-	/** The constructor... follows the same structure as original QueryProcessor... */
+	/** The constructor... follows the same structure as original QueryProcessor
+	 * 
+	 * @param index to utilize the inverted index methods...
+	 * @param isPartial determines partial/exact search...
+	 */
 	public ThreadSafeQueryProcessor(InvertedIndex index, boolean isPartial) {
 		super(index, isPartial);
 		this.lock = new MultiReaderLock();

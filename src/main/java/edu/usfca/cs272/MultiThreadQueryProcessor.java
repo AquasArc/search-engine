@@ -28,6 +28,12 @@ public class MultiThreadQueryProcessor {
 	/** The data structure for results from query searches */
 	private final TreeMap<String, List<InvertedIndex.FileResult>> resultsMap;
 
+
+	/**Constructor to establish the values for index, isPartial, and resultsMap
+	 * 
+	 * @param index is the threadSafeInvertedIndex with threadsafe methods with locks
+	 * @param isPartial is a boolean value to determine exact or partial search...
+	 */
 	public MultiThreadQueryProcessor(ThreadSafeInvertedIndex index, boolean isPartial) {
 		this.index = index;
 		this.isPartial = isPartial;

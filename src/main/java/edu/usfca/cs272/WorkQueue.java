@@ -35,7 +35,7 @@ public class WorkQueue {
 	private static final Logger log = LogManager.getLogger();
 
 	/** Added two new members, one for managing pending task*/
-	private final Object lock;
+	private final Object lock; // TODO Keep it this way
 
 	/** One for tracking pending tasks(unfinished)*/
 	private int pending;
@@ -59,7 +59,7 @@ public class WorkQueue {
 		this.tasks = new LinkedList<Runnable>();
 		this.workers = new Worker[threads];
 		this.shutdown = false;
-		this.lock = new Object();
+		this.lock = new Object(); // TODO rename to pendingLock
 		this.pending = 0;
 
 

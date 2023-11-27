@@ -113,6 +113,10 @@ public class InvertedIndex {
 	 * @param otherIndex The other InvertedIndex to merge with this one.
 	 */
 	public void addAll(InvertedIndex otherIndex) {
+		// TODO Not the most simple of implementations, need a comparison point for more complex code
+		// TODO Think about a 4-line approach that reuses your public methods as much as possible
+		// TODO Need a release, don't necessarily need to keep it in the code
+		
 		for (String word : otherIndex.invertedIndex.keySet()) {
 			invertedIndex.putIfAbsent(word, new TreeMap<>());
 			for (String location : otherIndex.invertedIndex.get(word).keySet()) {
@@ -257,6 +261,16 @@ public class InvertedIndex {
 			fr.incrementCount(count);
 		}
 	}
+	
+	/*
+	 * TODO 
+	 * Make this a general search method...
+	 * 
+	 * public list search(queries, boolean)
+	 * 
+	 * List<InvertedIndex.FileResult> sortedResults = isPartial ? index.searchPartial(cleanedUniqueQueries)
+					: index.searchExact(cleanedUniqueQueries);
+	 */
 
 	/**
 	 * Performs an exact search for cleaned and unique queries and returns a sorted
@@ -265,7 +279,7 @@ public class InvertedIndex {
 	 * @param cleanedUniqueQueries the cleaned and unique queries
 	 * @return a sorted list of FileResult objects
 	 */
-	public List<FileResult> searchExact(TreeSet<String> cleanedUniqueQueries) {
+	public List<FileResult> searchExact(TreeSet<String> cleanedUniqueQueries) { // TODO Set<String>
 		HashMap<String, FileResult> lookupMap = new HashMap<>();
 		List<FileResult> resultList = new ArrayList<>();
 
@@ -288,7 +302,7 @@ public class InvertedIndex {
 	 * @param cleanedUniqueQueries the cleaned and unique queries
 	 * @return a sorted list of FileResult objects
 	 */
-	public List<FileResult> searchPartial(TreeSet<String> cleanedUniqueQueries) {
+	public List<FileResult> searchPartial(TreeSet<String> cleanedUniqueQueries) { // TODO Set<String>
 		HashMap<String, FileResult> lookupMap = new HashMap<>();
 		List<FileResult> resultList = new ArrayList<>();
 

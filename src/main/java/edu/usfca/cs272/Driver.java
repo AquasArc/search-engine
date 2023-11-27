@@ -3,6 +3,14 @@ package edu.usfca.cs272;
 import java.io.IOException;
 import java.nio.file.Path;
 
+/*
+ * TODO
+Description	Resource	Path	Location	Type
+The method compareTo(InvertedIndex.FileResult) of type InvertedIndex.FileResult should be tagged with @Override since it actually overrides a superinterface method	InvertedIndex.java	/SearchEngine/src/main/java/edu/usfca/cs272	line 402	Java Problem
+The method run() of type MultiThreadInvertedIndexProcessor.Task should be tagged with @Override since it actually overrides a superinterface method	MultiThreadInvertedIndexProcessor.java	/SearchEngine/src/main/java/edu/usfca/cs272	line 93	Java Problem
+The method writeIndex(Path) of type ThreadSafeInvertedIndex should be tagged with @Override since it actually overrides a superclass method	ThreadSafeInvertedIndex.java	/SearchEngine/src/main/java/edu/usfca/cs272	line 233	Java Problem
+The value of the local variable processorTS is not used	Driver.java	/SearchEngine/src/main/java/edu/usfca/cs272	line 33	Java Problem
+ */
 
 /**
  * Class responsible for running this project based on the provided command-line

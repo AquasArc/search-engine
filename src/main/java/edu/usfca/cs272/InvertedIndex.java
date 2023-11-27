@@ -42,7 +42,7 @@ public class InvertedIndex {
 		this.invertedIndex = new TreeMap<>();
 		this.wordCountMap = new TreeMap<>();
 	}
-	
+
 	/** A toString method prints inverted index contents
 	 * 
 	 *@returns to string value of the inverted index 
@@ -105,7 +105,7 @@ public class InvertedIndex {
 			add(word, location, position++);
 		}
 	}
-	
+
 	/**
 	 * Adds all the entries from another inverted index into the original inverted index
 	 * Same for wordCount
@@ -113,17 +113,17 @@ public class InvertedIndex {
 	 * @param otherIndex The other InvertedIndex to merge with this one.
 	 */
 	public void addAll(InvertedIndex otherIndex) {
-	    for (String word : otherIndex.invertedIndex.keySet()) {
-	        invertedIndex.putIfAbsent(word, new TreeMap<>());
-	        for (String location : otherIndex.invertedIndex.get(word).keySet()) {
-	            invertedIndex.get(word).putIfAbsent(location, new TreeSet<>());
-	            invertedIndex.get(word).get(location).addAll(otherIndex.invertedIndex.get(word).get(location));
-	        }
-	    }
+		for (String word : otherIndex.invertedIndex.keySet()) {
+			invertedIndex.putIfAbsent(word, new TreeMap<>());
+			for (String location : otherIndex.invertedIndex.get(word).keySet()) {
+				invertedIndex.get(word).putIfAbsent(location, new TreeSet<>());
+				invertedIndex.get(word).get(location).addAll(otherIndex.invertedIndex.get(word).get(location));
+			}
+		}
 
-	    for (Map.Entry<String, Long> entry : otherIndex.wordCountMap.entrySet()) {
-	        wordCountMap.put(entry.getKey(), wordCountMap.getOrDefault(entry.getKey(), 0L) + entry.getValue());
-	    }
+		for (Map.Entry<String, Long> entry : otherIndex.wordCountMap.entrySet()) {
+			wordCountMap.put(entry.getKey(), wordCountMap.getOrDefault(entry.getKey(), 0L) + entry.getValue());
+		}
 	}
 
 	/**
@@ -271,12 +271,12 @@ public class InvertedIndex {
 
 		for (String word : cleanedUniqueQueries) {
 			var innerMap = invertedIndex.get(word);
-			
+
 			if (innerMap != null) {
 				processFileResult(lookupMap, resultList, innerMap.entrySet());
 			}
 		}
-		
+
 		Collections.sort(resultList);
 		return resultList;
 	}
@@ -303,7 +303,7 @@ public class InvertedIndex {
 				processFileResult(lookupMap, resultList, entry.getValue().entrySet());
 			}
 		}
-		
+
 		Collections.sort(resultList);
 		return resultList;
 	}
@@ -322,10 +322,10 @@ public class InvertedIndex {
 
 		/** A private final string value for location*/
 		private final String location;
-		
+
 		/** A private final integer for the amount of times a word has been found in a location */
 		private int count = 0;
-		
+
 		/** A private double score which is total times a word has appeared / total words in location of file*/
 		private double score = 0.0;
 

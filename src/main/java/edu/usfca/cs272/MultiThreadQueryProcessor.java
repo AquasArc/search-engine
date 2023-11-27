@@ -10,22 +10,22 @@ import java.util.TreeSet;
 
 
 public class MultiThreadQueryProcessor {
-	
+
 	/** The InvertedIndex class... */
 	private final InvertedIndex index;
 
 	/** To determine partial/exact search */
 	private final boolean isPartial;
-	
+
 	/** The data structure for results from query searches */
 	private final TreeMap<String, List<InvertedIndex.FileResult>> resultsMap;
-	
+
 	public MultiThreadQueryProcessor(ThreadSafeInvertedIndex index, boolean isPartial) {
 		this.index = index;
 		this.isPartial = isPartial;
 		this.resultsMap = new TreeMap<String, List<InvertedIndex.FileResult>>();
 	}
-	
+
 	/**
 	 * ProcessQuery is the start of the search exact/partial functionality. It first
 	 * creates a list of strings that will hold all the unique queries Then using an
@@ -46,7 +46,7 @@ public class MultiThreadQueryProcessor {
 		}
 		workQueue.finish();
 	}
-	
+
 	/**
 	 * Writes the results map to the specified output file in JSON format.
 	 *
@@ -58,7 +58,7 @@ public class MultiThreadQueryProcessor {
 			JsonWriter.writeResultsToFile(resultsMap, outputPath);
 		}
 	}
-	
+
 	/**Task class for processing a query of search requests
 	 *
 	 */
@@ -104,7 +104,6 @@ public class MultiThreadQueryProcessor {
 					resultsMap.put(query, local);
 				}
 			}
-			
 		}
 	}
 }

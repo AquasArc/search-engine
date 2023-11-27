@@ -24,19 +24,19 @@ public class Driver {
 		ArgumentParser parser = new ArgumentParser(args);
 		InvertedIndex index = null;
 		//ThreadSafeInvertedIndex index = new ThreadSafeInvertedIndex();
-		
+
 		/** Creating the workqueue and setting it to null*/
 		WorkQueue workQueue = null;
-		
+
 		/** Boolean flag to determine exact/partial search*/
 		boolean isPartial = parser.hasFlag("-partial");
-		
+
 		/** ThreadSafe QueryProcessor object for search*/
 		ThreadSafeQueryProcessor processorTS = null;
-		
+
 		/** QueryProcessor object for search*/
 		QueryProcessor processor = null;
-		
+
 		MultiThreadQueryProcessor multiProcessor = null;
 
 		/** Logic to determine multi-threading or not*/
@@ -49,8 +49,8 @@ public class Driver {
 			index = new InvertedIndex();
 			processor = new QueryProcessor(index, isPartial);
 		}
-		
-		
+
+
 		if (parser.hasFlag("-text")) {
 			try {
 				if (parser.hasFlag("-threads")) {
@@ -102,6 +102,10 @@ public class Driver {
 			} catch (IOException e) {
 				System.out.println("Error processing results: " + e.getMessage());
 			}
+		}
+
+		if (workQueue != null) {
+			workQueue.join();
 		}
 	}
 }

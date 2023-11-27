@@ -34,8 +34,11 @@ public class WorkQueue {
 	/** Logger used for this class. */
 	private static final Logger log = LogManager.getLogger();
 
+	/** Added two new members, one for managing pending task*/
+	private final Object lock;
+
 	/** One for tracking pending tasks(unfinished)*/
-	private int pending = 0;
+	private int pending;
 
 
 	/**
@@ -56,13 +59,15 @@ public class WorkQueue {
 		this.tasks = new LinkedList<Runnable>();
 		this.workers = new Worker[threads];
 		this.shutdown = false;
+		this.lock = new Object();
+		this.pending = 0;
+
 
 		// start the threads so they are waiting in the background
 		for (int i = 0; i < threads; i++) {
 			workers[i] = new Worker();
 			workers[i].start();
 		}
-
 	}
 
 	/**
@@ -72,9 +77,9 @@ public class WorkQueue {
 	 * @param task work request (in the form of a {@link Runnable} object)
 	 */
 	public void execute(Runnable task) {
+		incrementPending();
 		synchronized (tasks) {
 			tasks.addLast(task);
-			incrementPending();
 			tasks.notifyAll();
 		}
 	}
@@ -83,7 +88,9 @@ public class WorkQueue {
 	 * To keep track of pending tasks, increment up
 	 */
 	private synchronized void incrementPending() {
-		pending++;
+		synchronized(lock) {
+			pending++;
+		}
 	}
 
 	/**
@@ -91,10 +98,12 @@ public class WorkQueue {
 	 * 
 	 * 
 	 */
-	private synchronized void decrementPending() {
-		pending--;
-		if(pending == 0) {
-			this.notifyAll();
+	private void decrementPending() {
+		synchronized(lock) {
+			pending--;
+			if(pending <= 0) {
+				lock.notifyAll();
+			}
 		}
 	}
 
@@ -102,14 +111,16 @@ public class WorkQueue {
 	 * Waits for all pending work (or tasks) to be finished. Does not terminate the
 	 * worker threads so that the work queue can continue to be used.
 	 */
-	public synchronized void finish() {
-		while (pending > 0) {
-			try {
-				this.wait();
-			} catch (InterruptedException e) {
-				System.err.println("Warning: work queue is interrupted while waiting");
-				log.catching(Level.WARN, e);
-				Thread.currentThread().interrupt();
+	public void finish() {
+		synchronized(lock) {
+			while (pending > 0) {
+				try {
+					lock.wait();
+				} catch (InterruptedException e) {
+					System.err.println("Warning: work queue is interrupted while waiting");
+					log.catching(Level.WARN, e);
+					Thread.currentThread().interrupt();
+				}
 			}
 		}
 	}

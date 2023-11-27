@@ -53,8 +53,8 @@ public class MultiThreadInvertedIndexProcessor {
 		}
 		workQueue.finish();
 	}
-	
-	
+
+
 	/**
 	 * Represents a task for processing a file in a separate thread.
 	 * This task is responsible for reading a file, processing its contents,
@@ -62,48 +62,48 @@ public class MultiThreadInvertedIndexProcessor {
 	 */
 	public static class Task implements Runnable {
 		/**
-	     * The path to the file that this task will process.
-	     */
-	    private final Path path;
-	    
-	    /**
-	     * The ThreadSafeInvertedIndex instance where the results of file processing
-	     * will be stored.
-	     */
-	    private final ThreadSafeInvertedIndex index;
+		 * The path to the file that this task will process.
+		 */
+		private final Path path;
 
-	    /**
-	     * Creates a new task for processing the specified file.
-	     *
-	     * @param path  The file path to process.
-	     * @param index The ThreadSafeInvertedIndex instance to update with the results of processing the file.
-	     * 
-	     */
-	    public Task(Path path, ThreadSafeInvertedIndex index) {
-	        this.path = path;
-	        this.index = index;
-	    }
+		/**
+		 * The ThreadSafeInvertedIndex instance where the results of file processing
+		 * will be stored.
+		 */
+		private final ThreadSafeInvertedIndex index;
 
-	    /**
-	     * The main method that runs when this task is executed by a thread.
-	     * It calls the processFile method to handle the actual file processing.
-	     * If an IOException occurs during file processing, it is caught and rethrown
-	     * as an UncheckedIOException.
-	     */
-	    public void run() {
-	        try {
-	        	 // Create a local inverted index
-	            InvertedIndex localIndex = new InvertedIndex();
+		/**
+		 * Creates a new task for processing the specified file.
+		 *
+		 * @param path  The file path to process.
+		 * @param index The ThreadSafeInvertedIndex instance to update with the results of processing the file.
+		 * 
+		 */
+		public Task(Path path, ThreadSafeInvertedIndex index) {
+			this.path = path;
+			this.index = index;
+		}
 
-	            // Process the file and update the local index
-	            InvertedIndexProcessor.processFile(path, localIndex);
+		/**
+		 * The main method that runs when this task is executed by a thread.
+		 * It calls the processFile method to handle the actual file processing.
+		 * If an IOException occurs during file processing, it is caught and rethrown
+		 * as an UncheckedIOException.
+		 */
+		public void run() {
+			try {
+				// Create a local inverted index
+				InvertedIndex localIndex = new InvertedIndex();
 
-	            // Safely add the local index to the shared index
-	            index.addAll(localIndex);
-	            
-	        } catch (IOException e) {
-	            throw new UncheckedIOException(e);
-	        }
-	    }
+				// Process the file and update the local index
+				InvertedIndexProcessor.processFile(path, localIndex);
+
+				// Safely add the local index to the shared index
+				index.addAll(localIndex);
+
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
+		}
 	}
 }

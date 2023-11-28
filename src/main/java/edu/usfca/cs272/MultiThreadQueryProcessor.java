@@ -56,7 +56,7 @@ public class MultiThreadQueryProcessor {
 			String line;
 
 			while ((line = reader.readLine()) != null) {
-				workQueue.execute(new Task(line, isPartial)); //processQuery(line) was originally here, treating this as the main task...
+				workQueue.execute(new Task(line, isPartial));
 			}
 		}
 		workQueue.finish();
@@ -102,10 +102,11 @@ public class MultiThreadQueryProcessor {
 
 		}
 
-		@Override
+
 		/**
 		 * the run method to execute with queuer
 		 */
+		@Override
 		public void run() {
 			TreeSet<String> cleanedUniqueQueries = FileStemmer.uniqueStems(line);
 

@@ -430,6 +430,7 @@ public class InvertedIndex {
 		/** Compares the score + the count
 		 * 
 		 */
+		@Override
 		public int compareTo(FileResult other) {
 			int scoreCompare = Double.compare(other.score, this.score);
 			if (scoreCompare != 0) {

@@ -35,7 +35,7 @@ public class WorkQueue {
 	private static final Logger log = LogManager.getLogger();
 
 	/** Added two new members, one for managing pending task*/
-	private final Object lock; // TODO Keep it this way
+	private final Object pendingLock;
 
 	/** One for tracking pending tasks(unfinished)*/
 	private int pending;
@@ -59,7 +59,7 @@ public class WorkQueue {
 		this.tasks = new LinkedList<Runnable>();
 		this.workers = new Worker[threads];
 		this.shutdown = false;
-		this.lock = new Object(); // TODO rename to pendingLock
+		this.pendingLock = new Object();
 		this.pending = 0;
 
 
@@ -88,7 +88,7 @@ public class WorkQueue {
 	 * To keep track of pending tasks, increment up
 	 */
 	private void incrementPending() {
-		synchronized(lock) {
+		synchronized(pendingLock) {
 			pending++;
 		}
 	}
@@ -99,10 +99,10 @@ public class WorkQueue {
 	 * 
 	 */
 	private void decrementPending() {
-		synchronized(lock) {
+		synchronized(pendingLock) {
 			pending--;
 			if(pending <= 0) {
-				lock.notifyAll();
+				pendingLock.notifyAll();
 			}
 		}
 	}
@@ -112,10 +112,10 @@ public class WorkQueue {
 	 * worker threads so that the work queue can continue to be used.
 	 */
 	public void finish() {
-		synchronized(lock) {
+		synchronized(pendingLock) {
 			while (pending > 0) {
 				try {
-					lock.wait();
+					pendingLock.wait();
 				} catch (InterruptedException e) {
 					System.err.println("Warning: work queue is interrupted while waiting");
 					log.catching(Level.WARN, e);

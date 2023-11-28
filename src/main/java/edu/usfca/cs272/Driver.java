@@ -30,7 +30,7 @@ public class Driver {
 		boolean isPartial = parser.hasFlag("-partial");
 
 		/** ThreadSafe QueryProcessor object for search*/
-		ThreadSafeQueryProcessor processorTS = null;
+		//ThreadSafeQueryProcessor processorTS = null;
 
 		/** QueryProcessor object for search*/
 		QueryProcessor processor = null;

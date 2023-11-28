@@ -135,13 +135,13 @@ public class InvertedIndex {
 	 * @param otherIndex The other InvertedIndex to merge with this one.
 	 */
 	public void addAll(InvertedIndex otherIndex) {
-		for (String word : otherIndex.invertedIndex.keySet()) {
-			for (String location : otherIndex.invertedIndex.get(word).keySet()) {
-				for (int position : otherIndex.invertedIndex.get(word).get(location)) {
-					add(word, location, position);
-				}
-			}
-		}
+	    for (String word : otherIndex.getWords()) {
+	        for (String location : otherIndex.getLocations(word)) {
+	            for (int position : otherIndex.getPositions(word, location)) {
+	                add(word, location, position);
+	            }
+	        }
+	    }
 	}
 
 	/**

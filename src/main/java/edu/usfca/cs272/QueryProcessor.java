@@ -158,12 +158,12 @@ public class QueryProcessor {
 		String query = String.join(" ", cleanedUniqueQueries);
 
 		if (!cleanedUniqueQueries.isEmpty() && !resultsMap.containsKey(query)) {
-			List<InvertedIndex.FileResult> sortedResults = isPartial ? index.searchPartial(cleanedUniqueQueries)
-					: index.searchExact(cleanedUniqueQueries);
+			List<InvertedIndex.FileResult> sortedResults = index.search(cleanedUniqueQueries, isPartial);
 
 			resultsMap.put(query, sortedResults);
 		}
 	}
+
 
 	/**
 	 * Writes the results map to the specified output file in JSON format.

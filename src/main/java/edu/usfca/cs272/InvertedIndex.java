@@ -106,6 +106,28 @@ public class InvertedIndex {
 		}
 	}
 
+	// Complex Attempt: 
+	//	/**
+	//	 * Adds all the entries from another inverted index into the original inverted index
+	//	 * Same for wordCount
+	//	 * 
+	//	 * @param otherIndex The other InvertedIndex to merge with this one.
+	//	 */
+	//	public void addAll(InvertedIndex otherIndex) {
+	//		for (String word : otherIndex.invertedIndex.keySet()) {
+	//			invertedIndex.putIfAbsent(word, new TreeMap<>());
+	//			for (String location : otherIndex.invertedIndex.get(word).keySet()) {
+	//				invertedIndex.get(word).putIfAbsent(location, new TreeSet<>());
+	//				invertedIndex.get(word).get(location).addAll(otherIndex.invertedIndex.get(word).get(location));
+	//			}
+	//		}
+	//
+	//		for (Map.Entry<String, Long> entry : otherIndex.wordCountMap.entrySet()) {
+	//			wordCountMap.put(entry.getKey(), wordCountMap.getOrDefault(entry.getKey(), 0L) + entry.getValue());
+	//		}
+	//	}
+
+	// Simple Attempt:
 	/**
 	 * Adds all the entries from another inverted index into the original inverted index
 	 * Same for wordCount
@@ -113,20 +135,12 @@ public class InvertedIndex {
 	 * @param otherIndex The other InvertedIndex to merge with this one.
 	 */
 	public void addAll(InvertedIndex otherIndex) {
-		// TODO Not the most simple of implementations, need a comparison point for more complex code
-		// TODO Think about a 4-line approach that reuses your public methods as much as possible
-		// TODO Need a release, don't necessarily need to keep it in the code
-		
 		for (String word : otherIndex.invertedIndex.keySet()) {
-			invertedIndex.putIfAbsent(word, new TreeMap<>());
 			for (String location : otherIndex.invertedIndex.get(word).keySet()) {
-				invertedIndex.get(word).putIfAbsent(location, new TreeSet<>());
-				invertedIndex.get(word).get(location).addAll(otherIndex.invertedIndex.get(word).get(location));
+				for (int position : otherIndex.invertedIndex.get(word).get(location)) {
+					add(word, location, position);
+				}
 			}
-		}
-
-		for (Map.Entry<String, Long> entry : otherIndex.wordCountMap.entrySet()) {
-			wordCountMap.put(entry.getKey(), wordCountMap.getOrDefault(entry.getKey(), 0L) + entry.getValue());
 		}
 	}
 
@@ -261,16 +275,19 @@ public class InvertedIndex {
 			fr.incrementCount(count);
 		}
 	}
-	
-	/*
-	 * TODO 
-	 * Make this a general search method...
+
+
+	/**Convenience method... 
+	 * Basic search that determines exact or partial search
 	 * 
-	 * public list search(queries, boolean)
-	 * 
-	 * List<InvertedIndex.FileResult> sortedResults = isPartial ? index.searchPartial(cleanedUniqueQueries)
-					: index.searchExact(cleanedUniqueQueries);
+	 * @param cleanedUniqueQueries is the singular query being processed
+	 * @param isPartial determines partial or exact search
+	 * @return a List of file result meta data for the query being searched
 	 */
+	public List<InvertedIndex.FileResult> search(Set<String> cleanedUniqueQueries, boolean isPartial) {
+		return isPartial ? searchPartial(cleanedUniqueQueries)
+				: searchExact(cleanedUniqueQueries);
+	}
 
 	/**
 	 * Performs an exact search for cleaned and unique queries and returns a sorted
@@ -279,7 +296,7 @@ public class InvertedIndex {
 	 * @param cleanedUniqueQueries the cleaned and unique queries
 	 * @return a sorted list of FileResult objects
 	 */
-	public List<FileResult> searchExact(TreeSet<String> cleanedUniqueQueries) { // TODO Set<String>
+	public List<FileResult> searchExact(Set<String> cleanedUniqueQueries) {
 		HashMap<String, FileResult> lookupMap = new HashMap<>();
 		List<FileResult> resultList = new ArrayList<>();
 
@@ -302,7 +319,7 @@ public class InvertedIndex {
 	 * @param cleanedUniqueQueries the cleaned and unique queries
 	 * @return a sorted list of FileResult objects
 	 */
-	public List<FileResult> searchPartial(TreeSet<String> cleanedUniqueQueries) { // TODO Set<String>
+	public List<FileResult> searchPartial(Set<String> cleanedUniqueQueries) {
 		HashMap<String, FileResult> lookupMap = new HashMap<>();
 		List<FileResult> resultList = new ArrayList<>();
 

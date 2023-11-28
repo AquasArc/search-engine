@@ -210,11 +210,11 @@ public class ThreadSafeInvertedIndex extends InvertedIndex {
 		}
 	}
 
-	@Override
 	/** To string method... 
 	 * 
 	 * @return toString method
 	 */
+	@Override
 	public String toString() {
 		lock.readLock().lock();
 		try {
@@ -230,6 +230,7 @@ public class ThreadSafeInvertedIndex extends InvertedIndex {
 	 * 
 	 * @param indexPath the path that is being written to 
 	 */
+	@Override
 	public void writeIndex(Path indexPath) throws IOException {
 		lock.readLock().lock();
 		try {
@@ -263,7 +264,7 @@ public class ThreadSafeInvertedIndex extends InvertedIndex {
 	 * @return a sorted list of FileResult objects
 	 */
 	@Override
-	public List<FileResult> searchExact(TreeSet<String> cleanedUniqueQueries) {
+	public List<FileResult> searchExact(Set<String> cleanedUniqueQueries) {
 		lock.readLock().lock();
 		try {
 			return super.searchExact(cleanedUniqueQueries);
@@ -280,7 +281,7 @@ public class ThreadSafeInvertedIndex extends InvertedIndex {
 	 * @return a sorted list of FileResult objects
 	 */
 	@Override
-	public List<FileResult> searchPartial(TreeSet<String> cleanedUniqueQueries) {
+	public List<FileResult> searchPartial(Set<String> cleanedUniqueQueries) {
 		lock.readLock().lock();
 		try {
 			return super.searchPartial(cleanedUniqueQueries);

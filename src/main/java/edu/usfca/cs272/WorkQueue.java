@@ -87,7 +87,7 @@ public class WorkQueue {
 	/**
 	 * To keep track of pending tasks, increment up
 	 */
-	private synchronized void incrementPending() {
+	private void incrementPending() {
 		synchronized(lock) {
 			pending++;
 		}

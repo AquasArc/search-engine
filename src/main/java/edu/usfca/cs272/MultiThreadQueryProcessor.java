@@ -20,13 +20,15 @@ import java.util.TreeSet;
 public class MultiThreadQueryProcessor {
 
 	/** The InvertedIndex class... */
-	private final InvertedIndex index;
+	private final InvertedIndex index; // TODO ThreadSafeInvertedIndex
 
 	/** To determine partial/exact search */
 	private final boolean isPartial;
 
 	/** The data structure for results from query searches */
 	private final TreeMap<String, List<InvertedIndex.FileResult>> resultsMap;
+	
+	// TODO Make this a member: WorkQueue workQueue
 
 
 	/**Constructor to establish the values for index, isPartial, and resultsMap
@@ -112,6 +114,21 @@ public class MultiThreadQueryProcessor {
 
 			String query = String.join(" ", cleanedUniqueQueries);
 
+			/* TODO 
+			synchronized (resultsMap) {
+				if (cleanedUniqueQueries.isEmpty() || resultsMap.containsKey(query)) {
+					return;
+				}
+			}
+			
+			var local = index.search(cleanedUniqueQueries, isPartial);
+
+			synchronized (resultsMap) {
+				resultsMap.put(query, local);
+			}
+			*/
+			
+			
 			if (!cleanedUniqueQueries.isEmpty() && !resultsMap.containsKey(query)) {
 				var local = isPartial ? index.searchPartial(cleanedUniqueQueries)
 						: index.searchExact(cleanedUniqueQueries);

@@ -5,7 +5,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
 
-
+// TODO Remove this, make your multithreaded version also thread-safe
 /**
  * Represents a thread safe version of the query processor
  * 

@@ -135,6 +135,28 @@ public class InvertedIndex {
 	 * @param otherIndex The other InvertedIndex to merge with this one.
 	 */
 	public void addAll(InvertedIndex otherIndex) {
+		// TODO Don't get the same data multiple times
+		// TODO Reuse memory and avoid looping
+		
+		/*
+		 * TODO if the word exists in the otherIndex, but not in "thisIndex",
+		 * we do NOT need to loop!
+		 * 
+
+		for (var otherEntry : otherIndex.invertedIndex.entrySet()) {
+			String otherWord = otherEntry.getKey();
+			var otherMap = otherEntry.getValue();
+			var thisMap = this.invertedIndex.get(otherWord);
+			
+			if (thisMap == null) {
+				this.invertedIndex.put(otherWord, otherMap);
+			}
+			else {
+				loop...
+			}
+		}
+		*/
+		
 	    for (String word : otherIndex.getWords()) {
 	        for (String location : otherIndex.getLocations(word)) {
 	            for (int position : otherIndex.getPositions(word, location)) {

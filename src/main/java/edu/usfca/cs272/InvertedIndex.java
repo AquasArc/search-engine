@@ -115,7 +115,9 @@ public class InvertedIndex {
 		 */
 	public void addAll(InvertedIndex otherIndex) {
 //      ThreadBenchTest: SlowRuntimeTests -> testIndexOneMany() 
-//      Avg Speedup: x 2.5682
+//      Avg Speedup: x 3.210526
+//      ThreadBenchTest: SlowRuntimeTests -> testSearchOneMany() 
+//      Avg Speedup: x 3.194774
 		for (var otherEntry : otherIndex.invertedIndex.entrySet()) {
 			String otherWord = otherEntry.getKey();
 			var otherMap = otherEntry.getValue();
@@ -124,11 +126,22 @@ public class InvertedIndex {
 			if (thisMap == null) {
 				this.invertedIndex.put(otherWord, otherMap);
 			} else {
-				for (String location : otherMap.keySet()) {
-					for (int position : otherMap.get(location)) {
-						add(otherWord, location, position);
-					}
-				}
+			    for (var nextEntry : otherMap.entrySet()) {			    	
+			        String location = nextEntry.getKey();
+			        var positions = nextEntry.getValue();
+			        
+			        if (!thisMap.containsKey(location)) {
+			            thisMap.put(location, new TreeSet<>(positions));
+			        } else {
+			            var existingPositions = thisMap.get(location);
+			            
+			            if (!existingPositions.containsAll(positions)) {
+			                for (int position : positions) {
+			                    add(otherWord, location, position);
+			                }
+			            }
+			        }
+			    }
 			}
 		}
 		this.wordCountMap.putAll(otherIndex.wordCountMap);

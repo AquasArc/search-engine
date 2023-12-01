@@ -162,16 +162,16 @@ public class MultiThreadQueryProcessor implements IQueryProcessor{
 		}
 		workQueue.finish();
 	}
-
+	
 
 	/**The query processing logic. This processes one query. Essentially one line.
 	 * 
 	 * @param line takes in one line of query and adds the result of searching said line into the results map
 	 */
-	@Override
 	public void processQuery(String line) {
 		workQueue.execute(new Task((line)));
 	}
+
 
 	/**
 	 * Writes the results map to the specified output file in JSON format.

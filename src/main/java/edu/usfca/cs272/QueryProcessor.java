@@ -15,8 +15,6 @@ import java.util.TreeSet;
 import opennlp.tools.stemmer.Stemmer;
 import opennlp.tools.stemmer.snowball.SnowballStemmer;
 
-// TODO Create a interface that both implement
-
 /**
  * Handles query functionality. Both partial/exact
  * 

@@ -149,7 +149,6 @@ public class MultiThreadQueryProcessor implements IQueryProcessor{
 	 * given, we split to either search exact or partial
 	 * 
 	 * @param queryPath The given path that holds the address to file
-	 * @param workQueue The workqueue class that will be used to execute task...
 	 * @throws IOException throws io exception if issues hit
 	 */
 	public void processQuery(Path queryPath) throws IOException {	
@@ -201,7 +200,6 @@ public class MultiThreadQueryProcessor implements IQueryProcessor{
 		 * constructor declaration
 		 * 
 		 * @param line  the line to parse from
-		 * @param isPartial the boolean to see if we are doing exact search or not 
 		 *
 		 */
 		public Task(String line) {

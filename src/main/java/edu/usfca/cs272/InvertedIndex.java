@@ -134,11 +134,8 @@ public class InvertedIndex {
 			            thisMap.put(location, new TreeSet<>(positions));
 			        } else {
 			            var existingPositions = thisMap.get(location);
-			            
-			            if (!existingPositions.containsAll(positions)) {
-			                for (int position : positions) {
-			                    add(otherWord, location, position);
-			                }
+			            for (int position : positions) {
+			                add(otherWord, location, position);
 			            }
 			        }
 			    }

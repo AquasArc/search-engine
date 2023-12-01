@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
-
 
 
 /**ThreadSafeInvertedIndex class extends the InvertedIndex class with threadsafe methods 

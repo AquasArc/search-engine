@@ -4,7 +4,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -17,10 +21,10 @@ import java.util.TreeSet;
  * @author CS 272 Software Development (University of San Francisco)
  * @version Fall 2023
  */
-public class MultiThreadQueryProcessor {
+public class MultiThreadQueryProcessor implements IQueryProcessor{
 
 	/** The InvertedIndex class... */
-	private final InvertedIndex index; // TODO ThreadSafeInvertedIndex
+	private final ThreadSafeInvertedIndex index;
 
 	/** To determine partial/exact search */
 	private final boolean isPartial;
@@ -28,18 +32,113 @@ public class MultiThreadQueryProcessor {
 	/** The data structure for results from query searches */
 	private final TreeMap<String, List<InvertedIndex.FileResult>> resultsMap;
 	
-	// TODO Make this a member: WorkQueue workQueue
+	/** Creating a workQueue */
+	private final WorkQueue workQueue;
 
 
 	/**Constructor to establish the values for index, isPartial, and resultsMap
 	 * 
 	 * @param index is the threadSafeInvertedIndex with threadsafe methods with locks
 	 * @param isPartial is a boolean value to determine exact or partial search...
+	 * @param workQueue is for thread usages...
 	 */
-	public MultiThreadQueryProcessor(ThreadSafeInvertedIndex index, boolean isPartial) {
+	public MultiThreadQueryProcessor(ThreadSafeInvertedIndex index, boolean isPartial, WorkQueue workQueue) {
 		this.index = index;
 		this.isPartial = isPartial;
 		this.resultsMap = new TreeMap<String, List<InvertedIndex.FileResult>>();
+		this.workQueue = workQueue;
+	}
+	
+
+	/**Returns true or false depending on if the query exists in the results map
+	 * 
+	 * @param query string input of a query
+	 * @return true or false using containsKey...
+	 */
+	@Override
+	public boolean hasQuery(String query) {
+	    TreeSet<String> stemmedQueries = FileStemmer.uniqueStems(query);
+	    String processedQuery = String.join(" ", stemmedQueries);
+
+	    synchronized (resultsMap) {
+	        return resultsMap.containsKey(processedQuery);
+	    }
+	}
+
+
+	/**
+	 * Checks if a specific query has any associated FileResult objects.
+	 *
+	 * @param query The query to check.
+	 * @return True if the query has one or more FileResult objects, false otherwise.
+	 */
+	@Override
+	public boolean hasFileResults(String query) {
+	    TreeSet<String> stemmedQueries = FileStemmer.uniqueStems(query);
+	    String processedQuery = String.join(" ", stemmedQueries);
+
+	    synchronized (resultsMap) {
+	        return resultsMap.containsKey(processedQuery) && !resultsMap.get(processedQuery).isEmpty();
+	    }
+	}
+
+
+	/**Calculates the number of FileResults for a given query
+	 * 
+	 * @param query a string containing a line of queries
+	 * @return number of file results for a query, otherwise, 0 if none..
+	 */
+	@Override
+	public int numResultsForQuery(String query) {
+	    TreeSet<String> stemmedQueries = FileStemmer.uniqueStems(query);
+	    String processedQuery = String.join(" ", stemmedQueries);
+
+	    synchronized (resultsMap) {
+	        return resultsMap.containsKey(processedQuery) ? resultsMap.get(processedQuery).size() : 0;
+	    }
+	}
+
+
+	/**Returns an integer number of total queries that was processed
+	 * 
+	 * @return the size of the resultsMap
+	 */
+	@Override
+	public int numQueriesProcessed() {
+	    synchronized (resultsMap) {
+	        return resultsMap.size();
+	    }
+	}
+
+
+	/**Retrieves an unmodifiable set of all the queries processed.
+	 *
+	 * @return An unmodifiable set of query strings.
+	 */
+	@Override
+	public Set<String> getQueries() {
+	    synchronized (resultsMap) {
+	        return Collections.unmodifiableSet(new HashSet<>(resultsMap.keySet()));
+	    }
+	}
+
+	/**Retrieves the List of meta data associated to a query that has been processed
+	 * 
+	 * @param query input to search from the results map
+	 * @return either a empty list if the query does not exist, or a unmodifiableList 
+	 *  of the metadata associated to the processed query
+	 */
+	@Override
+	public List<InvertedIndex.FileResult> getResultsForQuery(String query) {
+	    TreeSet<String> stemmedQueries = FileStemmer.uniqueStems(query);
+	    String processedQuery = String.join(" ", stemmedQueries);
+
+	        if (hasQuery(processedQuery)) {
+	        	synchronized(resultsMap) {
+	        		return Collections.unmodifiableList(new ArrayList<>(resultsMap.get(processedQuery)));
+	        	}
+	        }
+	    return Collections.emptyList();
 	}
 
 	/**
@@ -53,15 +152,25 @@ public class MultiThreadQueryProcessor {
 	 * @param workQueue The workqueue class that will be used to execute task...
 	 * @throws IOException throws io exception if issues hit
 	 */
-	public void processQuery(Path queryPath, WorkQueue workQueue) throws IOException {	
+	public void processQuery(Path queryPath) throws IOException {	
 		try (BufferedReader reader = Files.newBufferedReader(queryPath)) {
 			String line;
 
 			while ((line = reader.readLine()) != null) {
-				workQueue.execute(new Task(line, isPartial));
+				processQuery(line);
 			}
 		}
 		workQueue.finish();
+	}
+
+
+	/**The query processing logic. This processes one query. Essentially one line.
+	 * 
+	 * @param line takes in one line of query and adds the result of searching said line into the results map
+	 */
+	@Override
+	public void processQuery(String line) {
+		workQueue.execute(new Task((line)));
 	}
 
 	/**
@@ -76,6 +185,7 @@ public class MultiThreadQueryProcessor {
 		}
 	}
 
+
 	/**Task class for processing a query of search requests
 	 *
 	 */
@@ -86,10 +196,6 @@ public class MultiThreadQueryProcessor {
 		 */
 		private final String line;
 
-		/**
-		 * boolean to determine search type
-		 */
-		private final boolean isPartial;
 
 		/**
 		 * constructor declaration
@@ -98,9 +204,8 @@ public class MultiThreadQueryProcessor {
 		 * @param isPartial the boolean to see if we are doing exact search or not 
 		 *
 		 */
-		public Task(String line, boolean isPartial) {
+		public Task(String line) {
 			this.line = line;
-			this.isPartial = isPartial;
 
 		}
 
@@ -114,7 +219,6 @@ public class MultiThreadQueryProcessor {
 
 			String query = String.join(" ", cleanedUniqueQueries);
 
-			/* TODO 
 			synchronized (resultsMap) {
 				if (cleanedUniqueQueries.isEmpty() || resultsMap.containsKey(query)) {
 					return;
@@ -125,17 +229,6 @@ public class MultiThreadQueryProcessor {
 
 			synchronized (resultsMap) {
 				resultsMap.put(query, local);
-			}
-			*/
-			
-			
-			if (!cleanedUniqueQueries.isEmpty() && !resultsMap.containsKey(query)) {
-				var local = isPartial ? index.searchPartial(cleanedUniqueQueries)
-						: index.searchExact(cleanedUniqueQueries);
-
-				synchronized (resultsMap) {
-					resultsMap.put(query, local);
-				}
 			}
 		}
 	}

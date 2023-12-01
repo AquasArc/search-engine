@@ -106,65 +106,42 @@ public class InvertedIndex {
 		}
 	}
 
-	// Complex Attempt: 
-	//	/**
-	//	 * Adds all the entries from another inverted index into the original inverted index
-	//	 * Same for wordCount
-	//	 * 
-	//	 * @param otherIndex The other InvertedIndex to merge with this one.
-	//	 */
-	//	public void addAll(InvertedIndex otherIndex) {
-	//		for (String word : otherIndex.invertedIndex.keySet()) {
-	//			invertedIndex.putIfAbsent(word, new TreeMap<>());
-	//			for (String location : otherIndex.invertedIndex.get(word).keySet()) {
-	//				invertedIndex.get(word).putIfAbsent(location, new TreeSet<>());
-	//				invertedIndex.get(word).get(location).addAll(otherIndex.invertedIndex.get(word).get(location));
-	//			}
-	//		}
-	//
-	//		for (Map.Entry<String, Long> entry : otherIndex.wordCountMap.entrySet()) {
-	//			wordCountMap.put(entry.getKey(), wordCountMap.getOrDefault(entry.getKey(), 0L) + entry.getValue());
-	//		}
-	//	}
-
 	// Simple Attempt:
-	/**
-	 * Adds all the entries from another inverted index into the original inverted index
-	 * Same for wordCount
-	 * 
-	 * @param otherIndex The other InvertedIndex to merge with this one.
-	 */
-	public void addAll(InvertedIndex otherIndex) {
-		// TODO Don't get the same data multiple times
-		// TODO Reuse memory and avoid looping
-		
-		/*
-		 * TODO if the word exists in the otherIndex, but not in "thisIndex",
-		 * we do NOT need to loop!
+		/**
+		 * Adds all the entries from another inverted index into the original inverted index
+		 * Same for wordCount
 		 * 
-
+		 * @param otherIndex The other InvertedIndex to merge with this one.
+		 */
+	public void addAll(InvertedIndex otherIndex) {
+//      ThreadBenchTest: SlowRuntimeTests -> testIndexOneMany() 
+//      Avg Speedup: x 2.5682
 		for (var otherEntry : otherIndex.invertedIndex.entrySet()) {
 			String otherWord = otherEntry.getKey();
 			var otherMap = otherEntry.getValue();
 			var thisMap = this.invertedIndex.get(otherWord);
-			
+
 			if (thisMap == null) {
 				this.invertedIndex.put(otherWord, otherMap);
-			}
-			else {
-				loop...
+			} else {
+				for (String location : otherMap.keySet()) {
+					for (int position : otherMap.get(location)) {
+						add(otherWord, location, position);
+					}
+				}
 			}
 		}
-		*/
-		
-	    for (String word : otherIndex.getWords()) {
-	        for (String location : otherIndex.getLocations(word)) {
-	            for (int position : otherIndex.getPositions(word, location)) {
-	                add(word, location, position);
-	            }
-	        }
-	    }
+		this.wordCountMap.putAll(otherIndex.wordCountMap);
 	}
+	
+//  Utilizing putAll methods...
+//	public void addAll(InvertedIndex otherIndex) {
+//      ThreadBenchTest: SlowRuntimeTests -> testIndexOneMany() 
+//      Avg Speedup: x 3.4156
+//	    this.invertedIndex.putAll(otherIndex.invertedIndex);
+//		this.wordCountMap.putAll(otherIndex.wordCountMap);
+//	}
+
 
 	/**
 	 * Checks if the index contains a word.

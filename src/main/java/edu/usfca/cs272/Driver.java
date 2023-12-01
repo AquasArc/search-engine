@@ -29,11 +29,8 @@ public class Driver {
 		/** Boolean flag to determine exact/partial search*/
 		boolean isPartial = parser.hasFlag("-partial");
 
-		/** ThreadSafe QueryProcessor object for search*/
-		//ThreadSafeQueryProcessor processorTS = null;
-
 		/** QueryProcessor object for search*/
-		QueryProcessor processor = null;
+		IQueryProcessor processor = null;
 
 		MultiThreadQueryProcessor multiProcessor = null;
 
@@ -41,8 +38,7 @@ public class Driver {
 		if (parser.hasFlag("-threads")) {
 			index = new ThreadSafeInvertedIndex();
 			workQueue = new WorkQueue(parser.getInteger("-threads", 5));
-			//processorTS = new ThreadSafeQueryProcessor(index, isPartial);
-			multiProcessor = new MultiThreadQueryProcessor((ThreadSafeInvertedIndex) index, isPartial);
+			multiProcessor = new MultiThreadQueryProcessor((ThreadSafeInvertedIndex) index, isPartial, workQueue);
 		} else {
 			index = new InvertedIndex();
 			processor = new QueryProcessor(index, isPartial);
@@ -81,7 +77,7 @@ public class Driver {
 		if (parser.hasFlag("-query")) {
 			try {
 				if (parser.hasFlag("-threads")) {
-					multiProcessor.processQuery(parser.getPath("-query"), workQueue);
+					multiProcessor.processQuery(parser.getPath("-query"));
 				} else {
 					processor.processQuery(parser.getPath("-query"));
 				}

@@ -24,7 +24,7 @@ import opennlp.tools.stemmer.snowball.SnowballStemmer;
  * @author CS 272 Software Development (University of San Francisco)
  * @version Fall 2023
  */
-public class QueryProcessor {
+public class QueryProcessor implements IQueryProcessor {
 
 	/** The InvertedIndex class... */
 	private final InvertedIndex index;
@@ -66,6 +66,7 @@ public class QueryProcessor {
 	 * @param query string input of a query
 	 * @return true or false using containsKey...
 	 */
+	@Override
 	public boolean hasQuery(String query) {
 		TreeSet<String> stemmedQueries = FileStemmer.uniqueStems(query, stemmer);
 		String processedQuery = String.join(" ", stemmedQueries);
@@ -78,6 +79,7 @@ public class QueryProcessor {
 	 * @param query The query to check.
 	 * @return True if the query has one or more FileResult objects, false otherwise.
 	 */
+	@Override
 	public boolean hasFileResults(String query) {
 		TreeSet<String> stemmedQueries = FileStemmer.uniqueStems(query, stemmer);
 		String processedQuery = String.join(" ", stemmedQueries);
@@ -89,6 +91,7 @@ public class QueryProcessor {
 	 * @param query a string containing a line of queries
 	 * @return number of file results for a query, otherwise, 0 if none..
 	 */
+	@Override
 	public int numResultsForQuery(String query) {
 		TreeSet<String> stemmedQueries = FileStemmer.uniqueStems(query, stemmer);
 		String processedQuery = String.join(" ", stemmedQueries);
@@ -99,6 +102,7 @@ public class QueryProcessor {
 	 * 
 	 * @return the size of the resultsMap
 	 */
+	@Override
 	public int numQueriesProcessed() {
 		return resultsMap.size();
 	}
@@ -107,6 +111,7 @@ public class QueryProcessor {
 	 *
 	 * @return An unmodifiable set of query strings.
 	 */
+	@Override
 	public Set<String> getQueries() {
 		return Collections.unmodifiableSet(resultsMap.keySet());
 	}
@@ -117,6 +122,7 @@ public class QueryProcessor {
 	 * @return either a empty list if the query does not exist, or a unmodifiableList 
 	 *  of the metadata associated to the processed query
 	 */
+	@Override
 	public List<InvertedIndex.FileResult> getResultsForQuery(String query) {
 		TreeSet<String> stemmedQueries = FileStemmer.uniqueStems(query, stemmer);
 		String processedQuery = String.join(" ", stemmedQueries);
@@ -138,6 +144,7 @@ public class QueryProcessor {
 	 * @param queryPath The given path that holds the address to file
 	 * @throws IOException throws io exception if issues hit
 	 */
+	@Override
 	public void processQuery(Path queryPath) throws IOException {	
 		try (BufferedReader reader = Files.newBufferedReader(queryPath)) {
 			String line;
@@ -153,6 +160,7 @@ public class QueryProcessor {
 	 * 
 	 * @param line takes in one line of query and adds the result of searching said line into the results map
 	 */
+	@Override
 	public void processQuery(String line) {
 		TreeSet<String> cleanedUniqueQueries = FileStemmer.uniqueStems(line, stemmer);
 
@@ -172,6 +180,7 @@ public class QueryProcessor {
 	 * @param outputPath the path to the output file
 	 * @throws IOException if an I/O error occurs
 	 */
+	@Override
 	public void writeResults(Path outputPath) throws IOException {
 		JsonWriter.writeResultsToFile(resultsMap, outputPath);
 	}

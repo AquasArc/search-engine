@@ -8,7 +8,7 @@ import java.util.Set;
 /**An interface for my multithread and normal search logic
  * 
  */
-public interface IQueryProcessor {
+public interface IQueryProcessor { // TODO Better name
 
 	/**Returns true or false depending on if the query exists in the results map
 	 * 

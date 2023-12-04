@@ -118,9 +118,12 @@ public class MultiThreadQueryProcessor implements IQueryProcessor{
 	@Override
 	public Set<String> getQueries() {
 	    synchronized (resultsMap) {
+	    	// TODO Why is there a copy here?
 	        return Collections.unmodifiableSet(new HashSet<>(resultsMap.keySet()));
 	    }
 	}
+	
+	// TODO Fix indentation
 
 	/**Retrieves the List of meta data associated to a query that has been processed
 	 * 
@@ -133,8 +136,10 @@ public class MultiThreadQueryProcessor implements IQueryProcessor{
 	    TreeSet<String> stemmedQueries = FileStemmer.uniqueStems(query);
 	    String processedQuery = String.join(" ", stemmedQueries);
 
-	        if (hasQuery(processedQuery)) {
+	    // TODO Sync around the if statement
+	        if (hasQuery(processedQuery)) { // TODO Directly access data structure
 	        	synchronized(resultsMap) {
+	        		// TODO Remove copy
 	        		return Collections.unmodifiableList(new ArrayList<>(resultsMap.get(processedQuery)));
 	        	}
 	        }
@@ -159,6 +164,8 @@ public class MultiThreadQueryProcessor implements IQueryProcessor{
 				processQuery(line);
 			}
 		}
+		
+		// TODO IQueryProcessor.super.processQuery(queryPath);
 		workQueue.finish();
 	}
 	

@@ -3,6 +3,15 @@ package edu.usfca.cs272;
 import java.io.IOException;
 import java.nio.file.Path;
 
+/*
+ * TODO 
+Description	Resource	Path	Location	Type
+The method processQuery(Path) of type MultiThreadQueryProcessor should be tagged with @Override since it actually overrides a superinterface method	MultiThreadQueryProcessor.java	/SearchEngine/src/main/java/edu/usfca/cs272	line 154	Java Problem
+The method processQuery(String) of type MultiThreadQueryProcessor should be tagged with @Override since it actually overrides a superinterface method	MultiThreadQueryProcessor.java	/SearchEngine/src/main/java/edu/usfca/cs272	line 170	Java Problem
+The method writeResults(Path) of type MultiThreadQueryProcessor should be tagged with @Override since it actually overrides a superinterface method	MultiThreadQueryProcessor.java	/SearchEngine/src/main/java/edu/usfca/cs272	line 181	Java Problem
+The value of the local variable existingPositions is not used	InvertedIndex.java	/SearchEngine/src/main/java/edu/usfca/cs272	line 136	Java Problem
+
+ */
 
 /**
  * Class responsible for running this project based on the provided command-line
@@ -38,6 +47,7 @@ public class Driver {
 		if (parser.hasFlag("-threads")) {
 			index = new ThreadSafeInvertedIndex();
 			workQueue = new WorkQueue(parser.getInteger("-threads", 5));
+			// TODO Need to avoid the downcast
 			multiProcessor = new MultiThreadQueryProcessor((ThreadSafeInvertedIndex) index, isPartial, workQueue);
 		} else {
 			index = new InvertedIndex();
@@ -48,6 +58,7 @@ public class Driver {
 		if (parser.hasFlag("-text")) {
 			try {
 				if (parser.hasFlag("-threads")) {
+				// TODO Need to avoid the downcast
 					MultiThreadInvertedIndexProcessor.processText(parser.getPath("-text"), (ThreadSafeInvertedIndex) index, workQueue);
 				} else {
 					InvertedIndexProcessor.processText(parser.getPath("-text"), index);
@@ -57,7 +68,15 @@ public class Driver {
 				System.out.println("Error processing text: " + e.getMessage());
 			}
 		}
+		
+		// TODO if (parser.hasFlag("-query")) {
 
+		/* TODO 
+		if (workQueue != null) {
+			workQueue.shutdown();
+		}
+		*/
+		
 		if (parser.hasFlag("-counts")) {
 			try {
 				index.writeCounts(parser.getPath("-counts", Path.of("counts.json")));
@@ -76,6 +95,7 @@ public class Driver {
 
 		if (parser.hasFlag("-query")) {
 			try {
+				// TODO Will be able to reduce duplicate logic
 				if (parser.hasFlag("-threads")) {
 					multiProcessor.processQuery(parser.getPath("-query"));
 				} else {

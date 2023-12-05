@@ -126,14 +126,17 @@ public class InvertedIndex {
 			if (thisMap == null) {
 				this.invertedIndex.put(otherWord, otherMap);
 			} else {
-			    for (var nextEntry : otherMap.entrySet()) {			    	
+			    for (var nextEntry : otherMap.entrySet()) {
 			        String location = nextEntry.getKey();
 			        var positions = nextEntry.getValue();
 			        
 			        if (!thisMap.containsKey(location)) {
-			            thisMap.put(location, new TreeSet<>(positions));
+			            thisMap.put(location, new TreeSet<>(positions)); // TODO No copy needed
+			            // TODO thisMap.put(location, positions);
 			        } else {
 			            var existingPositions = thisMap.get(location);
+			            // TODO existingPositions.addAll(positions);
+			            
 			            for (int position : positions) {
 			                add(otherWord, location, position);
 			            }
@@ -141,8 +144,12 @@ public class InvertedIndex {
 			    }
 			}
 		}
+		
+		// TODO wordCountMap needs a loop in case counts exist in both places
 		this.wordCountMap.putAll(otherIndex.wordCountMap);
 	}
+	
+	// TODO Cleanup
 	
 //  Utilizing putAll methods...
 //	public void addAll(InvertedIndex otherIndex) {
@@ -275,7 +282,7 @@ public class InvertedIndex {
 		for (var entry : set) {
 			String location = entry.getKey();
 			int count = entry.getValue().size();
-			FileResult fr = lookupMap.get(location);
+			FileResult fr = lookupMap.get(location); // TODO Better name
 			if (fr == null) {
 				fr = new FileResult(location);
 				lookupMap.put(location, fr);

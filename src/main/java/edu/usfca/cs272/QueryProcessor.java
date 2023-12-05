@@ -131,7 +131,7 @@ public class QueryProcessor implements IQueryProcessor {
 		return Collections.emptyList();
 	}
 
-
+// TODO Remove processQuery from here, put it as a default implementation in the interface instead
 	/**
 	 * ProcessQuery is the start of the search exact/partial functionality. It first
 	 * creates a list of strings that will hold all the unique queries Then using an

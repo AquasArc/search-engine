@@ -255,7 +255,6 @@ public class MultiReaderLock {
 					activeWriter = null;
 					lock.notifyAll();
 				}
-		
 			}
 		}
 	}

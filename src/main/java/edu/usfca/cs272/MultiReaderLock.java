@@ -244,13 +244,13 @@ public class MultiReaderLock {
 				if (writers <= 0) {
 					throw new IllegalStateException();
 				}
-			
+
 				if (!isActiveWriter()) {
 					throw new ConcurrentModificationException();
 				}
-			
+
 				writers--;
-			
+
 				if (writers == 0) {
 					activeWriter = null;
 					lock.notifyAll();

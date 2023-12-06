@@ -2,9 +2,7 @@ package edu.usfca.cs272;
 
 import static opennlp.tools.stemmer.snowball.SnowballStemmer.ALGORITHM.ENGLISH;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
@@ -22,7 +20,7 @@ import opennlp.tools.stemmer.snowball.SnowballStemmer;
  * @author CS 272 Software Development (University of San Francisco)
  * @version Fall 2023
  */
-public class QueryProcessor implements IQueryProcessor {
+public class QueryProcessor implements QueryInterface {
 
 	/** The InvertedIndex class... */
 	private final InvertedIndex index;
@@ -129,28 +127,6 @@ public class QueryProcessor implements IQueryProcessor {
 			return Collections.unmodifiableList(resultsMap.get(processedQuery));
 		} 
 		return Collections.emptyList();
-	}
-
-// TODO Remove processQuery from here, put it as a default implementation in the interface instead
-	/**
-	 * ProcessQuery is the start of the search exact/partial functionality. It first
-	 * creates a list of strings that will hold all the unique queries Then using an
-	 * enhanced for loop, checks if each query is not empty, then Checks whether or
-	 * not partial boolean flag is given Depending on whether or not partial is
-	 * given, we split to either search exact or partial
-	 * 
-	 * @param queryPath The given path that holds the address to file
-	 * @throws IOException throws io exception if issues hit
-	 */
-	@Override
-	public void processQuery(Path queryPath) throws IOException {	
-		try (BufferedReader reader = Files.newBufferedReader(queryPath)) {
-			String line;
-
-			while ((line = reader.readLine()) != null) {
-				processQuery(line);
-			}
-		}
 	}
 
 

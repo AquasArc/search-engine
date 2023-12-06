@@ -1,12 +1,8 @@
 package edu.usfca.cs272;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
@@ -21,34 +17,34 @@ import java.util.TreeSet;
  * @author CS 272 Software Development (University of San Francisco)
  * @version Fall 2023
  */
-public class MultiThreadQueryProcessor implements IQueryProcessor{
+public class MultiThreadQueryProcessor implements QueryInterface{
 
 	/** The InvertedIndex class... */
-	private final ThreadSafeInvertedIndex index;
+	private final InvertedIndex index;
 
 	/** To determine partial/exact search */
 	private final boolean isPartial;
 
 	/** The data structure for results from query searches */
 	private final TreeMap<String, List<InvertedIndex.FileResult>> resultsMap;
-	
+
 	/** Creating a workQueue */
 	private final WorkQueue workQueue;
 
 
 	/**Constructor to establish the values for index, isPartial, and resultsMap
 	 * 
-	 * @param index is the threadSafeInvertedIndex with threadsafe methods with locks
+	 * @param index2 is the threadSafeInvertedIndex with threadsafe methods with locks
 	 * @param isPartial is a boolean value to determine exact or partial search...
 	 * @param workQueue is for thread usages...
 	 */
-	public MultiThreadQueryProcessor(ThreadSafeInvertedIndex index, boolean isPartial, WorkQueue workQueue) {
-		this.index = index;
+	public MultiThreadQueryProcessor(InvertedIndex index2, boolean isPartial, WorkQueue workQueue) {
+		this.index = index2;
 		this.isPartial = isPartial;
 		this.resultsMap = new TreeMap<String, List<InvertedIndex.FileResult>>();
 		this.workQueue = workQueue;
 	}
-	
+
 
 	/**Returns true or false depending on if the query exists in the results map
 	 * 
@@ -57,12 +53,12 @@ public class MultiThreadQueryProcessor implements IQueryProcessor{
 	 */
 	@Override
 	public boolean hasQuery(String query) {
-	    TreeSet<String> stemmedQueries = FileStemmer.uniqueStems(query);
-	    String processedQuery = String.join(" ", stemmedQueries);
+		TreeSet<String> stemmedQueries = FileStemmer.uniqueStems(query);
+		String processedQuery = String.join(" ", stemmedQueries);
 
-	    synchronized (resultsMap) {
-	        return resultsMap.containsKey(processedQuery);
-	    }
+		synchronized (resultsMap) {
+			return resultsMap.containsKey(processedQuery);
+		}
 	}
 
 
@@ -74,12 +70,12 @@ public class MultiThreadQueryProcessor implements IQueryProcessor{
 	 */
 	@Override
 	public boolean hasFileResults(String query) {
-	    TreeSet<String> stemmedQueries = FileStemmer.uniqueStems(query);
-	    String processedQuery = String.join(" ", stemmedQueries);
+		TreeSet<String> stemmedQueries = FileStemmer.uniqueStems(query);
+		String processedQuery = String.join(" ", stemmedQueries);
 
-	    synchronized (resultsMap) {
-	        return resultsMap.containsKey(processedQuery) && !resultsMap.get(processedQuery).isEmpty();
-	    }
+		synchronized (resultsMap) {
+			return resultsMap.containsKey(processedQuery) && !resultsMap.get(processedQuery).isEmpty();
+		}
 	}
 
 
@@ -90,12 +86,12 @@ public class MultiThreadQueryProcessor implements IQueryProcessor{
 	 */
 	@Override
 	public int numResultsForQuery(String query) {
-	    TreeSet<String> stemmedQueries = FileStemmer.uniqueStems(query);
-	    String processedQuery = String.join(" ", stemmedQueries);
+		TreeSet<String> stemmedQueries = FileStemmer.uniqueStems(query);
+		String processedQuery = String.join(" ", stemmedQueries);
 
-	    synchronized (resultsMap) {
-	        return resultsMap.containsKey(processedQuery) ? resultsMap.get(processedQuery).size() : 0;
-	    }
+		synchronized (resultsMap) {
+			return resultsMap.containsKey(processedQuery) ? resultsMap.get(processedQuery).size() : 0;
+		}
 	}
 
 
@@ -105,9 +101,9 @@ public class MultiThreadQueryProcessor implements IQueryProcessor{
 	 */
 	@Override
 	public int numQueriesProcessed() {
-	    synchronized (resultsMap) {
-	        return resultsMap.size();
-	    }
+		synchronized (resultsMap) {
+			return resultsMap.size();
+		}
 	}
 
 
@@ -117,13 +113,10 @@ public class MultiThreadQueryProcessor implements IQueryProcessor{
 	 */
 	@Override
 	public Set<String> getQueries() {
-	    synchronized (resultsMap) {
-	    	// TODO Why is there a copy here?
-	        return Collections.unmodifiableSet(new HashSet<>(resultsMap.keySet()));
-	    }
+		synchronized (resultsMap) {
+			return Collections.unmodifiableSet(resultsMap.keySet());
+		}
 	}
-	
-	// TODO Fix indentation
 
 	/**Retrieves the List of meta data associated to a query that has been processed
 	 * 
@@ -133,17 +126,15 @@ public class MultiThreadQueryProcessor implements IQueryProcessor{
 	 */
 	@Override
 	public List<InvertedIndex.FileResult> getResultsForQuery(String query) {
-	    TreeSet<String> stemmedQueries = FileStemmer.uniqueStems(query);
-	    String processedQuery = String.join(" ", stemmedQueries);
+		TreeSet<String> stemmedQueries = FileStemmer.uniqueStems(query);
+		String processedQuery = String.join(" ", stemmedQueries);
 
-	    // TODO Sync around the if statement
-	        if (hasQuery(processedQuery)) { // TODO Directly access data structure
-	        	synchronized(resultsMap) {
-	        		// TODO Remove copy
-	        		return Collections.unmodifiableList(new ArrayList<>(resultsMap.get(processedQuery)));
-	        	}
-	        }
-	    return Collections.emptyList();
+		synchronized(resultsMap) {
+			if (resultsMap.containsKey(processedQuery)) {
+				return Collections.unmodifiableList(resultsMap.get(processedQuery));
+			}
+		}
+		return Collections.emptyList();
 	}
 
 	/**
@@ -156,24 +147,17 @@ public class MultiThreadQueryProcessor implements IQueryProcessor{
 	 * @param queryPath The given path that holds the address to file
 	 * @throws IOException throws io exception if issues hit
 	 */
-	public void processQuery(Path queryPath) throws IOException {	
-		try (BufferedReader reader = Files.newBufferedReader(queryPath)) {
-			String line;
-
-			while ((line = reader.readLine()) != null) {
-				processQuery(line);
-			}
-		}
-		
-		// TODO IQueryProcessor.super.processQuery(queryPath);
+	public void processQuery(Path queryPath) throws IOException {
+		QueryInterface.super.processQuery(queryPath);
 		workQueue.finish();
 	}
-	
+
 
 	/**The query processing logic. This processes one query. Essentially one line.
 	 * 
 	 * @param line takes in one line of query and adds the result of searching said line into the results map
 	 */
+	@Override
 	public void processQuery(String line) {
 		workQueue.execute(new Task((line)));
 	}
@@ -185,6 +169,7 @@ public class MultiThreadQueryProcessor implements IQueryProcessor{
 	 * @param outputPath the path to the output file
 	 * @throws IOException if an I/O error occurs
 	 */
+	@Override
 	public void writeResults(Path outputPath) throws IOException {
 		synchronized (resultsMap) {
 			JsonWriter.writeResultsToFile(resultsMap, outputPath);
@@ -229,7 +214,7 @@ public class MultiThreadQueryProcessor implements IQueryProcessor{
 					return;
 				}
 			}
-			
+
 			var local = index.search(cleanedUniqueQueries, isPartial);
 
 			synchronized (resultsMap) {

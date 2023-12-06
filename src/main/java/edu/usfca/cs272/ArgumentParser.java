@@ -205,7 +205,7 @@ public class ArgumentParser {
 	 *
 	 * @see Integer#parseInt(String)
 	 */
-	public int getInteger(String flag, int backup) { // TODO Rename getPositiveInteger
+	public int getPositiveInteger(String flag, int backup) {
 		try {
 			int value = Integer.parseInt(getString(flag));
 			return (value < 1) ? backup : value;
@@ -226,7 +226,7 @@ public class ArgumentParser {
 	 * @see #getInteger(String, int)
 	 */
 	public int getInteger(String flag) {
-		return getInteger(flag, 0);
+		return getPositiveInteger(flag, 0);
 	}
 
 	@Override

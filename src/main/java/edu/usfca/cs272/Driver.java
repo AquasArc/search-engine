@@ -3,16 +3,6 @@ package edu.usfca.cs272;
 import java.io.IOException;
 import java.nio.file.Path;
 
-/*
- * TODO 
-Description	Resource	Path	Location	Type
-The method processQuery(Path) of type MultiThreadQueryProcessor should be tagged with @Override since it actually overrides a superinterface method	MultiThreadQueryProcessor.java	/SearchEngine/src/main/java/edu/usfca/cs272	line 154	Java Problem
-The method processQuery(String) of type MultiThreadQueryProcessor should be tagged with @Override since it actually overrides a superinterface method	MultiThreadQueryProcessor.java	/SearchEngine/src/main/java/edu/usfca/cs272	line 170	Java Problem
-The method writeResults(Path) of type MultiThreadQueryProcessor should be tagged with @Override since it actually overrides a superinterface method	MultiThreadQueryProcessor.java	/SearchEngine/src/main/java/edu/usfca/cs272	line 181	Java Problem
-The value of the local variable existingPositions is not used	InvertedIndex.java	/SearchEngine/src/main/java/edu/usfca/cs272	line 136	Java Problem
-
- */
-
 /**
  * Class responsible for running this project based on the provided command-line
  * arguments. See the README for details.
@@ -37,18 +27,17 @@ public class Driver {
 
 		/** Boolean flag to determine exact/partial search*/
 		boolean isPartial = parser.hasFlag("-partial");
-
+		
 		/** QueryProcessor object for search*/
-		IQueryProcessor processor = null;
+		QueryInterface processor = null;
 
 		MultiThreadQueryProcessor multiProcessor = null;
 
 		/** Logic to determine multi-threading or not*/
 		if (parser.hasFlag("-threads")) {
 			index = new ThreadSafeInvertedIndex();
-			workQueue = new WorkQueue(parser.getInteger("-threads", 5));
-			// TODO Need to avoid the downcast
-			multiProcessor = new MultiThreadQueryProcessor((ThreadSafeInvertedIndex) index, isPartial, workQueue);
+			workQueue = new WorkQueue(parser.getPositiveInteger("-threads", 5));
+			multiProcessor = new MultiThreadQueryProcessor(index, isPartial, workQueue);
 		} else {
 			index = new InvertedIndex();
 			processor = new QueryProcessor(index, isPartial);
@@ -69,14 +58,24 @@ public class Driver {
 			}
 		}
 		
-		// TODO if (parser.hasFlag("-query")) {
 
-		/* TODO 
+		if (parser.hasFlag("-query")) {
+			try {
+				// TODO Will be able to reduce duplicate logic
+				if (parser.hasFlag("-threads")) {
+					multiProcessor.processQuery(parser.getPath("-query"));
+				} else {
+					processor.processQuery(parser.getPath("-query"));
+				}
+			} catch (IOException | NullPointerException e) {
+				System.out.println("Error processing query: " + e.getMessage());
+			}
+		}
+
+
 		if (workQueue != null) {
 			workQueue.shutdown();
 		}
-		*/
-		
 		if (parser.hasFlag("-counts")) {
 			try {
 				index.writeCounts(parser.getPath("-counts", Path.of("counts.json")));
@@ -93,19 +92,6 @@ public class Driver {
 			}
 		}
 
-		if (parser.hasFlag("-query")) {
-			try {
-				// TODO Will be able to reduce duplicate logic
-				if (parser.hasFlag("-threads")) {
-					multiProcessor.processQuery(parser.getPath("-query"));
-				} else {
-					processor.processQuery(parser.getPath("-query"));
-				}
-			} catch (IOException | NullPointerException e) {
-				System.out.println("Error processing query: " + e.getMessage());
-			}
-		}
-
 		if (parser.hasFlag("-results")) {
 			try {
 				if (parser.hasFlag("-threads")) {
@@ -116,10 +102,6 @@ public class Driver {
 			} catch (IOException e) {
 				System.out.println("Error processing results: " + e.getMessage());
 			}
-		}
-
-		if (workQueue != null) {
-			workQueue.join();
 		}
 	}
 }

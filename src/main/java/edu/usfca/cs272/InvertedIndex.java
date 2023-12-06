@@ -107,17 +107,13 @@ public class InvertedIndex {
 	}
 
 	// Simple Attempt:
-		/**
-		 * Adds all the entries from another inverted index into the original inverted index
-		 * Same for wordCount
-		 * 
-		 * @param otherIndex The other InvertedIndex to merge with this one.
-		 */
+	/**
+	 * Adds all the entries from another inverted index into the original inverted index
+	 * Same for wordCount
+	 * 
+	 * @param otherIndex The other InvertedIndex to merge with this one.
+	 */
 	public void addAll(InvertedIndex otherIndex) {
-//      ThreadBenchTest: SlowRuntimeTests -> testIndexOneMany() 
-//      Avg Speedup: x 3.210526
-//      ThreadBenchTest: SlowRuntimeTests -> testSearchOneMany() 
-//      Avg Speedup: x 3.194774
 		for (var otherEntry : otherIndex.invertedIndex.entrySet()) {
 			String otherWord = otherEntry.getKey();
 			var otherMap = otherEntry.getValue();
@@ -126,39 +122,28 @@ public class InvertedIndex {
 			if (thisMap == null) {
 				this.invertedIndex.put(otherWord, otherMap);
 			} else {
-			    for (var nextEntry : otherMap.entrySet()) {
-			        String location = nextEntry.getKey();
-			        var positions = nextEntry.getValue();
-			        
-			        if (!thisMap.containsKey(location)) {
-			            thisMap.put(location, new TreeSet<>(positions)); // TODO No copy needed
-			            // TODO thisMap.put(location, positions);
-			        } else {
-			            var existingPositions = thisMap.get(location);
-			            // TODO existingPositions.addAll(positions);
-			            
-			            for (int position : positions) {
-			                add(otherWord, location, position);
-			            }
-			        }
-			    }
+				for (var nextEntry : otherMap.entrySet()) {
+					String location = nextEntry.getKey();
+					var positions = nextEntry.getValue();
+
+					if (!thisMap.containsKey(location)) {
+						thisMap.put(location, positions);
+					} else {
+						var existingPositions = thisMap.get(location);
+						existingPositions.addAll(positions);
+					}
+				}
 			}
 		}
-		
-		// TODO wordCountMap needs a loop in case counts exist in both places
-		this.wordCountMap.putAll(otherIndex.wordCountMap);
-	}
-	
-	// TODO Cleanup
-	
-//  Utilizing putAll methods...
-//	public void addAll(InvertedIndex otherIndex) {
-//      ThreadBenchTest: SlowRuntimeTests -> testIndexOneMany() 
-//      Avg Speedup: x 3.4156
-//	    this.invertedIndex.putAll(otherIndex.invertedIndex);
-//		this.wordCountMap.putAll(otherIndex.wordCountMap);
-//	}
 
+		for (String location : otherIndex.wordCountMap.keySet()) {
+			if (this.invertedIndex.containsKey(location)) {
+				this.wordCountMap.put(location, this.wordCountMap.get(location) + otherIndex.wordCountMap.get(location));
+			} else {
+				this.wordCountMap.put(location, otherIndex.wordCountMap.get(location));
+			}
+		}
+	}
 
 	/**
 	 * Checks if the index contains a word.
@@ -282,13 +267,13 @@ public class InvertedIndex {
 		for (var entry : set) {
 			String location = entry.getKey();
 			int count = entry.getValue().size();
-			FileResult fr = lookupMap.get(location); // TODO Better name
-			if (fr == null) {
-				fr = new FileResult(location);
-				lookupMap.put(location, fr);
-				resultList.add(fr);
+			FileResult fileResults = lookupMap.get(location);
+			if (fileResults == null) {
+				fileResults = new FileResult(location);
+				lookupMap.put(location, fileResults);
+				resultList.add(fileResults);
 			}
-			fr.incrementCount(count);
+			fileResults.incrementCount(count);
 		}
 	}
 

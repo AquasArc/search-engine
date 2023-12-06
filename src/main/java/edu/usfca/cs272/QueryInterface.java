@@ -1,6 +1,8 @@
 package edu.usfca.cs272;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
@@ -8,7 +10,7 @@ import java.util.Set;
 /**An interface for my multithread and normal search logic
  * 
  */
-public interface IQueryProcessor { // TODO Better name
+public interface QueryInterface {
 
 	/**Returns true or false depending on if the query exists in the results map
 	 * 
@@ -62,7 +64,15 @@ public interface IQueryProcessor { // TODO Better name
 	 * @param queryPath The given path that holds the address to file
 	 * @throws IOException throws io exception if issues hit
 	 */
-	void processQuery(Path queryPath) throws IOException;
+	public default void processQuery(Path queryPath) throws IOException {	
+		try (BufferedReader reader = Files.newBufferedReader(queryPath)) {
+			String line;
+
+			while ((line = reader.readLine()) != null) {
+				processQuery(line);
+			}
+		}
+	}
 
 	/**The query processing logic. This processes one query. Essentially one line.
 	 * 

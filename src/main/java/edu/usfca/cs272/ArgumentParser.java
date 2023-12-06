@@ -223,7 +223,7 @@ public class ArgumentParser {
 	 * @return the value the specified flag is mapped as an int, or 0 if there is no
 	 *   valid mapping
 	 *
-	 * @see #getInteger(String, int)
+	 * @see #getPositiveInteger(String, int)
 	 */
 	public int getInteger(String flag) {
 		return getPositiveInteger(flag, 0);

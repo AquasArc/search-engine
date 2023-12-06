@@ -47,8 +47,7 @@ public class Driver {
 		if (parser.hasFlag("-text")) {
 			try {
 				if (parser.hasFlag("-threads")) {
-				// TODO Need to avoid the downcast
-					MultiThreadInvertedIndexProcessor.processText(parser.getPath("-text"), (ThreadSafeInvertedIndex) index, workQueue);
+					MultiThreadInvertedIndexProcessor.processText(parser.getPath("-text"), index, workQueue);
 				} else {
 					InvertedIndexProcessor.processText(parser.getPath("-text"), index);
 				}

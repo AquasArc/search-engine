@@ -76,7 +76,7 @@ public class QueryProcessor implements QueryInterface {
 	 * @return True if the query has one or more FileResult objects, false otherwise.
 	 */
 	@Override
-	public boolean hasFileResults(String query) {
+	public boolean hasFileResults(String query) { // TODO Remove
 		TreeSet<String> stemmedQueries = FileStemmer.uniqueStems(query, stemmer);
 		String processedQuery = String.join(" ", stemmedQueries);
 		return resultsMap.containsKey(processedQuery) && !resultsMap.get(processedQuery).isEmpty();
@@ -89,6 +89,7 @@ public class QueryProcessor implements QueryInterface {
 	 */
 	@Override
 	public int numResultsForQuery(String query) {
+		// TODO return getREsultsForQuery(query).size(); and implement in the interface
 		TreeSet<String> stemmedQueries = FileStemmer.uniqueStems(query, stemmer);
 		String processedQuery = String.join(" ", stemmedQueries);
 		return resultsMap.containsKey(processedQuery) ? resultsMap.get(processedQuery).size() : 0;
@@ -100,6 +101,7 @@ public class QueryProcessor implements QueryInterface {
 	 */
 	@Override
 	public int numQueriesProcessed() {
+		// TODO return getQueries().size(); --> move this into the interface
 		return resultsMap.size();
 	}
 

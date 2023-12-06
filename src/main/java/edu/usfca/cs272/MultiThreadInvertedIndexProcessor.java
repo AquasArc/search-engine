@@ -70,7 +70,7 @@ public class MultiThreadInvertedIndexProcessor {
 		 * The ThreadSafeInvertedIndex instance where the results of file processing
 		 * will be stored.
 		 */
-		private final InvertedIndex index;
+		private final InvertedIndex index; // TODO thread-safe
 
 		/**
 		 * Creates a new task for processing the specified file.
@@ -79,7 +79,7 @@ public class MultiThreadInvertedIndexProcessor {
 		 * @param index The ThreadSafeInvertedIndex instance to update with the results of processing the file.
 		 * 
 		 */
-		public Task(Path path, InvertedIndex index) {
+		public Task(Path path, InvertedIndex index) { // TODO thread-safe
 			this.path = path;
 			this.index = index;
 		}

@@ -16,13 +16,12 @@ public class Driver {
 	/**
 	 * Start of the program.
 	 *
-	 *
 	 * @param args Command-line arguments
 	 */
 	public static void main(String[] args){
 		ArgumentParser parser = new ArgumentParser(args);
 		InvertedIndex index = null;
-
+		// TODO ThreadSafeInvertedIndex safe = null;
 		WorkQueue workQueue = null;
 
 		/** Boolean flag to determine exact/partial search*/
@@ -34,8 +33,14 @@ public class Driver {
 		/** Logic to determine multi-threading or not*/
 		if (parser.hasFlag("-threads")) {
 			index = new ThreadSafeInvertedIndex();
+			
+			/* TODO 
+			safe = new ThreadSafeInvertedIndex();
+			index = safe;
+			*/
+			
 			workQueue = new WorkQueue(parser.getPositiveInteger("-threads", 5));
-			processor = new MultiThreadQueryProcessor(index, isPartial, workQueue);
+			processor = new MultiThreadQueryProcessor(index, isPartial, workQueue); // TODO safe, isParital, workQueue
 		} else {
 			index = new InvertedIndex();
 			processor = new QueryProcessor(index, isPartial);
@@ -43,7 +48,8 @@ public class Driver {
 
 		if (parser.hasFlag("-text")) {
 			try {
-				if (parser.hasFlag("-threads")) {
+				if (parser.hasFlag("-threads")) { // TODO if (safe != null && workQueue != null) {
+					// TODO MultiThreadInvertedIndexProcessor.processText(parser.getPath("-text"), safe, workQueue);
 					MultiThreadInvertedIndexProcessor.processText(parser.getPath("-text"), index, workQueue);
 				} else {
 					InvertedIndexProcessor.processText(parser.getPath("-text"), index);

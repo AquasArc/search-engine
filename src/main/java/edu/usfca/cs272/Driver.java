@@ -27,22 +27,19 @@ public class Driver {
 
 		/** Boolean flag to determine exact/partial search*/
 		boolean isPartial = parser.hasFlag("-partial");
-		
+
 		/** QueryProcessor object for search*/
 		QueryInterface processor = null;
-
-		MultiThreadQueryProcessor multiProcessor = null;
 
 		/** Logic to determine multi-threading or not*/
 		if (parser.hasFlag("-threads")) {
 			index = new ThreadSafeInvertedIndex();
 			workQueue = new WorkQueue(parser.getPositiveInteger("-threads", 5));
-			multiProcessor = new MultiThreadQueryProcessor(index, isPartial, workQueue);
+			processor = new MultiThreadQueryProcessor(index, isPartial, workQueue);
 		} else {
 			index = new InvertedIndex();
 			processor = new QueryProcessor(index, isPartial);
 		}
-
 
 		if (parser.hasFlag("-text")) {
 			try {
@@ -56,25 +53,19 @@ public class Driver {
 				System.out.println("Error processing text: " + e.getMessage());
 			}
 		}
-		
 
 		if (parser.hasFlag("-query")) {
 			try {
-				// TODO Will be able to reduce duplicate logic
-				if (parser.hasFlag("-threads")) {
-					multiProcessor.processQuery(parser.getPath("-query"));
-				} else {
-					processor.processQuery(parser.getPath("-query"));
-				}
+				processor.processQuery(parser.getPath("-query"));
 			} catch (IOException | NullPointerException e) {
 				System.out.println("Error processing query: " + e.getMessage());
 			}
 		}
 
-
 		if (workQueue != null) {
 			workQueue.shutdown();
 		}
+
 		if (parser.hasFlag("-counts")) {
 			try {
 				index.writeCounts(parser.getPath("-counts", Path.of("counts.json")));
@@ -93,11 +84,7 @@ public class Driver {
 
 		if (parser.hasFlag("-results")) {
 			try {
-				if (parser.hasFlag("-threads")) {
-					multiProcessor.writeResults(parser.getPath("-results", Path.of("results.json")));
-				} else {
-					processor.writeResults(parser.getPath("-results", Path.of("results.json")));
-				}
+				processor.writeResults(parser.getPath("-results", Path.of("results.json")));
 			} catch (IOException e) {
 				System.out.println("Error processing results: " + e.getMessage());
 			}

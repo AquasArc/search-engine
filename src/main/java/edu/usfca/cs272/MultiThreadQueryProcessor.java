@@ -17,10 +17,10 @@ import java.util.TreeSet;
  * @author CS 272 Software Development (University of San Francisco)
  * @version Fall 2023
  */
-public class MultiThreadQueryProcessor implements QueryInterface{
+public class MultiThreadQueryProcessor implements QueryInterface {
 
 	/** The InvertedIndex class... */
-	private final InvertedIndex index;
+	private final InvertedIndex index; // TODO Has to be thread-safe
 
 	/** To determine partial/exact search */
 	private final boolean isPartial;
@@ -38,7 +38,7 @@ public class MultiThreadQueryProcessor implements QueryInterface{
 	 * @param isPartial is a boolean value to determine exact or partial search...
 	 * @param workQueue is for thread usages...
 	 */
-	public MultiThreadQueryProcessor(InvertedIndex index2, boolean isPartial, WorkQueue workQueue) {
+	public MultiThreadQueryProcessor(InvertedIndex index2, boolean isPartial, WorkQueue workQueue) { // TODO Has to be thread-safe, fix name
 		this.index = index2;
 		this.isPartial = isPartial;
 		this.resultsMap = new TreeMap<String, List<InvertedIndex.FileResult>>();
@@ -137,6 +137,7 @@ public class MultiThreadQueryProcessor implements QueryInterface{
 		return Collections.emptyList();
 	}
 
+	// TODO @Override
 	/**
 	 * ProcessQuery is the start of the search exact/partial functionality. It first
 	 * creates a list of strings that will hold all the unique queries Then using an
@@ -180,7 +181,7 @@ public class MultiThreadQueryProcessor implements QueryInterface{
 	/**Task class for processing a query of search requests
 	 *
 	 */
-	public class Task implements Runnable {
+	public class Task implements Runnable { // TODO private
 
 		/**
 		 * the string line to parse

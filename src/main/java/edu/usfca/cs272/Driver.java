@@ -21,7 +21,7 @@ public class Driver {
 	public static void main(String[] args){
 		ArgumentParser parser = new ArgumentParser(args);
 		InvertedIndex index = null;
-		// TODO ThreadSafeInvertedIndex safe = null;
+		ThreadSafeInvertedIndex safe = null;
 		WorkQueue workQueue = null;
 
 		/** Boolean flag to determine exact/partial search*/
@@ -34,13 +34,11 @@ public class Driver {
 		if (parser.hasFlag("-threads")) {
 			index = new ThreadSafeInvertedIndex();
 			
-			/* TODO 
 			safe = new ThreadSafeInvertedIndex();
 			index = safe;
-			*/
 			
 			workQueue = new WorkQueue(parser.getPositiveInteger("-threads", 5));
-			processor = new MultiThreadQueryProcessor(index, isPartial, workQueue); // TODO safe, isParital, workQueue
+			processor = new MultiThreadQueryProcessor(safe, isPartial, workQueue);
 		} else {
 			index = new InvertedIndex();
 			processor = new QueryProcessor(index, isPartial);
@@ -48,9 +46,8 @@ public class Driver {
 
 		if (parser.hasFlag("-text")) {
 			try {
-				if (parser.hasFlag("-threads")) { // TODO if (safe != null && workQueue != null) {
-					// TODO MultiThreadInvertedIndexProcessor.processText(parser.getPath("-text"), safe, workQueue);
-					MultiThreadInvertedIndexProcessor.processText(parser.getPath("-text"), index, workQueue);
+				if (safe != null && workQueue != null) {
+					MultiThreadInvertedIndexProcessor.processText(parser.getPath("-text"), safe, workQueue);
 				} else {
 					InvertedIndexProcessor.processText(parser.getPath("-text"), index);
 				}

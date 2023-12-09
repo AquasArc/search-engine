@@ -19,14 +19,6 @@ public interface QueryInterface {
 	 */
 	boolean hasQuery(String query);
 
-	/**
-	 * Checks if a specific query has any associated FileResult objects.
-	 *
-	 * @param query The query to check.
-	 * @return True if the query has one or more FileResult objects, false otherwise.
-	 */
-	boolean hasFileResults(String query);
-
 	/**Calculates the number of FileResults for a given query
 	 * 
 	 * @param query a string containing a line of queries

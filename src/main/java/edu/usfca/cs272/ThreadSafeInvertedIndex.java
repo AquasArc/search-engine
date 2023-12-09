@@ -68,10 +68,10 @@ public class ThreadSafeInvertedIndex extends InvertedIndex {
 	 * @param index The other InvertedIndex to merge with this one.
 	 */
 	@Override
-	public void addAll(InvertedIndex index) {
+	public void addDistinct(InvertedIndex index) {
 		lock.writeLock().lock();
 		try {
-			super.addAll(index);
+			super.addDistinct(index);
 		} finally {
 			lock.writeLock().unlock();
 		}

@@ -23,7 +23,7 @@ public class MultiThreadInvertedIndexProcessor {
 	 * @param workQueue the Workqueue that will be used to execute said tasks
 	 * @throws IOException If an error occurs while reading files within the directory.
 	 */
-	public static void processDirectory(Path dirPath, InvertedIndex index, WorkQueue workQueue) throws IOException {
+	public static void processDirectory(Path dirPath, ThreadSafeInvertedIndex index, WorkQueue workQueue) throws IOException {
 		try (DirectoryStream<Path> stream = Files.newDirectoryStream(dirPath)) {
 			// Create the work queue
 			for (Path entry : stream) {
@@ -45,7 +45,7 @@ public class MultiThreadInvertedIndexProcessor {
 	 * @param workQueue the Workqueue that will be used to execute said tasks
 	 * @throws IOException If an error occurs during file or directory processing.
 	 */
-	public static void processText(Path inputPath, InvertedIndex index, WorkQueue workQueue) throws IOException {
+	public static void processText(Path inputPath, ThreadSafeInvertedIndex index, WorkQueue workQueue) throws IOException {
 		if (Files.isRegularFile(inputPath)) {
 			workQueue.execute(new Task(inputPath, index));
 		} else if (Files.isDirectory(inputPath)) {
@@ -70,7 +70,7 @@ public class MultiThreadInvertedIndexProcessor {
 		 * The ThreadSafeInvertedIndex instance where the results of file processing
 		 * will be stored.
 		 */
-		private final InvertedIndex index; // TODO thread-safe
+		private final ThreadSafeInvertedIndex index;
 
 		/**
 		 * Creates a new task for processing the specified file.
@@ -79,7 +79,7 @@ public class MultiThreadInvertedIndexProcessor {
 		 * @param index The ThreadSafeInvertedIndex instance to update with the results of processing the file.
 		 * 
 		 */
-		public Task(Path path, InvertedIndex index) { // TODO thread-safe
+		public Task(Path path, ThreadSafeInvertedIndex index) {
 			this.path = path;
 			this.index = index;
 		}
@@ -100,7 +100,7 @@ public class MultiThreadInvertedIndexProcessor {
 				InvertedIndexProcessor.processFile(path, localIndex);
 
 				// Safely add the local index to the shared index
-				index.addAll(localIndex);
+				index.addDistinct(localIndex);
 
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);

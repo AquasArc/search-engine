@@ -34,12 +34,12 @@ public class MultiThreadQueryProcessor implements QueryInterface {
 
 	/**Constructor to establish the values for index, isPartial, and resultsMap
 	 * 
-	 * @param index2 is the threadSafeInvertedIndex with threadsafe methods with locks
+	 * @param indexTS is the threadSafeInvertedIndex with thread safe methods with locks
 	 * @param isPartial is a boolean value to determine exact or partial search...
 	 * @param workQueue is for thread usages...
 	 */
-	public MultiThreadQueryProcessor(InvertedIndex index2, boolean isPartial, WorkQueue workQueue) { // TODO Has to be thread-safe, fix name
-		this.index = index2;
+	public MultiThreadQueryProcessor(ThreadSafeInvertedIndex indexTS, boolean isPartial, WorkQueue workQueue) {
+		this.index = indexTS;
 		this.isPartial = isPartial;
 		this.resultsMap = new TreeMap<String, List<InvertedIndex.FileResult>>();
 		this.workQueue = workQueue;
@@ -60,24 +60,6 @@ public class MultiThreadQueryProcessor implements QueryInterface {
 			return resultsMap.containsKey(processedQuery);
 		}
 	}
-
-
-	/**
-	 * Checks if a specific query has any associated FileResult objects.
-	 *
-	 * @param query The query to check.
-	 * @return True if the query has one or more FileResult objects, false otherwise.
-	 */
-	@Override
-	public boolean hasFileResults(String query) {
-		TreeSet<String> stemmedQueries = FileStemmer.uniqueStems(query);
-		String processedQuery = String.join(" ", stemmedQueries);
-
-		synchronized (resultsMap) {
-			return resultsMap.containsKey(processedQuery) && !resultsMap.get(processedQuery).isEmpty();
-		}
-	}
-
 
 	/**Calculates the number of FileResults for a given query
 	 * 
@@ -137,7 +119,6 @@ public class MultiThreadQueryProcessor implements QueryInterface {
 		return Collections.emptyList();
 	}
 
-	// TODO @Override
 	/**
 	 * ProcessQuery is the start of the search exact/partial functionality. It first
 	 * creates a list of strings that will hold all the unique queries Then using an
@@ -148,6 +129,7 @@ public class MultiThreadQueryProcessor implements QueryInterface {
 	 * @param queryPath The given path that holds the address to file
 	 * @throws IOException throws io exception if issues hit
 	 */
+	@Override
 	public void processQuery(Path queryPath) throws IOException {
 		QueryInterface.super.processQuery(queryPath);
 		workQueue.finish();
@@ -181,7 +163,7 @@ public class MultiThreadQueryProcessor implements QueryInterface {
 	/**Task class for processing a query of search requests
 	 *
 	 */
-	public class Task implements Runnable { // TODO private
+	private class Task implements Runnable {
 
 		/**
 		 * the string line to parse

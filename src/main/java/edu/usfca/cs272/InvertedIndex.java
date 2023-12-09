@@ -111,9 +111,12 @@ public class InvertedIndex {
 	 * Adds all the entries from another inverted index into the original inverted index
 	 * Same for wordCount
 	 * 
+	 * Warning:
+	 * The indexes should not overlap
+	 * 
 	 * @param otherIndex The other InvertedIndex to merge with this one.
 	 */
-	public void addAll(InvertedIndex otherIndex) { // TODO Change to addDistinct and warn in the javadoc that the indexes should not overlap
+	public void addDistinct(InvertedIndex otherIndex) {
 		for (var otherEntry : otherIndex.invertedIndex.entrySet()) {
 			String otherWord = otherEntry.getKey();
 			var otherMap = otherEntry.getValue();
@@ -125,12 +128,11 @@ public class InvertedIndex {
 				for (var nextEntry : otherMap.entrySet()) {
 					String location = nextEntry.getKey();
 					var positions = nextEntry.getValue();
-					// TODO var existingPositions = thisMap.get(location);
+					var existingPositions = thisMap.get(location);
 
-					if (!thisMap.containsKey(location)) { // TODO existingPositions == null
+					if (existingPositions == null) {
 						thisMap.put(location, positions);
 					} else {
-						var existingPositions = thisMap.get(location); // TODO remove
 						existingPositions.addAll(positions);
 					}
 				}

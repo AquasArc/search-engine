@@ -69,19 +69,6 @@ public class QueryProcessor implements QueryInterface {
 		return resultsMap.containsKey(processedQuery);
 	}
 
-	/**
-	 * Checks if a specific query has any associated FileResult objects.
-	 *
-	 * @param query The query to check.
-	 * @return True if the query has one or more FileResult objects, false otherwise.
-	 */
-	@Override
-	public boolean hasFileResults(String query) { // TODO Remove
-		TreeSet<String> stemmedQueries = FileStemmer.uniqueStems(query, stemmer);
-		String processedQuery = String.join(" ", stemmedQueries);
-		return resultsMap.containsKey(processedQuery) && !resultsMap.get(processedQuery).isEmpty();
-	}
-
 	/**Calculates the number of FileResults for a given query
 	 * 
 	 * @param query a string containing a line of queries

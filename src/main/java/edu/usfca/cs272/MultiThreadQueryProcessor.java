@@ -20,7 +20,7 @@ import java.util.TreeSet;
 public class MultiThreadQueryProcessor implements QueryInterface {
 
 	/** The InvertedIndex class... */
-	private final InvertedIndex index; // TODO Has to be thread-safe
+	private final ThreadSafeInvertedIndex index;
 
 	/** To determine partial/exact search */
 	private final boolean isPartial;
@@ -60,34 +60,6 @@ public class MultiThreadQueryProcessor implements QueryInterface {
 			return resultsMap.containsKey(processedQuery);
 		}
 	}
-
-	/**Calculates the number of FileResults for a given query
-	 * 
-	 * @param query a string containing a line of queries
-	 * @return number of file results for a query, otherwise, 0 if none..
-	 */
-	@Override
-	public int numResultsForQuery(String query) {
-		TreeSet<String> stemmedQueries = FileStemmer.uniqueStems(query);
-		String processedQuery = String.join(" ", stemmedQueries);
-
-		synchronized (resultsMap) {
-			return resultsMap.containsKey(processedQuery) ? resultsMap.get(processedQuery).size() : 0;
-		}
-	}
-
-
-	/**Returns an integer number of total queries that was processed
-	 * 
-	 * @return the size of the resultsMap
-	 */
-	@Override
-	public int numQueriesProcessed() {
-		synchronized (resultsMap) {
-			return resultsMap.size();
-		}
-	}
-
 
 	/**Retrieves an unmodifiable set of all the queries processed.
 	 *

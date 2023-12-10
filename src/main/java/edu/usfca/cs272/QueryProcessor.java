@@ -69,29 +69,6 @@ public class QueryProcessor implements QueryInterface {
 		return resultsMap.containsKey(processedQuery);
 	}
 
-	/**Calculates the number of FileResults for a given query
-	 * 
-	 * @param query a string containing a line of queries
-	 * @return number of file results for a query, otherwise, 0 if none..
-	 */
-	@Override
-	public int numResultsForQuery(String query) {
-		// TODO return getREsultsForQuery(query).size(); and implement in the interface
-		TreeSet<String> stemmedQueries = FileStemmer.uniqueStems(query, stemmer);
-		String processedQuery = String.join(" ", stemmedQueries);
-		return resultsMap.containsKey(processedQuery) ? resultsMap.get(processedQuery).size() : 0;
-	}
-
-	/**Returns an integer number of total queries that was processed
-	 * 
-	 * @return the size of the resultsMap
-	 */
-	@Override
-	public int numQueriesProcessed() {
-		// TODO return getQueries().size(); --> move this into the interface
-		return resultsMap.size();
-	}
-
 	/**Retrieves an unmodifiable set of all the queries processed.
 	 *
 	 * @return An unmodifiable set of query strings.

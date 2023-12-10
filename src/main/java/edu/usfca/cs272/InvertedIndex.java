@@ -139,12 +139,15 @@ public class InvertedIndex {
 			}
 		}
 
-		for (String location : otherIndex.wordCountMap.keySet()) { // TODO entrySet
-			if (this.invertedIndex.containsKey(location)) {
-				this.wordCountMap.put(location, this.wordCountMap.get(location) + otherIndex.wordCountMap.get(location));
-			} else {
-				this.wordCountMap.put(location, otherIndex.wordCountMap.get(location));
-			}
+		for (var entry : otherIndex.wordCountMap.entrySet()) {
+		    String location = entry.getKey();
+		    Long count = entry.getValue();
+
+		    if (this.wordCountMap.containsKey(location)) {
+		        this.wordCountMap.put(location, this.wordCountMap.get(location) + count);
+		    } else {
+		        this.wordCountMap.put(location, count);
+		    }
 		}
 	}
 

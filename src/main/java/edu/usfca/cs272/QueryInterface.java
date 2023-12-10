@@ -24,13 +24,18 @@ public interface QueryInterface {
 	 * @param query a string containing a line of queries
 	 * @return number of file results for a query, otherwise, 0 if none..
 	 */
-	int numResultsForQuery(String query);
+	public default int numResultsForQuery(String query) {
+		return getResultsForQuery(query).size();
+		
+	}
 
 	/**Returns an integer number of total queries that was processed
 	 * 
 	 * @return the size of the resultsMap
 	 */
-	int numQueriesProcessed();
+	public default int numQueriesProcessed() {
+		return getQueries().size();
+	}
 
 	/**Retrieves an unmodifiable set of all the queries processed.
 	 *
